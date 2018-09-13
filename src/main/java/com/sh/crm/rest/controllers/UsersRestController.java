@@ -1,0 +1,244 @@
+package com.sh.crm.rest.controllers;
+
+import com.sh.crm.config.general.ResponseCode;
+import com.sh.crm.general.Errors;
+import com.sh.crm.general.exceptions.GeneralException;
+import com.sh.crm.general.holders.UserHolder;
+import com.sh.crm.jpa.entities.*;
+import com.sh.crm.jpa.repos.UserGroupsRepo;
+import com.sh.crm.jpa.repos.UsersRepos;
+import com.sh.crm.jpa.repos.UsersRolesRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/users")
+@PreAuthorize("hasAnyAuthority('Administrator','UsersAdmin')")
+public class UsersRestController {
+    private static final Logger log = LoggerFactory.getLogger(UsersRestController.class);
+    @Autowired
+    private UsersRepos userRepo;
+    @Autowired
+    private UsersRolesRepo usersRolesRepo;
+    @Autowired
+    private UserGroupsRepo userGroupsRepo;
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    @GetMapping("all")
+    public List<Users> getAllUsers() {
+        log.debug("Getting all users list");
+        return userRepo.findAll();
+    }
+
+    @GetMapping("active")
+    ResponseEntity<?> getActive() {
+        List<Users> usersList = userRepo.findByEnabledAndSystemUser(true, false);
+        log.debug("Getting active users list");
+        if (usersList != null) {
+            return ResponseEntity.ok(usersList);
+        }
+        return ResponseEntity.noContent().build();
+
+    }
+
+    @GetMapping("validate/{username}")
+    ResponseEntity<?> validateUser(@PathVariable("username") String userName) {
+        log.debug("checking existence of user: " + userName);
+        if (userRepo.findByUserID(userName) != null) {
+            return ResponseEntity.ok(new ResponseCode(Errors.SUCCESSFUL));
+        } else
+            return new ResponseEntity(new ResponseCode(Errors.USER_NOT_EXISTS), HttpStatus.OK);
+
+    }
+
+    @PostMapping("create")
+    @Transactional
+    ResponseEntity<?> addUser(@RequestBody @Valid UserHolder userHolder) throws GeneralException {
+        log.debug("received a request to create user: " + userHolder.getUser().toString());
+        if (userHolder.getUser().getUserID() != null) {
+            if (userRepo.findByUserID(userHolder.getUser().getUserID()) != null) {
+                throw new GeneralException(Errors.USER_ALREADY_EXISTS, userHolder.getUser().getUserID());
+            }
+            Users user = userHolder.getUser();
+            if (!user.getLDAPUser())
+                user.setPassword(encoder.encode(userHolder.getPassword()));
+            user.setEnabled(true);
+            user.setSystemUser(false);
+
+            try {
+                userRepo.save(user);
+                log.info("User : " + user.getUserID() + " created successfully");
+            } catch (Exception e) {
+                log.error("Error Creating user: " + user + ", error: " + e);
+                e.printStackTrace();
+                throw new
+                        GeneralException(Errors.CANNOT_CREATE_USER, e);
+            }
+
+
+            createRoles(user, userHolder.getSelectedRoles());
+            createGroups(user, userHolder.getSelectedGroups());
+            log.info("User groups and Roles for User: " + user.getUserID() + " created sucessfully");
+            return ResponseEntity.ok(new ResponseCode("0", Errors.SUCCESSFUL.getDesc()));
+        }
+        return ResponseEntity.ok(new ResponseCode(Errors.CANNOT_CREATE_USER));
+    }
+
+
+    @PostMapping("edit")
+    @Transactional
+    public ResponseEntity<?> editUser(@RequestBody @Valid UserHolder userHolder) throws GeneralException {
+        Users user = userHolder.getUser();
+        log.debug("Received request to edit user: " + userHolder);
+        try {
+            if (user != null && user.getId() != null && user.getUserID() != null) {
+                Users origianlUser = userRepo.findById(user.getId());
+                //validateSuperUser(user);
+                if (!user.getLDAPUser() && userHolder.getPassword() != null && !userHolder.getPassword().equals("")) {
+                    // origianlUser.setLastPasswordResetDate(Calendar.getInstance().getTime());
+                    origianlUser.setPassword(encoder.encode(userHolder.getPassword()));
+                }
+                origianlUser.setLastName(user.getLastName());
+                origianlUser.setFirstName(user.getFirstName());
+                origianlUser.setEmail(user.getEmail());
+                origianlUser.setEnabled(user.getEnabled());
+                userRepo.save(origianlUser);
+            }
+        } catch (Exception e) {
+            log.error("Error Editing user : " + user.getUserID() + ", error: " + e);
+            e.printStackTrace();
+            throw new GeneralException(Errors.USER_EDIT_FAILED.getCode(),
+                    Errors.USER_EDIT_FAILED.getDesc() + ", exception: " + e);
+        }
+        if (userHolder.getSelectedRoles() != null || userHolder.getSelectedRoles() != null) {
+            log.info("User Groups/Roles modification requested for user: " + user);
+            if (userHolder.getSelectedGroups() != null && !userHolder.getSelectedGroups().isEmpty()) {
+                deleteGroups(user);
+                createGroups(user, userHolder.getSelectedGroups());
+                log.info("User: " + user.getUserID() + " Groups have been updated");
+            }
+            if (userHolder.getSelectedRoles() != null && !userHolder.getSelectedRoles().isEmpty()) {
+                deleteRoles(user);
+                createRoles(user, userHolder.getSelectedRoles());
+                log.info("User: " + user.getUserID() + " Roles have been updated");
+            }
+        }
+        return ResponseEntity.ok(new ResponseCode(Errors.SUCCESSFUL));
+
+    }
+
+    @GetMapping("disable/{userID}")
+    @Transactional
+    public ResponseEntity<?> disableUser(@PathVariable("userID") Integer userID) throws GeneralException {
+        Users user = userRepo.findById(userID);
+        // validateSuperUser(user);
+        user.setEnabled(false);
+        userRepo.save(user);
+        return new ResponseEntity<ResponseCode>(new ResponseCode(Errors.SUCCESSFUL), HttpStatus.OK);
+    }
+
+    @Transactional
+    @GetMapping("enable/{userID}")
+    public ResponseEntity<?> enableUser(@PathVariable("userID") Integer userID) throws GeneralException {
+        Users user = userRepo.findById(userID);
+        user.setEnabled(true);
+        userRepo.save(user);
+        return new ResponseEntity<ResponseCode>(new ResponseCode(Errors.SUCCESSFUL), HttpStatus.OK);
+    }
+
+    @GetMapping("groups/{userID}")
+    public List<Groups> getUsersGroup(@Valid @PathVariable("userID") Integer userID) {
+        List<Groups> usergroupsList = userGroupsRepo.findGroupsOfUser(userID);
+        return usergroupsList;
+    }
+
+    @GetMapping("roles/{userID}")
+    public List<Roles> getUsersRole(@Valid @PathVariable("userID") Integer userID) {
+        List<Roles> userRoles = usersRolesRepo.getUserRoles(userID);
+        return userRoles;
+    }
+
+    private void createGroups(Users user, List<Integer> groups) throws GeneralException {
+
+        try {
+            if (groups != null)
+                for (Integer group : groups) {
+                    Usergroups ug = new Usergroups();
+                    ug.setGroupID(new Groups(group));
+                    ug.setUserID(user);
+                    userGroupsRepo.save(ug);
+                    ug = null;
+                }
+        } catch (Exception e) {
+            log.error("Error Creating user groups: " + user.getUserID() + ", error: " + e);
+            e.printStackTrace();
+            throw new GeneralException(Errors.USER_CREATED_GROUPS_FAILED.getCode(),
+                    Errors.USER_CREATED_GROUPS_FAILED.getDesc() + ", exception: " + e);
+        }
+    }
+
+    private void createRoles(Users user, List<Integer> roles) throws GeneralException {
+        try {
+            if (roles != null)
+                for (Integer role : roles) {
+                    Userroles ur = new Userroles();
+                    ur.setRoleID(new Roles(role));
+                    ur.setUserID(user);
+                    usersRolesRepo.save(ur);
+                    ur = null;
+                }
+        } catch (Exception e) {
+            log.error("Error Creating user roles: " + user.getUserID() + ", error: " + e);
+            e.printStackTrace();
+            throw new GeneralException(Errors.USER_CREATED_ROLES_FAILED.getCode(),
+                    Errors.USER_CREATED_ROLES_FAILED.getDesc() + ", exception: " + e);
+        }
+
+    }
+
+    private void deleteRoles(Users userID) throws GeneralException {
+        try {
+            usersRolesRepo.deleteByUserID(userID);
+        } catch (Exception e) {
+            log.error("Error Deleting user roles: " + userID + ", error: " + e);
+            e.printStackTrace();
+            throw new GeneralException(Errors.USER_DELETE_ROLES_FAILED.getCode(),
+                    Errors.USER_DELETE_ROLES_FAILED.getDesc() + ", exception: " + e);
+        }
+    }
+
+    private void deleteGroups(Users userID) throws GeneralException {
+
+        try {
+            userGroupsRepo.deleteByUserID(userID);
+        } catch (Exception e) {
+            log.error("Error Deleting user Groups: " + userID + ", error: " + e);
+            e.printStackTrace();
+            throw new GeneralException(Errors.USER_DELETE_GROUPS_FAILED.getCode(),
+                    Errors.USER_DELETE_GROUPS_FAILED.getDesc() + ", exception: " + e);
+
+        }
+    }
+
+    @GetMapping("id/{userID}")
+    public ResponseEntity<Users> getUserbyId(@Valid @PathVariable("userID") Integer userID) {
+
+        Users user = userRepo.findById(userID);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else
+            return ResponseEntity.noContent().build();
+
+    }
+
+}
