@@ -5,12 +5,16 @@ public abstract class BasicException extends Exception {
     protected String errorCode;
 
     public BasicException(String errorCode, String message) {
-        super(message);
+        super( message );
         this.errorCode = errorCode;
     }
 
+    public BasicException(Throwable e) {
+        super( e );
+    }
+
     public BasicException() {
-        super("");
+        super( "" );
     }
 
     public String getErrorCode() {

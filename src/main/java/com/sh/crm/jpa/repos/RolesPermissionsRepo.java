@@ -12,4 +12,5 @@ public interface RolesPermissionsRepo extends CrudRepository<Rolepermissions, In
     @Query("select role.permissionID from Rolepermissions role where role.roleID=?1")
     List<Permissions> getRolePermissions(Roles role);
 
+    void deleteAllByRoleID(Roles roles);
 }

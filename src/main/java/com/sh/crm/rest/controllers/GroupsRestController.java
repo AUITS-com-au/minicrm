@@ -123,7 +123,7 @@ public class GroupsRestController {
         return new ResponseEntity(new ResponseCode(Errors.GROUP_NOT_EXISTS), HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("validate/{groupname}")
+    @GetMapping("validate/{groupname:.+}")
     public ResponseEntity<?> validateGroup(@PathVariable("groupname") String groupname) {
 
         if (groupRepo.findByGroupName(groupname) != null) {
