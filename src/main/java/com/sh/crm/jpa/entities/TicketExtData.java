@@ -18,20 +18,43 @@ import java.util.Date;
 @Table(name = "ticketExtData")
 @XmlRootElement
 public class TicketExtData {
-    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
+
     private Long id;
     @Basic(optional = false)
     @NotNull
     @Column(name = "TicketID")
     private long ticketID;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "CreationDate")
+    @Size(max = 500)
+    @Column(name = "BranchName")
+    private String branchName;
+    @Size(max = 50)
+    @Column(name = "TransactionCode")
+    private String transactionCode;
+    @Size(max = 2147483647)
+    @Column(name = "TransactionDesc")
+    private String transactionDesc;
+    @Size(max = 50)
+    @Column(name = "TransactionType")
+    private String transactionType;
+    @Size(max = 50)
+    @Column(name = "CustomerAccount")
+    private String customerAccount;
+    @Size(max = 20)
+    @Column(name = "Amount")
+    private String amount;
+    @Column(name = "TraxDateTime")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
+    private Date traxDateTime;
+    @Column(name = "ExtDate1")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date extDate1;
+    @Column(name = "ExtDate2")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date extDate2;
     @Size(max = 250)
     @Column(name = "ExtField1")
     private String extField1;
@@ -100,10 +123,9 @@ public class TicketExtData {
         this.id = id;
     }
 
-    public TicketExtData(Long id, long ticketID, Date creationDate) {
+    public TicketExtData(Long id, long ticketID) {
         this.id = id;
         this.ticketID = ticketID;
-        this.creationDate = creationDate;
     }
 
     public Long getId() {
@@ -122,12 +144,76 @@ public class TicketExtData {
         this.ticketID = ticketID;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public String getBranchName() {
+        return branchName;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+
+    public String getTransactionCode() {
+        return transactionCode;
+    }
+
+    public void setTransactionCode(String transactionCode) {
+        this.transactionCode = transactionCode;
+    }
+
+    public String getTransactionDesc() {
+        return transactionDesc;
+    }
+
+    public void setTransactionDesc(String transactionDesc) {
+        this.transactionDesc = transactionDesc;
+    }
+
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public String getCustomerAccount() {
+        return customerAccount;
+    }
+
+    public void setCustomerAccount(String customerAccount) {
+        this.customerAccount = customerAccount;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
+    public Date getTraxDateTime() {
+        return traxDateTime;
+    }
+
+    public void setTraxDateTime(Date traxDateTime) {
+        this.traxDateTime = traxDateTime;
+    }
+
+    public Date getExtDate1() {
+        return extDate1;
+    }
+
+    public void setExtDate1(Date extDate1) {
+        this.extDate1 = extDate1;
+    }
+
+    public Date getExtDate2() {
+        return extDate2;
+    }
+
+    public void setExtDate2(Date extDate2) {
+        this.extDate2 = extDate2;
     }
 
     public String getExtField1() {
@@ -304,7 +390,7 @@ public class TicketExtData {
             return false;
         }
         TicketExtData other = (TicketExtData) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

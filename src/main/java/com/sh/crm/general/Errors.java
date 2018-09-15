@@ -22,7 +22,9 @@ public enum Errors {
     ROLE_CREATE_FAILED( "206", "Cannot Create Role" ),
     ROLE_CREATED_OTHER_FAILED( "207", "ROLE Created but Other Transaction Failed" ),
     ROLE_EDIT_FAILED( "208", "Cannot Edit ROLE" ),
-    FILE_NOT_FOUND( "209", "File Not Found!" );
+    FILE_NOT_FOUND( "209", "File Not Found!" ),
+    CANNOT_CREATE_OBJECT( "10000", "Request for create object rejected" ),
+    CANNOT_EDIT_OBJECT( "10001", "Request for edit object rejected" );
 
     private String code;
     private String desc;

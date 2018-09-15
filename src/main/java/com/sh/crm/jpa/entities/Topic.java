@@ -1,9 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,12 +11,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
 
-/**
- * @author achah
- */
+
 @Entity
 @Table(name = "topic")
 @XmlRootElement
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Topic extends BasicModelWithIDInt {
 
 
@@ -42,10 +40,13 @@ public class Topic extends BasicModelWithIDInt {
     @Size(max = 2147483647)
     @Column(name = "Principals")
     private String principals;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "topicId", fetch = FetchType.LAZY)
     private List<Topicspermissions> topicspermissionsList;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "topicID", fetch = FetchType.LAZY)
     private List<Usertopic> usertopicList;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "topicID", fetch = FetchType.LAZY)
     private List<Topicsla> topicslaList;
     @JoinColumn(name = "SubCategory", referencedColumnName = "ID")

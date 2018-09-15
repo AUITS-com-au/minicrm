@@ -4,7 +4,7 @@ public class UploadFileResponse {
     private String fileName;
     private String fileType;
     private long size;
-    private String orignalFileName;
+    private String originalFileName;
 
     public UploadFileResponse() {
     }
@@ -14,16 +14,16 @@ public class UploadFileResponse {
 
         this.fileType = fileType;
         this.size = size;
-        this.orignalFileName = orignalFileName;
+        this.originalFileName = orignalFileName;
 
     }
 
     public String getOrignalFileName() {
-        return orignalFileName;
+        return originalFileName;
     }
 
     public void setOrignalFileName(String orignalFileName) {
-        this.orignalFileName = orignalFileName;
+        this.originalFileName = orignalFileName;
     }
 
     public String getFileName() {

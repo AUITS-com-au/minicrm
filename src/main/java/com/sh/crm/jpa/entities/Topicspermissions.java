@@ -9,7 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * @author achah
@@ -30,18 +29,19 @@ public class Topicspermissions extends BasicModelWithID {
     @Column(name = "type")
     private String type;
     @Column(name = "admin")
-    private Short admin;
+    private Boolean admin;
     @Column(name = "canCreate")
-    private Short canCreate;
+    private Boolean canCreate;
     @Column(name = "canRead")
-    private Short canRead;
+    private Boolean canRead;
     @Column(name = "canDelete")
-    private Short canDelete;
+    private Boolean canDelete;
     @Column(name = "canWrite")
-    private Short canWrite;
+    private Boolean canWrite;
     @Column(name = "canRunReport")
-    private Short canRunReport;
-
+    private Boolean canRunReport;
+    @Column(name = "canSubscribe")
+    private Boolean canSubscribe;
     @JoinColumn(name = "topicId", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Topic topicId;
@@ -83,52 +83,60 @@ public class Topicspermissions extends BasicModelWithID {
         this.type = type;
     }
 
-    public Short getAdmin() {
+    public Boolean getAdmin() {
         return admin;
     }
 
-    public void setAdmin(Short admin) {
+    public void setAdmin(Boolean admin) {
         this.admin = admin;
     }
 
-    public Short getCanCreate() {
+    public Boolean getCanCreate() {
         return canCreate;
     }
 
-    public void setCanCreate(Short canCreate) {
+    public void setCanCreate(Boolean canCreate) {
         this.canCreate = canCreate;
     }
 
-    public Short getCanRead() {
+    public Boolean getCanRead() {
         return canRead;
     }
 
-    public void setCanRead(Short canRead) {
+    public void setCanRead(Boolean canRead) {
         this.canRead = canRead;
     }
 
-    public Short getCanDelete() {
+    public Boolean getCanDelete() {
         return canDelete;
     }
 
-    public void setCanDelete(Short canDelete) {
+    public void setCanDelete(Boolean canDelete) {
         this.canDelete = canDelete;
     }
 
-    public Short getCanWrite() {
+    public Boolean getCanWrite() {
         return canWrite;
     }
 
-    public void setCanWrite(Short canWrite) {
+    public void setCanWrite(Boolean canWrite) {
         this.canWrite = canWrite;
     }
 
-    public Short getCanRunReport() {
+    public Boolean getCanRunReport() {
         return canRunReport;
     }
 
-    public void setCanRunReport(Short canRunReport) {
+    public void setCanRunReport(Boolean canRunReport) {
         this.canRunReport = canRunReport;
+    }
+
+    public Boolean getCanSubscribe() {
+        return canSubscribe;
+    }
+
+    public void setCanSubscribe(Boolean canSubscribe) {
+        this.canSubscribe = canSubscribe;
     }
 
     public Topic getTopicId() {
@@ -148,20 +156,15 @@ public class Topicspermissions extends BasicModelWithID {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Topicspermissions)) {
             return false;
         }
         Topicspermissions other = (Topicspermissions) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "com.sh.crm.jpa.entities.Topicspermissions[ id=" + id + " ]";
-    }
 
 }

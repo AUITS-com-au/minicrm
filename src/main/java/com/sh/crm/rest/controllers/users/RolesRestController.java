@@ -1,4 +1,4 @@
-package com.sh.crm.rest.controllers;
+package com.sh.crm.rest.controllers.users;
 
 import com.sh.crm.config.general.ResponseCode;
 import com.sh.crm.general.Errors;
@@ -7,32 +7,30 @@ import com.sh.crm.general.holders.RoleHolder;
 import com.sh.crm.jpa.entities.Permissions;
 import com.sh.crm.jpa.entities.Rolepermissions;
 import com.sh.crm.jpa.entities.Roles;
-import com.sh.crm.jpa.repos.RolesPermissionsRepo;
-import com.sh.crm.jpa.repos.RolesRepo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sh.crm.jpa.repos.users.RolesPermissionsRepo;
+import com.sh.crm.jpa.repos.users.RolesRepo;
+import com.sh.crm.rest.general.BasicController;
+import com.sh.crm.security.annotation.RolesAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/roles")
-@PreAuthorize("hasAnyAuthority('Administrator','RolesAdmin')")
-public class RolesRestController {
+@RolesAdmin
+public class RolesRestController extends BasicController<RoleHolder> {
     @Autowired
     private RolesRepo rolesRepo;
     @Autowired
     private RolesPermissionsRepo rolesPermissionsRepo;
 
-    private static final Logger log = LoggerFactory.getLogger( RolesRestController.class );
 
     @GetMapping("all")
-    List<Roles> getAll() {
+    public List<Roles> all() {
         return rolesRepo.findAll();
     }
 
@@ -41,9 +39,8 @@ public class RolesRestController {
         return rolesPermissionsRepo.getRolePermissions( new Roles( roleID ) );
     }
 
-    @PostMapping("create")
-    @Transactional
-    ResponseEntity<?> create(@RequestBody RoleHolder roleHolder) throws GeneralException {
+
+    public ResponseEntity<?> create(@RequestBody RoleHolder roleHolder) throws GeneralException {
         if (roleHolder != null && roleHolder.getRole() != null && roleHolder.getPermissions() != null && !roleHolder.getPermissions().isEmpty()) {
             Roles role = roleHolder.getRole();
             role.setId( null );
@@ -66,9 +63,7 @@ public class RolesRestController {
         return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
     }
 
-    @PostMapping("edit")
-    @Transactional
-    ResponseEntity<?> edit(@RequestBody RoleHolder roleHolder) throws GeneralException {
+    public ResponseEntity<?> edit(@RequestBody RoleHolder roleHolder) throws GeneralException {
         if (roleHolder != null && roleHolder.getRole() != null && roleHolder.getPermissions() != null && !roleHolder.getPermissions().isEmpty()) {
             Roles role = roleHolder.getRole();
             Roles originalRole = rolesRepo.findOne( role.getId() );
@@ -96,6 +91,10 @@ public class RolesRestController {
         return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
     }
 
+    @Override
+    public ResponseEntity<?> delete(RoleHolder object) throws GeneralException {
+        return null;
+    }
 
     private void deleteRolePermissions(Roles role) {
         rolesPermissionsRepo.deleteAllByRoleID( role );

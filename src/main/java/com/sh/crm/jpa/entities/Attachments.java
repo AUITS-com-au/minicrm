@@ -9,7 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * @author achah
@@ -32,11 +31,13 @@ public class Attachments extends BasicModelWithID {
     private String hash;
     @Lob
     @Column(name = "RAWContent")
-    private byte[] rAWContent;
+    private byte[] rawContent;
     @Size(max = 500)
     @Column(name = "FilePath")
     private String filePath;
-
+    @Size(max = 1000)
+    @Column(name = "FileDesc")
+    private String fileDesc;
 
     public Attachments() {
     }
@@ -44,7 +45,6 @@ public class Attachments extends BasicModelWithID {
     public Attachments(Long id) {
         this.id = id;
     }
-
 
 
     public Long getId() {
@@ -80,11 +80,11 @@ public class Attachments extends BasicModelWithID {
     }
 
     public byte[] getRAWContent() {
-        return rAWContent;
+        return rawContent;
     }
 
     public void setRAWContent(byte[] rAWContent) {
-        this.rAWContent = rAWContent;
+        this.rawContent = rAWContent;
     }
 
     public String getFilePath() {
@@ -95,8 +95,13 @@ public class Attachments extends BasicModelWithID {
         this.filePath = filePath;
     }
 
+    public String getFileDesc() {
+        return fileDesc;
+    }
 
-
+    public void setFileDesc(String fileDesc) {
+        this.fileDesc = fileDesc;
+    }
 
     @Override
     public int hashCode() {
@@ -112,7 +117,7 @@ public class Attachments extends BasicModelWithID {
             return false;
         }
         Attachments other = (Attachments) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

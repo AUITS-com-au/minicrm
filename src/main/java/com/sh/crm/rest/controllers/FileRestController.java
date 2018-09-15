@@ -68,10 +68,9 @@ public class FileRestController {
         // Resource resource = fileStorageService.loadFileAsResource( fileInfo.getNewFileName() );
         Path path = fileStorageService.loadFile( fileInfo.getFileName() );
         Resource resource = new UrlResource( path.toUri() );
-        // Try to determine file's content type
+
         String contentType = fileInfo.getFileType();
 
-        // Fallback to the default content type if type could not be determined
         if (contentType == null) {
             contentType = "application/octet-stream";
         }

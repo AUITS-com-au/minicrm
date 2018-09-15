@@ -2,8 +2,8 @@ package com.sh.crm.security.service;
 
 import com.sh.crm.jpa.entities.Permissions;
 import com.sh.crm.jpa.entities.Users;
-import com.sh.crm.jpa.repos.PermissionsRepo;
-import com.sh.crm.jpa.repos.UsersRepos;
+import com.sh.crm.jpa.repos.users.PermissionsRepo;
+import com.sh.crm.jpa.repos.users.UsersRepos;
 import com.sh.crm.security.model.CustomAuthority;
 import com.sh.crm.security.util.JwtUserFactory;
 import org.slf4j.Logger;

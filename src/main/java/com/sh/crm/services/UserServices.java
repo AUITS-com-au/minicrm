@@ -1,7 +1,7 @@
 package com.sh.crm.services;
 
 import com.sh.crm.jpa.entities.Users;
-import com.sh.crm.jpa.repos.UsersRepos;
+import com.sh.crm.jpa.repos.users.UsersRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.BadCredentialsException;

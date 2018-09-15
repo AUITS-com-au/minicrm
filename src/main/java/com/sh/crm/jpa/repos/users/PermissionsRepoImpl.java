@@ -1,9 +1,8 @@
-package com.sh.crm.jpa.repos;
+package com.sh.crm.jpa.repos.users;
 
 import com.sh.crm.jpa.entities.Permissions;
 
 import javax.persistence.EntityManager;
-import javax.persistence.ParameterMode;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
 import java.util.List;

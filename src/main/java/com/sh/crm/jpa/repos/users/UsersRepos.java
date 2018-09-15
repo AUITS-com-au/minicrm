@@ -1,4 +1,4 @@
-package com.sh.crm.jpa.repos;
+package com.sh.crm.jpa.repos.users;
 
 import com.sh.crm.jpa.entities.Users;
 import org.springframework.data.jpa.repository.JpaRepository;

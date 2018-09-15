@@ -5,6 +5,9 @@
  */
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,6 +21,7 @@ import java.util.List;
 @Entity
 @Table(name = "subcategory")
 @XmlRootElement
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Subcategory extends BasicModelWithIDInt {
 
     @Basic(optional = false)
@@ -33,8 +37,10 @@ public class Subcategory extends BasicModelWithIDInt {
 
     @Column(name = "Enabled")
     private Boolean enabled;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "subCategory", fetch = FetchType.LAZY)
     private List<Topic> topicList;
+
     @JoinColumn(name = "MainCategory", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Maincategory mainCategory;

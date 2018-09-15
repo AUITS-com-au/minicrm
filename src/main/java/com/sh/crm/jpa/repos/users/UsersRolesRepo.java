@@ -1,4 +1,4 @@
-package com.sh.crm.jpa.repos;
+package com.sh.crm.jpa.repos.users;
 
 import com.sh.crm.jpa.entities.Roles;
 import com.sh.crm.jpa.entities.Userroles;
