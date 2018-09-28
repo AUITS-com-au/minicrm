@@ -5,12 +5,16 @@
  */
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +24,7 @@ import java.util.List;
 @Entity
 @Table(name = "ticket")
 @XmlRootElement
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Ticket {
 
     @Id
@@ -35,24 +40,26 @@ public class Ticket {
     private Integer currentStatus;
     @Size(max = 50)
     @Column(name = "CreatedBy")
+
     private String createdBy;
     @Basic(optional = false)
-    @NotNull
+    @LastModifiedBy
     @Size(min = 1, max = 50)
     @Column(name = "ModifiedBy")
     private String modifiedBy;
     @Basic(optional = false)
-    @NotNull
+    @CreatedDate
     @Column(name = "CreationDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationDate;
+    @LastModifiedDate
     @Column(name = "ModificationDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modificationDate;
     @Column(name = "CrossedMainSLA")
-    private Short crossedMainSLA;
+    private boolean crossedMainSLA;
     @Column(name = "CustomerAccount")
-    private BigInteger customerAccount;
+    private Long customerAccount;
     @Column(name = "SourceChannel")
     private Integer sourceChannel;
     @Size(max = 300)
@@ -66,6 +73,7 @@ public class Ticket {
     @Size(max = 50)
     @Column(name = "AssignedTo")
     private String assignedTo;
+    @CreatedDate
     @Column(name = "EscalationCalDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date escalationCalDate;
@@ -76,21 +84,22 @@ public class Ticket {
     @Column(name = "Priority")
     private Integer priority;
     @Column(name = "LastTicketData")
-    private BigInteger lastTicketData;
+    private Long lastTicketData;
     @Column(name = "Solved")
-    private Short solved;
+    private boolean solved;
     @Column(name = "Closed")
-    private Short closed;
+    private boolean closed;
     @Column(name = "Deleted")
-    private Short deleted;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY)
-    private List<Ticketlock> ticketlockList;
+    private boolean deleted;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY)
     private List<Ticketdata> ticketdataList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY)
     private List<Escalationhistory> escalationhistoryList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY)
     private List<SmsHistory> smsHistoryList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<TicketExtData> ticketExtData;
 
     public Ticket() {
     }
@@ -169,19 +178,19 @@ public class Ticket {
         this.modificationDate = modificationDate;
     }
 
-    public Short getCrossedMainSLA() {
+    public boolean getCrossedMainSLA() {
         return crossedMainSLA;
     }
 
-    public void setCrossedMainSLA(Short crossedMainSLA) {
+    public void setCrossedMainSLA(boolean crossedMainSLA) {
         this.crossedMainSLA = crossedMainSLA;
     }
 
-    public BigInteger getCustomerAccount() {
+    public Long getCustomerAccount() {
         return customerAccount;
     }
 
-    public void setCustomerAccount(BigInteger customerAccount) {
+    public void setCustomerAccount(Long customerAccount) {
         this.customerAccount = customerAccount;
     }
 
@@ -257,46 +266,46 @@ public class Ticket {
         this.priority = priority;
     }
 
-    public BigInteger getLastTicketData() {
+    public Long getLastTicketData() {
         return lastTicketData;
     }
 
-    public void setLastTicketData(BigInteger lastTicketData) {
+    public void setLastTicketData(Long lastTicketData) {
         this.lastTicketData = lastTicketData;
     }
 
-    public Short getSolved() {
+    public List<TicketExtData> getTicketExtData() {
+        return ticketExtData;
+    }
+
+    public void setTicketExtData(List<TicketExtData> ticketExtData) {
+        this.ticketExtData = ticketExtData;
+    }
+
+    public boolean getSolved() {
         return solved;
     }
 
-    public void setSolved(Short solved) {
+    public void setSolved(boolean solved) {
         this.solved = solved;
     }
 
-    public Short getClosed() {
+    public boolean getClosed() {
         return closed;
     }
 
-    public void setClosed(Short closed) {
+    public void setClosed(boolean closed) {
         this.closed = closed;
     }
 
-    public Short getDeleted() {
+    public boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(Short deleted) {
+    public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
 
-    @XmlTransient
-    public List<Ticketlock> getTicketlockList() {
-        return ticketlockList;
-    }
-
-    public void setTicketlockList(List<Ticketlock> ticketlockList) {
-        this.ticketlockList = ticketlockList;
-    }
 
     @XmlTransient
     public List<Ticketdata> getTicketdataList() {
@@ -339,7 +348,7 @@ public class Ticket {
             return false;
         }
         Ticket other = (Ticket) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

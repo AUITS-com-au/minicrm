@@ -5,23 +5,24 @@
  */
 package com.sh.crm.jpa.entities;
 
-import java.io.Serializable;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
 
 /**
- *
  * @author achah
  */
 @Entity
 @Table(name = "ticketlock")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Ticketlock.findAll", query = "SELECT t FROM Ticketlock t")})
-public class Ticketlock  {
+        @NamedQuery(name = "Ticketlock.findAll", query = "SELECT t FROM Ticketlock t")})
+public class Ticketlock {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +33,7 @@ public class Ticketlock  {
     @Size(min = 1, max = 50)
     @Column(name = "UserID")
     private String userID;
-    @Basic(optional = false)
-    @NotNull
+
     @Column(name = "DateTime")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateTime;
@@ -45,6 +45,9 @@ public class Ticketlock  {
     @JoinColumn(name = "TicketID", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Ticket ticketID;
+
+    @Column(name = "Expired")
+    private boolean expired;
 
     public Ticketlock() {
     }
@@ -100,6 +103,14 @@ public class Ticketlock  {
         this.ticketID = ticketID;
     }
 
+    public boolean isExpired() {
+        return expired;
+    }
+
+    public void setExpired(boolean expired) {
+        this.expired = expired;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -114,7 +125,7 @@ public class Ticketlock  {
             return false;
         }
         Ticketlock other = (Ticketlock) object;
-        if ((this.lockID == null && other.lockID != null) || (this.lockID != null && !this.lockID.equals(other.lockID))) {
+        if ((this.lockID == null && other.lockID != null) || (this.lockID != null && !this.lockID.equals( other.lockID ))) {
             return false;
         }
         return true;
@@ -122,7 +133,13 @@ public class Ticketlock  {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Ticketlock[ lockID=" + lockID + " ]";
+        return "Ticketlock{" +
+                "lockID=" + lockID +
+                ", userID='" + userID + '\'' +
+                ", dateTime=" + dateTime +
+                ", expiresOn=" + expiresOn +
+                ", ticketID=" + ticketID +
+                ", expired=" + expired +
+                '}';
     }
-    
 }

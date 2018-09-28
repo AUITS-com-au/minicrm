@@ -16,32 +16,96 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "topicspermissions")
 @XmlRootElement
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(
+                name = "GetUserTopicPermissions",
+                procedureName = "dbo.GetUserTopicPermissions",
+                resultClasses = {Topicspermissions.class},
+                parameters = {
+                        @StoredProcedureParameter(
+                                type = Integer.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                type = Integer.class,
+                                mode = ParameterMode.IN)
+                })
+        , @NamedStoredProcedureQuery(
+        name = "GetUserTopics",
+        procedureName = "dbo.GetUserTopics",
+        resultClasses = {Topic.class},
+        parameters = {
+                @StoredProcedureParameter(
+                        type = Integer.class,
+                        mode = ParameterMode.IN)
+        }), @NamedStoredProcedureQuery(
+        name = "GetUserMainCats",
+        procedureName = "dbo.GetUserMainCats",
+        resultClasses = {Maincategory.class},
+        parameters = {
+                @StoredProcedureParameter(
+                        type = Integer.class,
+                        mode = ParameterMode.IN)
+        }), @NamedStoredProcedureQuery(
+        name = "GetUserSubCats",
+        procedureName = "dbo.GetUserSubCats",
+        resultClasses = {Subcategory.class},
+        parameters = {
+                @StoredProcedureParameter(
+                        type = Integer.class,
+                        mode = ParameterMode.IN),
+                @StoredProcedureParameter(
+                        type = Integer.class,
+                        mode = ParameterMode.IN)
+        }), @NamedStoredProcedureQuery(
+        name = "GetUserTopicsBySubCat",
+        procedureName = "dbo.GetUserTopicsBySubCat",
+        resultClasses = {Topic.class},
+        parameters = {
+                @StoredProcedureParameter(
+                        type = Integer.class,
+                        mode = ParameterMode.IN),
+                @StoredProcedureParameter(
+                        type = Integer.class,
+                        mode = ParameterMode.IN)
+        })
+}
+
+)
+
 public class Topicspermissions extends BasicModelWithID {
 
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "assigne")
-    private String assigne;
+    private Integer assigne;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 10)
     @Column(name = "type")
     private String type;
     @Column(name = "admin")
-    private Boolean admin;
+    private boolean admin;
     @Column(name = "canCreate")
-    private Boolean canCreate;
+    private boolean canCreate;
+    @Column(name = "canReopen")
+    private boolean canReopen;
     @Column(name = "canRead")
-    private Boolean canRead;
+    private boolean canRead;
     @Column(name = "canDelete")
-    private Boolean canDelete;
-    @Column(name = "canWrite")
-    private Boolean canWrite;
+    private boolean canDelete;
+    @Column(name = "canReply")
+    private boolean canReply;
+    @Column(name = "canClose")
+    private boolean canClose;
+    @Column(name = "canResolve")
+    private boolean canResolve;
+    @Column(name = "canModify")
+    private boolean canModify;
     @Column(name = "canRunReport")
-    private Boolean canRunReport;
+    private boolean canRunReport;
     @Column(name = "canSubscribe")
-    private Boolean canSubscribe;
+    private boolean canSubscribe;
     @JoinColumn(name = "topicId", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Topic topicId;
@@ -53,7 +117,7 @@ public class Topicspermissions extends BasicModelWithID {
         this.id = id;
     }
 
-    public Topicspermissions(Long id, String assigne, String type) {
+    public Topicspermissions(Long id, Integer assigne, String type) {
         this.id = id;
         this.assigne = assigne;
         this.type = type;
@@ -67,11 +131,11 @@ public class Topicspermissions extends BasicModelWithID {
         this.id = id;
     }
 
-    public String getAssigne() {
+    public Integer getAssigne() {
         return assigne;
     }
 
-    public void setAssigne(String assigne) {
+    public void setAssigne(Integer assigne) {
         this.assigne = assigne;
     }
 
@@ -83,59 +147,83 @@ public class Topicspermissions extends BasicModelWithID {
         this.type = type;
     }
 
-    public Boolean getAdmin() {
+    public boolean getAdmin() {
         return admin;
     }
 
-    public void setAdmin(Boolean admin) {
+    public void setAdmin(boolean admin) {
         this.admin = admin;
     }
 
-    public Boolean getCanCreate() {
+    public boolean getCanCreate() {
         return canCreate;
     }
 
-    public void setCanCreate(Boolean canCreate) {
+    public void setCanCreate(boolean canCreate) {
         this.canCreate = canCreate;
     }
 
-    public Boolean getCanRead() {
+    public boolean getCanRead() {
         return canRead;
     }
 
-    public void setCanRead(Boolean canRead) {
+    public void setCanRead(boolean canRead) {
         this.canRead = canRead;
     }
 
-    public Boolean getCanDelete() {
+    public boolean getCanDelete() {
         return canDelete;
     }
 
-    public void setCanDelete(Boolean canDelete) {
+    public void setCanDelete(boolean canDelete) {
         this.canDelete = canDelete;
     }
 
-    public Boolean getCanWrite() {
-        return canWrite;
+    public boolean getCanReopen() {
+        return canReopen;
     }
 
-    public void setCanWrite(Boolean canWrite) {
-        this.canWrite = canWrite;
+    public void setCanReopen(boolean canReopen) {
+        this.canReopen = canReopen;
     }
 
-    public Boolean getCanRunReport() {
+    public boolean getCanReply() {
+        return canReply;
+    }
+
+    public void setCanReply(boolean canReply) {
+        this.canReply = canReply;
+    }
+
+    public boolean getCanClose() {
+        return canClose;
+    }
+
+    public void setCanClose(boolean canClose) {
+        this.canClose = canClose;
+    }
+
+    public boolean getCanResolve() {
+        return canResolve;
+    }
+
+    public void setCanResolve(boolean canResolve) {
+        this.canResolve = canResolve;
+    }
+
+    public boolean getCanRunReport() {
         return canRunReport;
     }
 
-    public void setCanRunReport(Boolean canRunReport) {
+    public void setCanRunReport(boolean canRunReport) {
         this.canRunReport = canRunReport;
     }
 
-    public Boolean getCanSubscribe() {
+    public boolean getCanSubscribe() {
         return canSubscribe;
     }
 
-    public void setCanSubscribe(Boolean canSubscribe) {
+    public void setCanSubscribe(boolean canSubscribe) {
         this.canSubscribe = canSubscribe;
     }
 
@@ -145,6 +233,14 @@ public class Topicspermissions extends BasicModelWithID {
 
     public void setTopicId(Topic topicId) {
         this.topicId = topicId;
+    }
+
+    public boolean getCanModify() {
+        return canModify;
+    }
+
+    public void setCanModify(boolean canModify) {
+        this.canModify = canModify;
     }
 
     @Override

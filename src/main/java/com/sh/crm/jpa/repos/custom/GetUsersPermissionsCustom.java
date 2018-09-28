@@ -1,4 +1,4 @@
-package com.sh.crm.jpa.repos.users;
+package com.sh.crm.jpa.repos.custom;
 
 import com.sh.crm.jpa.entities.Permissions;
 

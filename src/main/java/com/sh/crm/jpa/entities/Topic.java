@@ -18,7 +18,6 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Topic extends BasicModelWithIDInt {
 
-
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
@@ -172,7 +171,21 @@ public class Topic extends BasicModelWithIDInt {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Topic[ id=" + id + " ]";
+        return "Topic{" +
+                "arabicLabel='" + arabicLabel + '\'' +
+                ", englishLabel='" + englishLabel + '\'' +
+                ", configuration='" + configuration + '\'' +
+                ", enabled=" + enabled +
+                ", principals='" + principals + '\'' +
+                ", topicspermissionsList=" + topicspermissionsList +
+                ", usertopicList=" + usertopicList +
+                ", topicslaList=" + topicslaList +
+                ", subCategory=" + subCategory +
+                ", id=" + id +
+                ", createdBy='" + createdBy + '\'' +
+                ", modificationDate=" + modificationDate +
+                ", modifiedBy='" + modifiedBy + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
     }
-
 }

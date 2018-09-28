@@ -23,8 +23,14 @@ public enum Errors {
     ROLE_CREATED_OTHER_FAILED( "207", "ROLE Created but Other Transaction Failed" ),
     ROLE_EDIT_FAILED( "208", "Cannot Edit ROLE" ),
     FILE_NOT_FOUND( "209", "File Not Found!" ),
+    INVALID_TICKET_LOCK( "210", "Invalid Ticket Lock" ),
+    EXPIRED_TICKET_LOCK( "211", "Expired Ticket Lock" ),
+    TICKET_LOCKED( "212", "Ticket Locked" ),
+    INVALID_TICKET( "213", "Invalid Ticket ID" ),
     CANNOT_CREATE_OBJECT( "10000", "Request for create object rejected" ),
-    CANNOT_EDIT_OBJECT( "10001", "Request for edit object rejected" );
+    CANNOT_EDIT_OBJECT( "10001", "Request for edit object rejected" ),
+    UNAUTHORIZED( "10002", "You are not allowed to perform this action please contact your system admin" ),
+    CANNOT_FIND_TICKET( "10003", "Ticket ID not valid" );
 
     private String code;
     private String desc;

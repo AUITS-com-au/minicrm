@@ -1,40 +1,32 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
 
-/**
- * @author achah
- */
 @Entity
 @Table(name = "ticketdata")
 @XmlRootElement
 public class Ticketdata extends BasicModelWithID {
 
-    @Column(name = "ActionID")
-    private Integer actionID;
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Ticketactions.class)
+    @JoinColumn(name = "actionID")
+    private Ticketactions actionID;
     @Size(max = 400)
     @Column(name = "Title")
     private String title;
     @Size(max = 2147483647)
     @Column(name = "TicketData")
     private String ticketData;
-
     @Size(max = 2147483647)
     @Column(name = "Notes")
     private String notes;
     @Column(name = "Hidden")
-    private Short hidden;
+    private Boolean hidden;
     @Column(name = "OldStatus")
     private Integer oldStatus;
     @Column(name = "NewStatus")
@@ -46,9 +38,10 @@ public class Ticketdata extends BasicModelWithID {
     @Column(name = "NotificationID")
     private BigInteger notificationID;
     @Column(name = "Notify")
-    private Short notify;
+    private Boolean notify;
     @Column(name = "NotfiyStatus")
     private Integer notfiyStatus;
+    @JsonIgnore
     @JoinColumn(name = "TicketID", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Ticket ticketID;
@@ -68,11 +61,11 @@ public class Ticketdata extends BasicModelWithID {
         this.id = id;
     }
 
-    public Integer getActionID() {
+    public Ticketactions getActionID() {
         return actionID;
     }
 
-    public void setActionID(Integer actionID) {
+    public void setActionID(Ticketactions actionID) {
         this.actionID = actionID;
     }
 
@@ -101,11 +94,11 @@ public class Ticketdata extends BasicModelWithID {
         this.notes = notes;
     }
 
-    public Short getHidden() {
+    public Boolean getHidden() {
         return hidden;
     }
 
-    public void setHidden(Short hidden) {
+    public void setHidden(Boolean hidden) {
         this.hidden = hidden;
     }
 
@@ -149,11 +142,11 @@ public class Ticketdata extends BasicModelWithID {
         this.notificationID = notificationID;
     }
 
-    public Short getNotify() {
+    public Boolean getNotify() {
         return notify;
     }
 
-    public void setNotify(Short notify) {
+    public void setNotify(Boolean notify) {
         this.notify = notify;
     }
 
@@ -182,12 +175,12 @@ public class Ticketdata extends BasicModelWithID {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+
         if (!(object instanceof Ticketdata)) {
             return false;
         }
         Ticketdata other = (Ticketdata) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
@@ -195,7 +188,25 @@ public class Ticketdata extends BasicModelWithID {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Ticketdata[ id=" + id + " ]";
+        return "Ticketdata{" +
+                "actionID=" + actionID +
+                ", title='" + title + '\'' +
+                ", ticketData='" + ticketData + '\'' +
+                ", notes='" + notes + '\'' +
+                ", hidden=" + hidden +
+                ", oldStatus=" + oldStatus +
+                ", newStatus=" + newStatus +
+                ", oldTopic=" + oldTopic +
+                ", newTopic=" + newTopic +
+                ", notificationID=" + notificationID +
+                ", notify=" + notify +
+                ", notfiyStatus=" + notfiyStatus +
+                ", ticketID=" + ticketID +
+                ", id=" + id +
+                ", createdBy='" + createdBy + '\'' +
+                ", modificationDate=" + modificationDate +
+                ", modifiedBy='" + modifiedBy + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
     }
-
 }

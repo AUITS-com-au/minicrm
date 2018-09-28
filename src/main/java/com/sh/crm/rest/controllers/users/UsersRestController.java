@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -58,7 +59,7 @@ public class UsersRestController extends BasicController<UserHolder> {
 
     }
 
-    public ResponseEntity<?> create(@RequestBody @Valid UserHolder userHolder) throws GeneralException {
+    public ResponseEntity<?> create(@RequestBody @Valid UserHolder userHolder, Principal principal) throws GeneralException {
         log.debug( "received a request to create user: " + userHolder.getUser().toString() );
         if (userHolder.getUser().getUserID() != null) {
             if (userRepo.findByUserID( userHolder.getUser().getUserID() ) != null) {
@@ -90,7 +91,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     }
 
 
-    public ResponseEntity<?> edit(@RequestBody @Valid UserHolder userHolder) throws GeneralException {
+    public ResponseEntity<?> edit(@RequestBody @Valid UserHolder userHolder, Principal principal) throws GeneralException {
         Users user = userHolder.getUser();
         log.debug( "Received request to edit user: " + userHolder );
         try {
@@ -235,7 +236,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     }
 
     @Override
-    public ResponseEntity<?> delete(UserHolder object) throws GeneralException {
+    public ResponseEntity<?> delete(UserHolder object, Principal principal) throws GeneralException {
         return null;
     }
 }

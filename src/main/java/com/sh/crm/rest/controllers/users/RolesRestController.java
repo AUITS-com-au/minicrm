@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -40,7 +41,7 @@ public class RolesRestController extends BasicController<RoleHolder> {
     }
 
 
-    public ResponseEntity<?> create(@RequestBody RoleHolder roleHolder) throws GeneralException {
+    public ResponseEntity<?> create(@RequestBody RoleHolder roleHolder, Principal principal) throws GeneralException {
         if (roleHolder != null && roleHolder.getRole() != null && roleHolder.getPermissions() != null && !roleHolder.getPermissions().isEmpty()) {
             Roles role = roleHolder.getRole();
             role.setId( null );
@@ -63,7 +64,7 @@ public class RolesRestController extends BasicController<RoleHolder> {
         return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
     }
 
-    public ResponseEntity<?> edit(@RequestBody RoleHolder roleHolder) throws GeneralException {
+    public ResponseEntity<?> edit(@RequestBody RoleHolder roleHolder, Principal principal) throws GeneralException {
         if (roleHolder != null && roleHolder.getRole() != null && roleHolder.getPermissions() != null && !roleHolder.getPermissions().isEmpty()) {
             Roles role = roleHolder.getRole();
             Roles originalRole = rolesRepo.findOne( role.getId() );
@@ -92,7 +93,7 @@ public class RolesRestController extends BasicController<RoleHolder> {
     }
 
     @Override
-    public ResponseEntity<?> delete(RoleHolder object) throws GeneralException {
+    public ResponseEntity<?> delete(RoleHolder object, Principal principal) throws GeneralException {
         return null;
     }
 

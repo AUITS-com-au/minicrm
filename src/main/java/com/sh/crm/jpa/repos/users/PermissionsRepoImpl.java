@@ -1,6 +1,7 @@
 package com.sh.crm.jpa.repos.users;
 
 import com.sh.crm.jpa.entities.Permissions;
+import com.sh.crm.jpa.repos.custom.GetUsersPermissionsCustom;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

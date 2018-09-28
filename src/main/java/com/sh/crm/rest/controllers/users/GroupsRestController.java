@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 
@@ -47,7 +48,7 @@ public class GroupsRestController extends BasicController<GroupHolder> {
     }
 
 
-    public ResponseEntity<?> create(@RequestBody @Valid GroupHolder groupHolder) throws GeneralException {
+    public ResponseEntity<?> create(@RequestBody @Valid GroupHolder groupHolder, Principal principal) throws GeneralException {
         log.debug( "create group {} requested", groupHolder.toString() );
         Groups group = new Groups();
         group.setEnabled( true );
@@ -77,7 +78,7 @@ public class GroupsRestController extends BasicController<GroupHolder> {
     }
 
 
-    public ResponseEntity<?> edit(@RequestBody @Valid GroupHolder groupHolder) throws GeneralException {
+    public ResponseEntity<?> edit(@RequestBody @Valid GroupHolder groupHolder, Principal principal) throws GeneralException {
         log.debug( "Received modify Groups request: " + groupHolder.toString() );
         Groups group = groupRepo.findOne( groupHolder.getGroup().getId() );
         group.setGroupName( groupHolder.getName() );
@@ -134,7 +135,7 @@ public class GroupsRestController extends BasicController<GroupHolder> {
     }
 
     @Override
-    public ResponseEntity<?> delete(GroupHolder object) throws GeneralException {
+    public ResponseEntity<?> delete(GroupHolder object, Principal principal) throws GeneralException {
         return null;
     }
 
