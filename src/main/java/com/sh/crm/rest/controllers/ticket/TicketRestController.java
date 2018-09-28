@@ -109,7 +109,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             throw new GeneralException( Errors.INVALID_TICKET );
 
 
-        // ticketLocksRepo.invalidateExistingUserLocks( principal.getName() );
+        ticketLocksRepo.invalidateExistingUserLocks( principal.getName() );
         Set<Topicspermissions> topicspermissions = getCurrentUserTopicsPermissionsByTopicID( ticketObject.getTopic() );
 
         if (Utils.isAllowedPermission( topicspermissions, new Ticketactions( actionID ) )) {
@@ -145,7 +145,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     log.debug( "found list of active locks for ticket {} \n {}", ticket, locks.toString() );
                 Ticketlock ticketlock = locks.get( 0 );
                 ticketlock.setTicketID( null );
-                ResponseEntity.badRequest().body( locks.get( 0 ) );
+                return ResponseEntity.badRequest().body( locks.get( 0 ) );
             }
 
         }
@@ -158,7 +158,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             ticketID, @RequestBody Ticketdata ticketdata, Principal principal) throws GeneralException {
         if (log.isDebugEnabled())
             log.debug( "Logging ticket reply:\n{} triggered by user: {}, using lock ID {}", ticketdata, principal.getName(), lockID );
-
+        ResponseEntity responseEntity = null;
         //validating lock first
         Ticketlock ticketlock = ticketLocksRepo.findOne( lockID );
         if (ticketlock == null)
@@ -183,10 +183,13 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
 
             log.debug( "Trying to persist ticket action data" );
+            Ticketactions ticketactions = null;
+            Ticket ticket = null;
+            Set<Topicspermissions> tps = null;
             try {
                 if (log.isDebugEnabled())
                     log.debug( "fetching data base to get ticket id first before editing, ticket id {}", ticketID );
-                Ticket ticket = ticketsRepo.findOne( ticketID );
+                ticket = ticketsRepo.findOne( ticketID );
                 if (ticket == null) {
                     String error = String.format( "Ticket ID %s cannot be found", ticketID );
                     if (log.isDebugEnabled())
@@ -194,14 +197,14 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, error );
                 }
 
-                Ticketactions ticketactions = ticketActionsRepo.findOne( ticketdata.getActionID().getActionID() );
+                ticketactions = ticketActionsRepo.findOne( ticketdata.getActionID().getActionID() );
                 if (ticketactions == null) {
                     String error = String.format( "Ticket action %s cannot be found for edit ticket data request", ticketdata.getActionID().getActionID() );
                     if (log.isDebugEnabled())
                         log.debug( error );
                     throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, error );
                 }
-                Set<Topicspermissions> tps = getCurrentUserTopicsPermissionsByTopicID( ticket.getTopic() );
+                tps = getCurrentUserTopicsPermissionsByTopicID( ticket.getTopic() );
 
                 if (Utils.isAllowedPermission( tps, ticketactions )) {
                     Status newStatus = ticketactions.getSetStatusTo();
@@ -215,25 +218,39 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     log.debug( "Ticket action saved successfully for ticket {}\n action {} \n data {}",
                             ticket.getId(),
                             ticketactions, ticketdata );
-                    return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+                    //remove lock
+                    ticketlock.setExpired( true );
+                    ticketLocksRepo.save( ticketlock );
+                    ticketlock = null;
+                    ticket = null;
+                    responseEntity = ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
                 } else {
                     if (log.isDebugEnabled())
                         log.debug( "User {} is not allowed to perform this action {} on ticket {}", principal.getName(),
                                 ticketactions.getActionID(),
                                 ticket.getId() );
-                    return new ResponseEntity( new ResponseCode( Errors.CANNOT_CREATE_OBJECT ), HttpStatus.UNAUTHORIZED );
+                    responseEntity = new ResponseEntity( new ResponseCode( Errors.CANNOT_CREATE_OBJECT ), HttpStatus.UNAUTHORIZED );
                 }
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, "error" );
                 log.error( "An exception happened during ticket action persistence {} ", e );
                 throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, e );
+            } finally {
+                ticket = null;
+                ticketactions = null;
+                ticketdata = null;
+                ticketlock = null;
+                tps = null;
             }
         } else {
-            return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_CREATE_OBJECT ) );
+            responseEntity = ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_CREATE_OBJECT ) );
         }
+
+
+        return responseEntity;
     }
 
-    @PostMapping("modify/{lockID}")
+    @PostMapping("modify")
     ResponseEntity<?> modifyTicket(@RequestBody Ticket ticket, Principal principal) {
         if (log.isDebugEnabled()) {
             log.debug( "received modify ticket request from user {}  , ticket: \n{} ", principal.getName(), ticket );
