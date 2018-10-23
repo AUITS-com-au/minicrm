@@ -49,7 +49,6 @@ public class TopicRestController extends BasicController<Topic> {
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
-
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_CREATE_OBJECT ) );
     }
@@ -68,7 +67,6 @@ public class TopicRestController extends BasicController<Topic> {
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
-
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
     }
