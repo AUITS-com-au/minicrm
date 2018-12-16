@@ -17,22 +17,21 @@ public class TopicsPermissionsRepoImpl implements GetUsersTopicsCustom {
     private EntityManager em;
 
     @Override
-    public Set<Topic> getUserTopics(Integer userID) {
+    public Set<Topic> getUserTopics(String userID) {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery( "GetUserTopics" );
-
         findUsersPerms.setParameter( 1, userID );
-
         return new HashSet<>( findUsersPerms.getResultList() );
     }
 
+
     @Override
-    public Set<Topicspermissions> getUserTopicsPermissions(Integer userID) {
+    public Set<Topicspermissions> getUserTopicsPermissions(String userID) {
         return getUserTopicsPermissions( userID, -1 );
     }
 
     @Override
-    public Set<Topicspermissions> getUserTopicsPermissions(Integer userID, Integer topicID) {
+    public Set<Topicspermissions> getUserTopicsPermissions(String userID, Integer topicID) {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery( "GetUserTopicPermissions" );
 
@@ -42,17 +41,16 @@ public class TopicsPermissionsRepoImpl implements GetUsersTopicsCustom {
     }
 
     @Override
-    public Set<Topic> getUserTopics(Integer userID, Integer subcat) {
+    public Set<Topic> getUserTopics(String userID, Integer subcat) {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery( "GetUserTopicsBySubCat" );
-
         findUsersPerms.setParameter( 1, userID );
         findUsersPerms.setParameter( 2, subcat );
         return new HashSet<>( findUsersPerms.getResultList() );
     }
 
     @Override
-    public Set<Subcategory> getUserSubCats(Integer userID, Integer mainCat) {
+    public Set<Subcategory> getUserSubCats(String userID, Integer mainCat) {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery( "GetUserSubCats" );
 
@@ -62,7 +60,7 @@ public class TopicsPermissionsRepoImpl implements GetUsersTopicsCustom {
     }
 
     @Override
-    public Set<Maincategory> getUserMainCats(Integer userID) {
+    public Set<Maincategory> getUserMainCats(String userID) {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery( "GetUserMainCats" );
 
@@ -71,5 +69,25 @@ public class TopicsPermissionsRepoImpl implements GetUsersTopicsCustom {
         return new HashSet<>( findUsersPerms.getResultList() );
     }
 
+    @Override
+    public void generateGroupTopicsPermission(Integer topicID, String groupName, Integer groupID) {
+        StoredProcedureQuery findUsersPerms =
+                em.createNamedStoredProcedureQuery( "GenerateGroupTopicsPermissions" );
 
+        findUsersPerms.setParameter( 1, topicID );
+        findUsersPerms.setParameter( 2, groupName );
+        findUsersPerms.setParameter( 3, groupID );
+        findUsersPerms.execute();
+    }
+
+    @Override
+    public void generateUserTopicsPermission(Integer topicID, String username, Integer userID) {
+        StoredProcedureQuery findUsersPerms =
+                em.createNamedStoredProcedureQuery( "GenerateUserTopicsPermissions" );
+
+        findUsersPerms.setParameter( 1, topicID );
+        findUsersPerms.setParameter( 2, username );
+        findUsersPerms.setParameter( 3, userID );
+        findUsersPerms.execute();
+    }
 }

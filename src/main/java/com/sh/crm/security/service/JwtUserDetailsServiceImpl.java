@@ -38,11 +38,11 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
         } else {
             if (logger.isDebugEnabled())
                 logger.debug("User :" + username + " found, loading information");
-            return JwtUserFactory.create(user, getUserAuthorities(user.getId()));
+            return JwtUserFactory.create( user, getUserAuthorities( user.getUserID() ) );
         }
     }
 
-    private List<Permissions> getUserAuthorities(Integer id) {
+    private List<Permissions> getUserAuthorities(String id) {
 
         List<Permissions> userAuthorities = permissionsRepo.usersPermission(id);
         if (logger.isDebugEnabled())
@@ -52,8 +52,8 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
     }
 
     public Set<CustomAuthority> getUserGrantedAuth(String username) {
-        Users user = userRepository.findByUserID(username);
-        List<Permissions> allAuth = getUserAuthorities(user.getId());
+        // Users user = userRepository.findByUserID(username);
+        List<Permissions> allAuth = getUserAuthorities( username );
         Set<CustomAuthority> activeAuth = new HashSet<>();
         if (allAuth != null) {
             for (Permissions auth : allAuth) {

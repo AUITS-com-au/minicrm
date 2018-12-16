@@ -23,14 +23,14 @@ public abstract class BasicController<T> extends BasicGeneralController {
         String principal = SecurityUtils.getPrincipal();
         return topicsPermissionsRepo.
                 getUserTopicsPermissions(
-                        usersRepos.findByUserID( principal ).getId() );
+                        principal );
     }
 
     protected Set<Topicspermissions> getUserTopicsPermissionsByTopicIDAndUserID(Integer topicID, String userID) {
 
         return topicsPermissionsRepo.
                 getUserTopicsPermissions(
-                        usersRepos.findByUserID( userID ).getId(),
+                        userID,
                         topicID );
     }
 

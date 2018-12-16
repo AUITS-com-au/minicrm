@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
                 resultClasses = {Permissions.class},
                 parameters = {
                         @StoredProcedureParameter(
-                                type = Integer.class,
+                                type = String.class,
                                 mode = ParameterMode.IN)
                 })
 })

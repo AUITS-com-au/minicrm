@@ -48,6 +48,12 @@ public class Topic extends BasicModelWithIDInt {
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "topicID", fetch = FetchType.LAZY)
     private List<Topicsla> topicslaList;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "topic", fetch = FetchType.LAZY)
+    private List<GeneratedTopicPermissions> generatedTopicPermissionsList;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "topic", fetch = FetchType.LAZY)
+    private List<Ticket> ticketList;
     @JoinColumn(name = "SubCategory", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Subcategory subCategory;
@@ -149,6 +155,22 @@ public class Topic extends BasicModelWithIDInt {
         this.subCategory = subCategory;
     }
 
+    public List<GeneratedTopicPermissions> getGeneratedTopicPermissionsList() {
+        return generatedTopicPermissionsList;
+    }
+
+    public void setGeneratedTopicPermissionsList(List<GeneratedTopicPermissions> generatedTopicPermissionsList) {
+        this.generatedTopicPermissionsList = generatedTopicPermissionsList;
+    }
+
+    public List<Ticket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Ticket> ticketList) {
+        this.ticketList = ticketList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -163,7 +185,7 @@ public class Topic extends BasicModelWithIDInt {
             return false;
         }
         Topic other = (Topic) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

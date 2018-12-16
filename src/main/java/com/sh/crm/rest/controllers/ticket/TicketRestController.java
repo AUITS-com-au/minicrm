@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sh.crm.config.general.ResponseCode;
 import com.sh.crm.general.Errors;
 import com.sh.crm.general.exceptions.GeneralException;
+import com.sh.crm.general.holders.SearchTicketsContainer;
+import com.sh.crm.general.holders.SearchTicketsResult;
 import com.sh.crm.general.holders.TicketHolder;
 import com.sh.crm.general.utils.LoggingUtils;
 import com.sh.crm.general.utils.TicketOperation;
@@ -12,6 +14,8 @@ import com.sh.crm.jpa.entities.*;
 import com.sh.crm.misc.TopicConfiguration;
 import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.Administrator;
+import com.sh.crm.services.tickets.TopicPermissionsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,12 +31,14 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = "tickets", produces = MediaType.APPLICATION_JSON_VALUE)
 @PreAuthorize("hasAnyAuthority('TICKET:USER','TICKET:ADMIN','Administrator')")
 public class TicketRestController extends BasicController<TicketHolder> {
+
+    @Autowired
+    private TopicPermissionsService topicPermissionsService;
 
     @Override
     @Transactional
@@ -52,15 +58,12 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 Ticket ticket = ticketHolder.getTicket();
                 if (ticket == null)
                     throw new GeneralException( Errors.CANNOT_CREATE_OBJECT, "Ticket record is empty" );
-
-                Topic topic = topicRepo.findOne( ticket.getTopic() );
-
-                Set<Topicspermissions> topicspermissions = getCurrentUserTopicsPermissionsByTopicID( topic.getId() );
-                if (Utils.isAllowedPermission( topicspermissions, new Ticketactions( 4 ) )) {
+                // Topic topic = topicRepo.findOne( ticket.getTopic() );
+                if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), new Ticketactions( 4 ) )) {
                     if (log.isDebugEnabled())
                         log.debug( "User {} is allowed to create a ticket", principal.getName() );
                     ticket.setCustomerAccount( accounts != null ? accounts.getId() : null );
-                    ticket.setId( Long.parseLong( getNextTicketID( ticket.getTopic() ) ) );
+                    ticket.setId( Long.parseLong( getNextTicketID( ticket.getTopic().getId() ) ) );
                     ticket.setOriginalTopic( ticket.getTopic() );
                     ticket.setEscalationCalDate( java.util.Calendar.getInstance().getTime() );
                     if (log.isDebugEnabled())
@@ -92,11 +95,9 @@ public class TicketRestController extends BasicController<TicketHolder> {
         } catch (Exception e) {
             LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             throw new GeneralException( Errors.CANNOT_CREATE_OBJECT, e );
-
         }
         throw new GeneralException( Errors.CANNOT_CREATE_OBJECT );
     }
-
 
     @GetMapping("lock/{ticketID}/{actionID}")
     ResponseEntity<?> getLock(@PathVariable("ticketID") Long ticket,
@@ -110,12 +111,11 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
 
         ticketLocksRepo.invalidateExistingUserLocks( principal.getName() );
-        Set<Topicspermissions> topicspermissions = getCurrentUserTopicsPermissionsByTopicID( ticketObject.getTopic() );
 
-        if (Utils.isAllowedPermission( topicspermissions, new Ticketactions( actionID ) )) {
+        if (topicPermissionsService.isAllowedPermission( ticketObject.getTopic().getId(), principal.getName(), new Ticketactions( actionID ) )) {
             List<Ticketlock> locks = ticketLocksRepo.getByTicketIDAndExpiresOnAfterAndExpiredIsFalse( ticketObject, Calendar.getInstance().getTime() );
             if (locks == null || locks.isEmpty()) {
-                Topic topic = topicRepo.findOne( ticketObject.getTopic() );
+                Topic topic = topicRepo.findOne( ticketObject.getTopic().getId() );
                 ObjectMapper objectMapper = new ObjectMapper();
                 TopicConfiguration configuration = null;
                 try {
@@ -149,7 +149,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
             }
 
         }
-        topicspermissions = null;
         return ResponseEntity.badRequest().body( Errors.UNAUTHORIZED );
     }
 
@@ -185,7 +184,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
             log.debug( "Trying to persist ticket action data" );
             Ticketactions ticketactions = null;
             Ticket ticket = null;
-            Set<Topicspermissions> tps = null;
             try {
                 if (log.isDebugEnabled())
                     log.debug( "fetching data base to get ticket id first before editing, ticket id {}", ticketID );
@@ -204,15 +202,14 @@ public class TicketRestController extends BasicController<TicketHolder> {
                         log.debug( error );
                     throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, error );
                 }
-                tps = getCurrentUserTopicsPermissionsByTopicID( ticket.getTopic() );
 
-                if (Utils.isAllowedPermission( tps, ticketactions )) {
+                if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), ticketactions )) {
                     Status newStatus = ticketactions.getSetStatusTo();
                     ticketdata.setTicketID( ticket );
                     ticketdata.setNewStatus( newStatus.getId() );
                     ticketdata.setOldStatus( ticket.getCurrentStatus() );
-                    ticketdata.setOldTopic( ticket.getTopic() );
-                    ticketdata.setNewTopic( ticket.getTopic() );
+                    ticketdata.setOldTopic( ticket.getTopic().getId() );
+                    ticketdata.setNewTopic( ticket.getTopic().getId() );
                     tikcetDataRepo.save( ticketdata );
                     modifyTicket( ticket, ticketactions, ticketdata );
                     log.debug( "Ticket action saved successfully for ticket {}\n action {} \n data {}",
@@ -240,15 +237,14 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 ticketactions = null;
                 ticketdata = null;
                 ticketlock = null;
-                tps = null;
+
             }
         } else {
             responseEntity = ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_CREATE_OBJECT ) );
         }
-
-
         return responseEntity;
     }
+
 
     @PostMapping("modify")
     ResponseEntity<?> modifyTicket(@RequestBody Ticket ticket, Principal principal) {
@@ -264,9 +260,8 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 log.debug( "cannot find original ticket with ID {} ", ticket.getId() );
             return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_FIND_TICKET ) );
         }
-        Set<Topicspermissions> topicspermissions = getCurrentUserTopicsPermissionsByTopicID( originalTicket.getTopic() );
         //action is 7
-        if (Utils.isAllowedPermission( topicspermissions, new Ticketactions( 7 ) )) {
+        if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), new Ticketactions( 7 ) )) {
             originalTicket.setCustomerAccount( ticket.getCustomerAccount() );
             originalTicket.setLanguage( ticket.getLanguage() );
             originalTicket.setSourceChannel( ticket.getSourceChannel() );
@@ -308,7 +303,16 @@ public class TicketRestController extends BasicController<TicketHolder> {
     Page<Ticket> getPagingList(@PathVariable("page") int page, @PathVariable("size") int size) {
         if (log.isDebugEnabled())
             log.debug( "Getting page of tickets with size {} , page number {} ", size, page );
-        return ticketsRepo.findByDeletedFalse( new PageRequest( page, size, Sort.Direction.ASC, "priority" ) );
+        return ticketsRepo.findByDeletedFalseOrderByCreationDateDesc( new PageRequest( page, size, Sort.Direction.ASC, "priority" ) );
+    }
+
+    @PostMapping("list")
+    SearchTicketsResult getTickets(@RequestBody SearchTicketsContainer searchTicketsContainer, Principal principal) {
+        if (log.isDebugEnabled())
+            log.debug( "Getting  list for searching parameters {} ", searchTicketsContainer );
+        searchTicketsContainer.setSearchUser( principal.getName() );
+
+        return ticketsRepo.searchTickets( searchTicketsContainer );
     }
 
     @GetMapping("/data/{ticketID}")
@@ -333,7 +337,14 @@ public class TicketRestController extends BasicController<TicketHolder> {
     }
 
     @GetMapping("/{ticketID}")
-    Ticket getTicketByID(@PathVariable("ticketID") Long ticketID) {
-        return ticketsRepo.findOne( ticketID );
+    ResponseEntity<?> getTicketByID(@PathVariable("ticketID") Long ticketID, Principal principal) {
+        Ticket ticket = ticketsRepo.findOne( ticketID );
+        if (ticket == null)
+            return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
+
+        if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), TicketOperation.READ )) {
+            return ResponseEntity.ok( ticket );
+        }
+        return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
     }
 }

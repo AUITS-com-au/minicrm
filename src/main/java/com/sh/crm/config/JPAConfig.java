@@ -24,7 +24,6 @@ public class JPAConfig {
     public AuditorAware<String> auditorProvider() {
         return new SpringSecurityAuditorAware();
     }
-
     @Bean
     @Primary
     public Jackson2ObjectMapperBuilder jacksonBuilder() {
@@ -32,8 +31,6 @@ public class JPAConfig {
         b.indentOutput( true ).dateFormat( new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss a" ) );
         return b;
     }
-
-
     @Bean
     @Primary
     public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {

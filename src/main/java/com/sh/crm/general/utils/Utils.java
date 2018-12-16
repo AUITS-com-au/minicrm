@@ -63,33 +63,37 @@ public class Utils {
 
         return value;
     }
+/**
+ public static boolean isAllowedPermission(Set<Topicspermissions> topicspermissions, Ticketactions ticketactions) {
+ /**
+ * Actions mapping must be same as database
+ * 1 resolved
+ * 2 close
+ * 3 reopen
+ * 4 open
+ * 5 On Progress
+ * 6 hold
+ */
+    /**
+     * if (topicspermissions == null || topicspermissions.isEmpty()) {
+     * log.debug( "topics permissions are null, return false" );
+     * return false;
+     * }
+     * String operation = getOperationFromAction( ticketactions );
+     * <p>
+     * <p>
+     * if (operation == null) {
+     * log.info( "cannot map ticket action {} with proper operation", ticketactions.toString() );
+     * return false;
+     * } else {
+     * if (log.isDebugEnabled())
+     * log.debug( "ticket action {} has been translated to ticket operation {}", ticketactions, operation );
+     * }
+     * return isAllowedPermission( topicspermissions, operation );
+     * }
+     */
 
-    public static boolean isAllowedPermission(Set<Topicspermissions> topicspermissions, Ticketactions ticketactions) {
-        /**
-         * Actions mapping must be same as database
-         * 1 resolved
-         * 2 close
-         * 3 reopen
-         * 4 open
-         * 5 On Progress
-         * 6 hold
-         */
-        if (topicspermissions == null || topicspermissions.isEmpty()) {
-            log.debug( "topics permissions are null, return false" );
-            return false;
-        }
-        String operation = getOperationFromAction( ticketactions );
 
-
-        if (operation == null) {
-            log.info( "cannot map ticket action {} with proper operation", ticketactions.toString() );
-            return false;
-        } else {
-            if (log.isDebugEnabled())
-                log.debug( "ticket action {} has been translated to ticket operation {}", ticketactions, operation );
-        }
-        return isAllowedPermission( topicspermissions, operation );
-    }
 
     public static String getOperationFromAction(Ticketactions ticketactions) {
         String operation = null;
@@ -120,125 +124,6 @@ public class Utils {
                 break;
         }
         return operation;
-    }
-
-    private static boolean isAllowedPermission(Set<Topicspermissions> topicspermissions, String operation) {
-
-        switch (operation) {
-            case TicketOperation.CLOSE:
-                return isAllowedClose( topicspermissions );
-            case TicketOperation.CREATE:
-                return isAllowedCreate( topicspermissions );
-            case TicketOperation.DELETE:
-                return isAllowedDelete( topicspermissions );
-            case TicketOperation.READ:
-                return isAllowedRead( topicspermissions );
-            case TicketOperation.REPLY:
-                return isAllowedReply( topicspermissions );
-            case TicketOperation.REPORT:
-                return isAllowedRunReport( topicspermissions );
-            case TicketOperation.RESOLVE:
-                return isAllowedResolve( topicspermissions );
-            case TicketOperation.SUBSCRIBE:
-                return isAllowedSubscribe( topicspermissions );
-            case TicketOperation.REOPEN:
-                return isAllowedReOpen( topicspermissions );
-            case TicketOperation.MODIFYINFO:
-                return isAllowedModify( topicspermissions );
-            default:
-                return false;
-        }
-    }
-
-
-    private static boolean isAllowedRead(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanRead()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedModify(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanModify()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedReply(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanReply()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedReOpen(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanReopen()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedCreate(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanCreate()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedDelete(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanDelete()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedClose(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanClose()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedResolve(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanResolve()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedRunReport(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanRunReport()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isAllowedSubscribe(Set<Topicspermissions> tps) {
-        for (Topicspermissions tp : tps) {
-            if (tp.getCanSubscribe()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static void main(String[] args) {

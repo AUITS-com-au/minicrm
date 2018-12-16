@@ -16,59 +16,88 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "topicspermissions")
 @XmlRootElement
-@NamedStoredProcedureQueries({
-        @NamedStoredProcedureQuery(
+@NamedStoredProcedureQueries(
+        {
+                @NamedStoredProcedureQuery(
+                        name = "GenerateUserTopicsPermissions",
+                        procedureName = "dbo.GenerateTopicUserPermissionMapping",
+                        parameters = {
+                                @StoredProcedureParameter(
+                                        type = Integer.class,
+                                        mode = ParameterMode.IN),
+                                @StoredProcedureParameter(
+                                        type = String.class,
+                                        mode = ParameterMode.IN),
+                                @StoredProcedureParameter(
+                                        type = Integer.class,
+                                        mode = ParameterMode.IN)
+                        }),
+                @NamedStoredProcedureQuery(
+                        name = "GenerateGroupTopicsPermissions",
+                        procedureName = "dbo.GenerateTopicGroupPermissionMapping",
+                        parameters = {
+                                @StoredProcedureParameter(
+                                        type = Integer.class,
+                                        mode = ParameterMode.IN),
+                                @StoredProcedureParameter(
+                                        type = String.class,
+                                        mode = ParameterMode.IN),
+                                @StoredProcedureParameter(
+                                        type = Integer.class,
+                                        mode = ParameterMode.IN)
+                        })
+                , @NamedStoredProcedureQuery(
                 name = "GetUserTopicPermissions",
                 procedureName = "dbo.GetUserTopicPermissions",
                 resultClasses = {Topicspermissions.class},
                 parameters = {
                         @StoredProcedureParameter(
-                                type = Integer.class,
+                                type = String.class,
                                 mode = ParameterMode.IN),
                         @StoredProcedureParameter(
                                 type = Integer.class,
                                 mode = ParameterMode.IN)
                 })
-        , @NamedStoredProcedureQuery(
-        name = "GetUserTopics",
-        procedureName = "dbo.GetUserTopics",
-        resultClasses = {Topic.class},
-        parameters = {
-                @StoredProcedureParameter(
-                        type = Integer.class,
-                        mode = ParameterMode.IN)
-        }), @NamedStoredProcedureQuery(
-        name = "GetUserMainCats",
-        procedureName = "dbo.GetUserMainCats",
-        resultClasses = {Maincategory.class},
-        parameters = {
-                @StoredProcedureParameter(
-                        type = Integer.class,
-                        mode = ParameterMode.IN)
-        }), @NamedStoredProcedureQuery(
-        name = "GetUserSubCats",
-        procedureName = "dbo.GetUserSubCats",
-        resultClasses = {Subcategory.class},
-        parameters = {
-                @StoredProcedureParameter(
-                        type = Integer.class,
-                        mode = ParameterMode.IN),
-                @StoredProcedureParameter(
-                        type = Integer.class,
-                        mode = ParameterMode.IN)
-        }), @NamedStoredProcedureQuery(
-        name = "GetUserTopicsBySubCat",
-        procedureName = "dbo.GetUserTopicsBySubCat",
-        resultClasses = {Topic.class},
-        parameters = {
-                @StoredProcedureParameter(
-                        type = Integer.class,
-                        mode = ParameterMode.IN),
-                @StoredProcedureParameter(
-                        type = Integer.class,
-                        mode = ParameterMode.IN)
-        })
-}
+                , @NamedStoredProcedureQuery(
+                name = "GetUserTopics",
+                procedureName = "dbo.GetUserTopics",
+                resultClasses = {Topic.class},
+                parameters = {
+                        @StoredProcedureParameter(
+                                type = String.class,
+                                mode = ParameterMode.IN)
+                }), @NamedStoredProcedureQuery(
+                name = "GetUserMainCats",
+                procedureName = "dbo.GetUserMainCats",
+                resultClasses = {Maincategory.class},
+                parameters = {
+                        @StoredProcedureParameter(
+                                type = String.class,
+                                mode = ParameterMode.IN)
+                }), @NamedStoredProcedureQuery(
+                name = "GetUserSubCats",
+                procedureName = "dbo.GetUserSubCats",
+                resultClasses = {Subcategory.class},
+                parameters = {
+                        @StoredProcedureParameter(
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                type = Integer.class,
+                                mode = ParameterMode.IN)
+                }), @NamedStoredProcedureQuery(
+                name = "GetUserTopicsBySubCat",
+                procedureName = "dbo.GetUserTopicsBySubCat",
+                resultClasses = {Topic.class},
+                parameters = {
+                        @StoredProcedureParameter(
+                                type = String.class,
+                                mode = ParameterMode.IN),
+                        @StoredProcedureParameter(
+                                type = Integer.class,
+                                mode = ParameterMode.IN)
+                })
+        }
 
 )
 

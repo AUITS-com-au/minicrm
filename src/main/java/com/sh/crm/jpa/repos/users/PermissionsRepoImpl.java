@@ -13,11 +13,11 @@ public class PermissionsRepoImpl implements GetUsersPermissionsCustom {
     private EntityManager em;
 
     @Override
-    public List<Permissions> usersPermission(Integer id) {
+    public List<Permissions> usersPermission(String username) {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery("GetPermissions");
         //findUsersPerms.registerStoredProcedureParameter(1, Integer.class, ParameterMode.IN);
-        findUsersPerms.setParameter(1, id);
+        findUsersPerms.setParameter( 1, username );
 
         //  .registerStoredProcedureParameter(2, void.class, ParameterMode.REF_CURSOR)
 

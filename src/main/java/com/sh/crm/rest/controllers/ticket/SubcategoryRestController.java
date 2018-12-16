@@ -68,7 +68,7 @@ public class SubcategoryRestController extends BasicController<Subcategory> {
 
     @GetMapping("/authorized/{mainCat}")
     public Iterable<?> getAuthorized(Principal principal, @PathVariable("mainCat") Integer mainCat) throws GeneralException {
-        return topicsPermissionsRepo.getUserSubCats( getAuthorizedUser( principal ).getId(), mainCat );
+        return topicsPermissionsRepo.getUserSubCats( principal.getName(), mainCat );
     }
 
     @Override

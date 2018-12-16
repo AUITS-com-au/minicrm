@@ -7,7 +7,7 @@ import com.sh.crm.general.utils.LoggingUtils;
 import com.sh.crm.jpa.entities.Subcategory;
 import com.sh.crm.jpa.entities.Topic;
 import com.sh.crm.jpa.entities.Topicspermissions;
-import com.sh.crm.jpa.entities.Users;
+import com.sh.crm.jpa.repos.tickets.GeneratedTopicsPermissionsRepo;
 import com.sh.crm.jpa.repos.tickets.TopicRepo;
 import com.sh.crm.jpa.repos.tickets.TopicsPermissionsRepo;
 import com.sh.crm.jpa.repos.users.UsersRepos;
@@ -20,11 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "topics", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TopicRestController extends BasicController<Topic> {
 
+    @Autowired
+    private GeneratedTopicsPermissionsRepo generatedTopicsPermissions;
     @Autowired
     private TopicRepo topicRepo;
 
@@ -73,13 +77,35 @@ public class TopicRestController extends BasicController<Topic> {
 
     @TicketsAdmin
     @PostMapping("/permissions/create")
-    public ResponseEntity<?> createTopicPermissions(@RequestBody Topicspermissions topicspermissions) throws GeneralException {
+    public ResponseEntity<?> createTopicPermissions(@RequestBody List<Topicspermissions> topicspermissions) throws GeneralException {
 
-        if (topicspermissions != null) {
+        if (topicspermissions != null && !topicspermissions.isEmpty()) {
             try {
-                topicsPermissionsRepo.save( topicspermissions );
+
+                for (Topicspermissions tp : topicspermissions) {
+                    Set<Topicspermissions> existing = topicsPermissionsRepo.findByAssigneAndType( tp.getAssigne(), tp.getType() );
+
+                    try {
+                        //delete old permissions for the same topic and assigne
+                        topicsPermissionsRepo.delete( existing );
+                    } catch (Exception e) {
+                        LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
+                        return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
+                    }
+
+                    topicsPermissionsRepo.save( tp );
+                    if (tp.getType().equalsIgnoreCase( "user" )) {
+                        topicsPermissionsRepo.generateUserTopicsPermission( tp.getTopicId().getId(), null, tp.getAssigne() );
+                    } else {
+                        topicsPermissionsRepo.generateGroupTopicsPermission( tp.getTopicId().getId(), null, tp.getAssigne() );
+                    }
+                    tp = null;
+                    existing = null;
+                }
+
+
                 if (log.isDebugEnabled())
-                    log.debug( "Topics permissions for topic {} created/modified sucessfully with values {} ", topicspermissions.getTopicId(), topicspermissions );
+                    log.debug( "Topics permissions created/modified sucessfully " );
 
                 return ResponseEntity.ok().body( new ResponseCode( Errors.SUCCESSFUL ) );
             } catch (Exception e) {
@@ -91,18 +117,8 @@ public class TopicRestController extends BasicController<Topic> {
 
     @TicketsAdmin
     @PostMapping("/permissions/edit")
-    public ResponseEntity<?> editTopicPermissions(@RequestBody Topicspermissions topicspermissions) throws GeneralException {
-
-        if (topicspermissions != null && topicsPermissionsRepo.findOne( topicspermissions.getId() ) != null) {
-            try {
-                ResponseEntity responseEntity = createTopicPermissions( topicspermissions );
-                return responseEntity;
-            } catch (GeneralException e) {
-                throw new GeneralException( Errors.CANNOT_EDIT_OBJECT );
-            }
-        }
-        return ResponseEntity.badRequest().body( Errors.CANNOT_EDIT_OBJECT );
-
+    public ResponseEntity<?> editTopicPermissions(@RequestBody List<Topicspermissions> topicspermissions) throws GeneralException {
+        return createTopicPermissions( topicspermissions );
     }
 
     @TicketsAdmin
@@ -113,7 +129,7 @@ public class TopicRestController extends BasicController<Topic> {
 
     @TicketsAdmin
     @GetMapping("/permissions/users/{userId}")
-    public Iterable<Topicspermissions> getUserTopicPermissions(@PathVariable("userId") Integer userID) {
+    public Iterable<Topicspermissions> getUserTopicPermissions(@PathVariable("userId") String userID) {
         return topicsPermissionsRepo.getUserTopicsPermissions( userID );
     }
 
@@ -141,18 +157,16 @@ public class TopicRestController extends BasicController<Topic> {
     protected Iterable<?> authorizedList(Principal principal) {
 
         if (principal != null) {
-            Users user = usersRepos.findByUserID( principal.getName() );
-            return topicsPermissionsRepo.getUserTopics( user.getId() );
+            return topicsPermissionsRepo.getUserTopics( principal.getName() );
         }
-
         return null;
-
     }
 
     @GetMapping("/authorized/{subCat}")
     public Iterable<?> getAuthorized(Principal principal, @PathVariable("subCat") Integer subCat) throws GeneralException {
-        return topicsPermissionsRepo.getUserTopics( getAuthorizedUser( principal ).getId(), subCat );
+        return topicsPermissionsRepo.getUserTopics( principal.getName(), subCat );
     }
+
 
     @GetMapping("/subCat/{subCat}")
     @TicketsAdmin

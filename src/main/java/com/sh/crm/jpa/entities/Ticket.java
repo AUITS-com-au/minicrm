@@ -32,10 +32,12 @@ public class Ticket {
     @NotNull
     @Column(name = "ID")
     private Long id;
-    @Column(name = "Topic")
-    private Integer topic;
-    @Column(name = "OriginalTopic")
-    private Integer originalTopic;
+    @JoinColumn(name = "Topic", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    private Topic topic;
+    @JoinColumn(name = "OriginalTopic", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    private Topic originalTopic;
     @Column(name = "CurrentStatus")
     private Integer currentStatus;
     @Size(max = 50)
@@ -122,19 +124,19 @@ public class Ticket {
         this.id = id;
     }
 
-    public Integer getTopic() {
+    public Topic getTopic() {
         return topic;
     }
 
-    public void setTopic(Integer topic) {
+    public void setTopic(Topic topic) {
         this.topic = topic;
     }
 
-    public Integer getOriginalTopic() {
+    public Topic getOriginalTopic() {
         return originalTopic;
     }
 
-    public void setOriginalTopic(Integer originalTopic) {
+    public void setOriginalTopic(Topic originalTopic) {
         this.originalTopic = originalTopic;
     }
 

@@ -8,17 +8,21 @@ import com.sh.crm.jpa.entities.Topicspermissions;
 import java.util.Set;
 
 public interface GetUsersTopicsCustom {
-    Set<Topic> getUserTopics(Integer userID);
+    Set<Topic> getUserTopics(String userID);
 
-    Set<Topicspermissions> getUserTopicsPermissions(Integer userID);
+    Set<Topicspermissions> getUserTopicsPermissions(String userID);
 
-    Set<Topicspermissions> getUserTopicsPermissions(Integer userID, Integer topicID);
+    Set<Topicspermissions> getUserTopicsPermissions(String userID, Integer topicID);
 
-    Set<Topic> getUserTopics(Integer userID, Integer subcat);
+    Set<Topic> getUserTopics(String userID, Integer subcat);
 
-    Set<Subcategory> getUserSubCats(Integer userID, Integer mainCat);
+    Set<Subcategory> getUserSubCats(String userID, Integer mainCat);
 
-    Set<Maincategory> getUserMainCats(Integer userID);
+    Set<Maincategory> getUserMainCats(String userID);
+
+    void generateUserTopicsPermission(Integer topicID, String username, Integer userID);
+
+    void generateGroupTopicsPermission(Integer topicID, String groupName, Integer groupID);
 
 
 }

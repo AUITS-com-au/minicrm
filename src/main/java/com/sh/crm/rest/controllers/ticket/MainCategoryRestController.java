@@ -17,7 +17,6 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/categories")
 public class MainCategoryRestController extends BasicController<Maincategory> {
-
     @TicketsAdmin
     public ResponseEntity<?> create(@RequestBody Maincategory maincategory, Principal principal) {
         if (maincategory != null) {
@@ -49,7 +48,6 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
         if (maincategory != null) {
             if (log.isDebugEnabled())
                 log.debug( "Received request to modify main category {}", maincategory );
-
             try {
                 Maincategory original = mainCategoryRepo.findOne( maincategory.getId() );
                 if (original == null)
@@ -57,7 +55,6 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
                 original.setEnabled( maincategory.getEnabled() );
                 original.setArabicLabel( maincategory.getArabicLabel() );
                 original.setEnglishLabel( maincategory.getEnglishLabel() );
-
                 mainCategoryRepo.save( original );
                 if (log.isDebugEnabled())
                     log.debug( "Main category {} modified successfully", original );
@@ -65,7 +62,6 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
-
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
     }
@@ -96,7 +92,7 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
 
     @Override
     protected Iterable<?> authorizedList(Principal principal) {
-        Users users = usersRepos.findByUserID( principal.getName() );
-        return topicsPermissionsRepo.getUserMainCats( users.getId() );
+
+        return topicsPermissionsRepo.getUserMainCats( principal.getName() );
     }
 }
