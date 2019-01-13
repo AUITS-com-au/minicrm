@@ -11,7 +11,12 @@ public class TicketHolder {
     private Ticket ticket;
     private CustomerAccounts customerAccount;
     private List<TicketExtData> extDataList;
-
+    private Ticketdata ticketdata;
+    private Long lockID;
+    private Integer actionID;
+    private Integer newTopic;
+    private List<Long> ticketList;
+    private String targetUser;
 
     public TicketHolder() {
     }
@@ -40,5 +45,51 @@ public class TicketHolder {
         this.extDataList = extDataList;
     }
 
+    public Ticketdata getTicketdata() {
+        return ticketdata;
+    }
 
+    public void setTicketdata(Ticketdata ticketdata) {
+        this.ticketdata = ticketdata;
+    }
+
+    public Long getLockID() {
+        return lockID;
+    }
+
+    public void setLockID(Long lockID) {
+        this.lockID = lockID;
+    }
+
+    public Integer getActionID() {
+        return actionID;
+    }
+
+    public void setActionID(Integer actionID) {
+        this.actionID = actionID;
+    }
+
+    public List<Long> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<Long> ticketList) {
+        this.ticketList = ticketList;
+    }
+
+    public String getTargetUser() {
+        return targetUser;
+    }
+
+    public void setTargetUser(String targetUser) {
+        this.targetUser = targetUser;
+    }
+
+    public Integer getNewTopic() {
+        return newTopic;
+    }
+
+    public void setNewTopic(Integer newTopic) {
+        this.newTopic = newTopic;
+    }
 }

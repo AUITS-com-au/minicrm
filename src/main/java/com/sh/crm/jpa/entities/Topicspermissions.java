@@ -127,10 +127,14 @@ public class Topicspermissions extends BasicModelWithID {
     private boolean canReply;
     @Column(name = "canClose")
     private boolean canClose;
+    @Column(name = "canAssign")
+    private Boolean canAssign;
     @Column(name = "canResolve")
     private boolean canResolve;
     @Column(name = "canModify")
     private boolean canModify;
+    @Column(name = "canChgDpt")
+    private Boolean canChgDpt;
     @Column(name = "canRunReport")
     private boolean canRunReport;
     @Column(name = "canSubscribe")
@@ -270,6 +274,22 @@ public class Topicspermissions extends BasicModelWithID {
 
     public void setCanModify(boolean canModify) {
         this.canModify = canModify;
+    }
+
+    public Boolean getCanAssign() {
+        return canAssign;
+    }
+
+    public void setCanAssign(Boolean canAssign) {
+        this.canAssign = canAssign;
+    }
+
+    public Boolean getCanChgDpt() {
+        return canChgDpt;
+    }
+
+    public void setCanChgDpt(Boolean canChgDpt) {
+        this.canChgDpt = canChgDpt;
     }
 
     @Override

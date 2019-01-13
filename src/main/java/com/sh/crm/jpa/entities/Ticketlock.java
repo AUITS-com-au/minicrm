@@ -20,8 +20,6 @@ import java.util.Date;
 @Entity
 @Table(name = "ticketlock")
 @XmlRootElement
-@NamedQueries({
-        @NamedQuery(name = "Ticketlock.findAll", query = "SELECT t FROM Ticketlock t")})
 public class Ticketlock {
     private static final long serialVersionUID = 1L;
     @Id

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface TikcetDataRepo extends JpaRepository<Ticketdata, Long> {
+public interface TicketDataRepo extends JpaRepository<Ticketdata, Long> {
     List<Ticketdata> findByTicketIDOrderByCreationDateDesc(Ticket ticket);
+
+    List<Ticketdata> findByActionID_ActionIDAndTicketID_IdOrderByCreationDateDesc(Integer actionID, Long ticketID);
 }

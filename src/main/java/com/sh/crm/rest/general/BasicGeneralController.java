@@ -5,6 +5,7 @@ import com.sh.crm.jpa.entities.Users;
 import com.sh.crm.jpa.repos.tickets.*;
 import com.sh.crm.jpa.repos.users.UsersRepos;
 import com.sh.crm.security.util.SecurityUtils;
+import com.sh.crm.services.tickets.TicketServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +40,16 @@ public abstract class BasicGeneralController {
     @Autowired
     protected TicketExtDataRepo ticketExtDataRepo;
     @Autowired
-    protected TikcetDataRepo tikcetDataRepo;
+    protected TicketDataRepo tikcetDataRepo;
     @Autowired
     protected TicketActionsRepo ticketActionsRepo;
     @Autowired
     protected TicketLocksRepo ticketLocksRepo;
     @PersistenceContext
     private EntityManager em;
+
+    @Autowired
+    protected TicketServices ticketServices;
 
     protected Users getAuthorizedUser() {
         return usersRepos.findByUserID( SecurityUtils.getPrincipal() );

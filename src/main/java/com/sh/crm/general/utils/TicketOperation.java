@@ -11,4 +11,7 @@ public interface TicketOperation {
     public final static String REPORT = "report";
     public final static String SUBSCRIBE = "subscribe";
     public final static String MODIFYINFO = "modifyticket";
+    public final static String CHGDPT = "changedepartment";
+    public final static String ASSIGN = "assign";
+
 }

@@ -9,6 +9,7 @@ public abstract class BasicException extends Exception {
         this.errorCode = errorCode;
     }
 
+
     public BasicException(Throwable e) {
         super( e );
     }

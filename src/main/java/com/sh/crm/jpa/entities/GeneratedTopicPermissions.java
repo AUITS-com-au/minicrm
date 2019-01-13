@@ -11,8 +11,8 @@ import java.util.Date;
 @Entity
 @Table(name = "generatedTopicPermissions")
 @XmlRootElement
-public class GeneratedTopicPermissions implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class GeneratedTopicPermissions {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -47,6 +47,10 @@ public class GeneratedTopicPermissions implements Serializable {
     private Boolean canClose;
     @Column(name = "canResolve")
     private Boolean canResolve;
+    @Column(name = "canChgDpt")
+    private Boolean canChgDpt;
+    @Column(name = "canAssign")
+    private Boolean canAssign;
     @Column(name = "canModify")
     private Boolean canModify;
     @Column(name = "canRunReport")
@@ -67,6 +71,14 @@ public class GeneratedTopicPermissions implements Serializable {
     public GeneratedTopicPermissions(Long id, Topic topicID) {
         this.id = id;
         this.topic = topicID;
+    }
+
+    public Boolean getCanAssign() {
+        return canAssign;
+    }
+
+    public void setCanAssign(Boolean canAssign) {
+        this.canAssign = canAssign;
     }
 
     public Long getId() {
@@ -211,6 +223,14 @@ public class GeneratedTopicPermissions implements Serializable {
 
     public void setInheritedFrom(String inheritedFrom) {
         this.inheritedFrom = inheritedFrom;
+    }
+
+    public Boolean getCanChgDpt() {
+        return canChgDpt;
+    }
+
+    public void setCanChgDpt(Boolean canChgDpt) {
+        this.canChgDpt = canChgDpt;
     }
 
     @Override

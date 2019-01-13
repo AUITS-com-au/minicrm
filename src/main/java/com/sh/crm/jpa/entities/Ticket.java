@@ -25,7 +25,7 @@ import java.util.List;
 @Table(name = "ticket")
 @XmlRootElement
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Ticket {
+public class Ticket extends BasicModel {
 
     @Id
     @Basic(optional = false)
@@ -40,24 +40,6 @@ public class Ticket {
     private Topic originalTopic;
     @Column(name = "CurrentStatus")
     private Integer currentStatus;
-    @Size(max = 50)
-    @Column(name = "CreatedBy")
-
-    private String createdBy;
-    @Basic(optional = false)
-    @LastModifiedBy
-    @Size(min = 1, max = 50)
-    @Column(name = "ModifiedBy")
-    private String modifiedBy;
-    @Basic(optional = false)
-    @CreatedDate
-    @Column(name = "CreationDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date creationDate;
-    @LastModifiedDate
-    @Column(name = "ModificationDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date modificationDate;
     @Column(name = "CrossedMainSLA")
     private boolean crossedMainSLA;
     @Column(name = "CustomerAccount")
@@ -345,7 +327,6 @@ public class Ticket {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Ticket)) {
             return false;
         }
@@ -358,7 +339,8 @@ public class Ticket {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Ticket[ id=" + id + " ]";
+        return "Ticket{" +
+                "id=" + id +
+                '}';
     }
-
 }

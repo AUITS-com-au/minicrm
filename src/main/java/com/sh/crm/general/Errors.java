@@ -30,7 +30,8 @@ public enum Errors {
     CANNOT_CREATE_OBJECT( "10000", "Request for create object rejected" ),
     CANNOT_EDIT_OBJECT( "10001", "Request for edit object rejected" ),
     UNAUTHORIZED( "10002", "You are not allowed to perform this action please contact your system admin" ),
-    CANNOT_FIND_TICKET( "10003", "Ticket ID not valid" );
+    CANNOT_FIND_TICKET( "10003", "Ticket ID not valid" ),
+    CANNOT_APPLY_ACTION( "10004", "Cannot Apply Action, This might Happen due to missing information in the request body" );
 
     private String code;
     private String desc;

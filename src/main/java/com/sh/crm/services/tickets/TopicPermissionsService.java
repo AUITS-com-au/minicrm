@@ -16,15 +16,25 @@ public class TopicPermissionsService {
     @Autowired
     private GeneratedTopicsPermissionsRepo tp;
 
+    public Boolean isAllowedPermission(Integer topic, String username, Integer ticketaction) {
+        return isAllowedPermission( topic, username, new Ticketactions( ticketaction ) );
+
+    }
+
     public Boolean isAllowedPermission(Integer topic, String username, Ticketactions ticketactions) {
         /**
          * Actions mapping must be same as database
          * 1 resolved
          * 2 close
          * 3 reopen
-         * 4 open
+         * 4 create
          * 5 On Progress
          * 6 hold
+         * 7 Modify Information
+         * 8 change department
+         * 9 read
+         * 10 lock
+         * 11 assign
          */
 
         if (topic == null) {
@@ -36,8 +46,6 @@ public class TopicPermissionsService {
             log.debug( "Validating permissions of user {} for topic {} and action {}", username, topic, ticketactions );
 
         String operation = Utils.getOperationFromAction( ticketactions );
-
-
         if (operation == null) {
             log.info( "cannot map ticket action {} with proper operation", ticketactions.toString() );
             return false;
@@ -83,6 +91,10 @@ public class TopicPermissionsService {
                 return tp.canReopen( username, topic );
             case TicketOperation.MODIFYINFO:
                 return tp.canModify( username, topic );
+            case TicketOperation.CHGDPT:
+                return tp.canChangeDepartment( username, topic );
+            case TicketOperation.ASSIGN:
+                return tp.canAssign( username, topic );
             default:
                 return false;
         }

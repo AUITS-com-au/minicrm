@@ -3,6 +3,7 @@ package com.sh.crm.general.exceptions;
 import com.sh.crm.general.Errors;
 
 public class GeneralException extends BasicException {
+
     public GeneralException(String errorCode, String message) {
         super( errorCode, message );
     }
@@ -12,6 +13,9 @@ public class GeneralException extends BasicException {
         super.errorCode = message;
     }
 
+    public GeneralException() {
+
+    }
 
     public GeneralException(String message) {
         super( "", message );

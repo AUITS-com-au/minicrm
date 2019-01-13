@@ -88,7 +88,6 @@ public class Ticketactions extends BasicModel {
 
     @Override
     public boolean equals(Object object) {
-
         if (!(object instanceof Ticketactions)) {
             return false;
         }
@@ -103,14 +102,6 @@ public class Ticketactions extends BasicModel {
     public String toString() {
         return "Ticketactions{" +
                 "actionID=" + actionID +
-                ", arabicLabel='" + arabicLabel + '\'' +
-                ", englishLabel='" + englishLabel + '\'' +
-                ", enabled=" + enabled +
-                ", setStatusTo=" + setStatusTo +
-                ", createdBy='" + createdBy + '\'' +
-                ", modificationDate=" + modificationDate +
-                ", modifiedBy='" + modifiedBy + '\'' +
-                ", creationDate=" + creationDate +
                 '}';
     }
 }

@@ -102,8 +102,6 @@ public class TopicRestController extends BasicController<Topic> {
                     tp = null;
                     existing = null;
                 }
-
-
                 if (log.isDebugEnabled())
                     log.debug( "Topics permissions created/modified sucessfully " );
 

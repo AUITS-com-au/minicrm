@@ -1,7 +1,6 @@
 package com.sh.crm.general.utils;
 
 import com.sh.crm.jpa.entities.Ticketactions;
-import com.sh.crm.jpa.entities.Topicspermissions;
 import com.sh.crm.security.model.JwtUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Calendar;
 import java.util.Optional;
-import java.util.Set;
 
 public class Utils {
     private static final Logger log = LoggerFactory.getLogger( Utils.class );
@@ -94,7 +92,6 @@ public class Utils {
      */
 
 
-
     public static String getOperationFromAction(Ticketactions ticketactions) {
         String operation = null;
         switch (ticketactions.getActionID()) {
@@ -111,19 +108,31 @@ public class Utils {
                 operation = TicketOperation.CREATE;
                 break;
             case 5:
-                operation = TicketOperation.REPLY;
-                break;
             case 6:
+            case 12:
                 operation = TicketOperation.REPLY;
                 break;
             case 7:
                 operation = TicketOperation.MODIFYINFO;
+                break;
+            case 8:
+                operation = TicketOperation.CHGDPT;
+                break;
+            case 9:
+                operation = TicketOperation.READ;
+                break;
+            case 11:
+                operation = TicketOperation.ASSIGN;
                 break;
             default:
                 operation = null;
                 break;
         }
         return operation;
+    }
+
+    public static String getOperationFromAction(Integer ticketactions) {
+        return getOperationFromAction( new Ticketactions( ticketactions ) );
     }
 
     public static void main(String[] args) {
