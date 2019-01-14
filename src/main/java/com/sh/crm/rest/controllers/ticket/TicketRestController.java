@@ -11,6 +11,7 @@ import com.sh.crm.general.holders.TicketHolder;
 import com.sh.crm.general.utils.LoggingUtils;
 import com.sh.crm.general.utils.TicketAction;
 import com.sh.crm.general.utils.TicketOperation;
+import com.sh.crm.general.utils.TicketStatus;
 import com.sh.crm.jpa.entities.*;
 import com.sh.crm.misc.TopicConfiguration;
 import com.sh.crm.rest.general.BasicController;
@@ -25,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
@@ -181,20 +181,20 @@ public class TicketRestController extends BasicController<TicketHolder> {
         if (log.isDebugEnabled())
             log.debug( "Logging ticket action:\n{} triggered by user: {}", ticketHolder, principal.getName() );
         ResponseEntity responseEntity = null;
-        //validating lock first
-
-
-// check action first
-
+        // check action first
         if (ticketHolder.getActionID() != null) {
             switch (ticketHolder.getActionID()) {
                 case TicketAction.REPLY:
+                case TicketAction.CHGDEPT:
+                case TicketAction.CLOSE:
+                case TicketAction.ONPROGRESS:
+                case TicketAction.REOPEN:
+                case TicketAction.RESOLVED:
                     handleTicketData( ticketHolder, principal );
                     return ResponseEntity.ok( ticketsRepo.findOne( ticketHolder.getTicket().getId() ) );
                 case TicketAction.ASSIGN:
                     Set<Ticket> response = assignTickets( ticketHolder, principal );
                     return ResponseEntity.ok( response );
-
             }
         } else {
             throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, "Action ID is empty" );
@@ -258,89 +258,93 @@ public class TicketRestController extends BasicController<TicketHolder> {
         ticketServices.logTicketHistory( history, principal );
     }
 
+
     @Transactional
     void handleTicketData(TicketHolder ticketHolder, Principal principal) throws GeneralException {
         validateTicketLock( ticketHolder );
-
         Integer actionID = ticketHolder.getActionID();
         Ticketdata ticketdata = ticketHolder.getTicketdata();
         Integer newTopic = ticketHolder.getNewTopic();
-        if (ticketdata != null) {
-            log.debug( "Trying to persist ticket action data" );
-            Ticketactions ticketactions = ticketActionsRepo.findOne( actionID );
-            Ticket ticket = null;
-            try {
+
+        log.debug( "Trying to persist ticket action data" );
+        Ticketactions ticketactions = ticketActionsRepo.findOne( actionID );
+        Ticket ticket = null;
+        try {
+            if (log.isDebugEnabled())
+                log.debug( "fetching data base to get ticket id first before editing, ticket id {}", ticketHolder.getTicket().getId() );
+            ticket = ticketsRepo.findOne( ticketHolder.getTicket().getId() );
+
+            if (ticket == null) {
+                String error = String.format( "Ticket ID %s cannot be found", ticketHolder.getTicket().getId() );
                 if (log.isDebugEnabled())
-                    log.debug( "fetching data base to get ticket id first before editing, ticket id {}", ticketHolder.getTicket().getId() );
-                ticket = ticketsRepo.findOne( ticketHolder.getTicket().getId() );
-
-                if (ticket == null) {
-                    String error = String.format( "Ticket ID %s cannot be found", ticketHolder.getTicket().getId() );
-                    if (log.isDebugEnabled())
-                        log.debug( error );
-                    throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, error );
-                }
-                Integer currentStatus = ticket.getCurrentStatus();
-                Topic currentTopic = ticket.getTopic();
-                //action ID 8 is
-                if (newTopic != null && actionID != 8) {
-                    throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, "Received Value to Change topic to " + newTopic + " and action is not change topic action" );
-                }
-                if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), ticketactions )) {
-                    Status newStatus = ticketactions.getSetStatusTo();
-                    ticketdata.setTicketID( ticket );
-                    ticketdata.setNewStatus( newStatus != null ? newStatus.getId() : null );
-                    ticketdata.setOldStatus( ticket.getCurrentStatus() );
-                    ticketdata.setOldTopic( ticket.getTopic().getId() );
-                    if (newTopic != null) {
-                        ticketdata.setNewTopic( newTopic );
-                        ticket.setTopic( topicRepo.getOne( newTopic ) );
-                    }
-                    ticketdata.setActionID( ticketactions );
-                    tikcetDataRepo.save( ticketdata );
-                    log.debug( "Ticket action saved successfully for ticket {}\n action {} \n data {}",
-                            ticket.getId(),
-                            ticketactions, ticketdata );
-                    // updating ticket record
-                    if (newStatus != null)
-                        ticket.setCurrentStatus( newStatus.getId() );
-
-                    //update ticket record it self
-                    updateTicketRecord( ticket, actionID, newTopic, principal );
-                    if (log.isDebugEnabled()) {
-                        log.debug( "Ticket Record Modified {} ", ticket.getId() );
-                        log.debug( "Storing Ticket Action {} for ticket {} ", actionID, ticket.getId() );
-                    }
-                    TicketHistory history = new TicketHistory();
-                    history.setActionID( actionID );
-                    history.setTicketID( ticket.getId() );
-                    history.setDateTime( Calendar.getInstance().getTime() );
-                    history.setOldTopic( currentTopic.getId() );
-                    history.setNewTopic( ticket.getTopic().getId() );
-                    history.setOldStatus( currentStatus );
-                    history.setNewStatus( ticket.getCurrentStatus() );
-                    history.setOldAssigne( ticket.getAssignedTo() );
-                    ticketServices.logTicketHistory( history, principal );
-
-                    if (log.isDebugEnabled())
-                        log.debug( "Ticket action for ticket {}  handled", ticket.getId() );
-
-                } else {
-                    if (log.isDebugEnabled())
-                        log.debug( "User {} is not allowed to do this action {} on ticket {}", principal.getName(),
-                                ticketactions.getActionID(),
-                                ticket.getId() );
-                    throw new UserNotAllowedException( "User" + principal.getName() + " is not allowed for this action " );
-                }
-            } catch (Exception e) {
-                LoggingUtils.logStackTrace( log, e, "error" );
-                log.error( "An exception happened during ticket action persistence {} ", e );
-                throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, e );
-            } finally {
-                ticket = null;
-                ticketactions = null;
+                    log.debug( error );
+                throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, error );
             }
+            Integer currentStatus = ticket.getCurrentStatus();
+            Topic currentTopic = ticket.getTopic();
+            //action ID 8 is
+            if (newTopic != null && actionID != TicketAction.CHGDEPT) {
+                throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, "Received Value to Change topic to " + newTopic + " and action is not change topic action" );
+            }
+            if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), ticketactions )) {
+                Status newStatus = ticketactions.getSetStatusTo();
+                ticketdata.setTicketID( ticket );
+                ticketdata.setNewStatus( newStatus != null ? newStatus.getId() : null );
+                ticketdata.setOldStatus( ticket.getCurrentStatus() );
+                ticketdata.setOldTopic( ticket.getTopic().getId() );
+                if (newTopic != null) {
+                    ticketdata.setNewTopic( newTopic );
+                    ticket.setTopic( topicRepo.getOne( newTopic ) );
+                }
+                ticketdata.setActionID( ticketactions );
+                tikcetDataRepo.save( ticketdata );
+                log.debug( "Ticket action saved successfully for ticket {}\n action {} \n data {}",
+                        ticket.getId(),
+                        ticketactions, ticketdata );
+                // updating ticket record
+                if (newStatus != null)
+                    ticket.setCurrentStatus( newStatus.getId() );
+
+                //update ticket record it self
+                updateTicketRecord( ticket, actionID, newTopic, principal );
+                if (log.isDebugEnabled()) {
+                    log.debug( "Ticket Record Modified {} ", ticket.getId() );
+                    log.debug( "Storing Ticket Action {} for ticket {} ", actionID, ticket.getId() );
+                }
+                TicketHistory history = new TicketHistory();
+                history.setActionID( actionID );
+                history.setTicketID( ticket.getId() );
+                history.setDateTime( Calendar.getInstance().getTime() );
+                history.setOldTopic( currentTopic.getId() );
+                history.setNewTopic( ticket.getTopic().getId() );
+                history.setOldStatus( currentStatus );
+                history.setNewStatus( ticket.getCurrentStatus() );
+                history.setOldAssigne( ticket.getAssignedTo() );
+                ticketServices.logTicketHistory( history, principal );
+
+                if (log.isDebugEnabled())
+                    log.debug( "Ticket action for ticket {}  handled", ticket.getId() );
+
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug( "User {} is not allowed to do this action {} on ticket {}", principal.getName(),
+                            ticketactions.getActionID(),
+                            ticket.getId() );
+                throw new UserNotAllowedException( "User" + principal.getName() + " is not allowed for this action " );
+            }
+        } catch (Exception e) {
+            LoggingUtils.logStackTrace( log, e, "error" );
+            log.error( "An exception happened during ticket action persistence {} ", e );
+            throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, e );
+        } finally {
+            ticket = null;
+            ticketactions = null;
         }
+    }
+
+    @Transactional
+    void changeTktDept() {
+
     }
 
     @PostMapping("modifyInfo")
@@ -363,7 +367,12 @@ public class TicketRestController extends BasicController<TicketHolder> {
             originalTicket.setSourceChannel( ticket.getSourceChannel() );
             originalTicket.setSubject( ticket.getSubject() );
             originalTicket.setTicketType( ticket.getTicketType() );
+            originalTicket.setTicketExtData( ticket.getTicketExtData() );
+            TicketHistory history = new TicketHistory();
+            history.setTicketID( ticket.getId() );
+            history.setActionID( TicketAction.MODIFYINFO );
             ticketsRepo.save( originalTicket );
+            ticketServices.logTicketHistory( history, principal );
             log.info( "Ticket {} has been modified by user {}", ticket.getId(), principal.getName() );
             originalTicket = null;
             ticket = null;
@@ -372,7 +381,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
     }
 
-
     @Transactional
     void updateTicketRecord(Ticket ticket, Integer ticketactions,
                             Integer newTopic, Principal principal) {
@@ -380,22 +388,23 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
 
         switch (currentStatus) {
-            case 2:
+            case TicketStatus.Closed:
                 //closed
                 ticket.setClosed( true );
                 break;
-            case 4:
+            case TicketStatus.Resolved:
                 //resolved
                 ticket.setSolved( true );
                 break;
-            case 7:
+            case TicketStatus.Deleted:
                 //deleted
                 ticket.setDeleted( true );
                 break;
         }
 
         if (ticketactions != null) {
-            if (ticketactions == 2 || ticketactions == 3 || ticketactions == 8) {
+            if (ticketactions == TicketAction.CLOSE || ticketactions == TicketAction.REOPEN
+                    || ticketactions == TicketAction.CHGDEPT) {
                 /**
                  * closed
                  * reopen
@@ -403,7 +412,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                  */
                 ticket.setEscalationCalDate( Calendar.getInstance().getTime() );
                 ticket.setLastSLA( null );
-                if (ticketactions == 8) {
+                if (ticketactions == TicketAction.CHGDEPT) {
                     ticket.setAssignedTo( null );
                 }
             }

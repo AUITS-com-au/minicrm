@@ -1,8 +1,8 @@
 package com.sh.crm.general.utils;
 
-public class TicketAction {
+public interface TicketAction {
     public final static int RESOLVED = 1;
-    public final static int CLOSED = 2;
+    public final static int CLOSE = 2;
     public final static int REOPEN = 3;
     public final static int CREATE = 4;
     public final static int ONPROGRESS = 5;
