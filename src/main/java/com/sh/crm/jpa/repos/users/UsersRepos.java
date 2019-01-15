@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UsersRepos extends JpaRepository<Users, Integer> {
     Users findByUserID(String username);
@@ -21,7 +22,7 @@ public interface UsersRepos extends JpaRepository<Users, Integer> {
     void deleteById(Integer id);
 
     @Query("select u from Users u where u.id=?1 and u.systemUser=false")
-    Users findById(Integer id);
+    Optional<Users> findById(Integer id);
 
     List<Users> findByEnabledAndSystemUser(boolean enabled, boolean systemUser);
 

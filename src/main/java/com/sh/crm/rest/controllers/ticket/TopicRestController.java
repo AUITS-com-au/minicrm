@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -87,7 +88,7 @@ public class TopicRestController extends BasicController<Topic> {
 
                     try {
                         //delete old permissions for the same topic and assigne
-                        topicsPermissionsRepo.delete( existing );
+                        topicsPermissionsRepo.deleteAll( existing );
                     } catch (Exception e) {
                         LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
                         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
@@ -173,7 +174,7 @@ public class TopicRestController extends BasicController<Topic> {
     }
 
     @GetMapping(value = "/{ID}", produces = "application/json")
-    ResponseEntity<Topic> findByID(@PathVariable("ID") Integer topicID) {
-        return ResponseEntity.ok( topicRepo.findOne( topicID ) );
+    ResponseEntity<Optional<Topic>> findByID(@PathVariable("ID") Integer topicID) {
+        return ResponseEntity.ok( topicRepo.findById( topicID ) );
     }
 }

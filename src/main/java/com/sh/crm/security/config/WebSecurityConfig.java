@@ -2,6 +2,7 @@ package com.sh.crm.security.config;
 
 import com.sh.crm.config.SpringSecurityAuditorAware;
 import com.sh.crm.security.filter.JwtAuthenticationTokenFilter;
+import com.sh.crm.security.service.JwtUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
     @Autowired
-    private UserDetailsService userDetailsService;
+    private JwtUserDetailsServiceImpl userDetailsService;
     @Autowired
     private AuthenticationProvider databaseProvider;
     @Autowired
@@ -47,11 +48,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private String AD_DOMAIN;
     @Value("${ldap.url}")
     private String AD_URL;
-
-    @Bean
-    public AuditorAware<String> auditorProvider() {
-        return new SpringSecurityAuditorAware();
-    }
 
 
 
@@ -102,7 +98,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 
-                .authorizeRequests().antMatchers("/auth/**","/metrics/**").permitAll().antMatchers(HttpMethod.OPTIONS, "/**")
+                .authorizeRequests().antMatchers( "/auth/**", "/metrics/**", "/v2/**", "/favicon.ico", "/swagger/**" ).permitAll().antMatchers( HttpMethod.OPTIONS, "/**" )
                 .permitAll().anyRequest().authenticated();
 
         // Custom JWT based security filter
@@ -122,5 +118,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }

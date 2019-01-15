@@ -16,18 +16,17 @@ import java.util.Date;
 @Entity
 @Table(name = "TicketHistory")
 @XmlRootElement
-public class TicketHistory extends BasicModelWithID {
-
+public class TicketHistory {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    protected Long id;
     @Basic(optional = false)
     @NotNull
     @Column(name = "TicketID")
     private long ticketID;
-    @CreatedDate
-    @Column(name = "DateTime")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateTime;
+
     @Size(max = 50)
-    @CreatedBy
     @Column(name = "CreatedBy")
     private String createdBy;
     @Column(name = "ActionID")
@@ -44,7 +43,8 @@ public class TicketHistory extends BasicModelWithID {
     private String oldAssigne;
     @Column(name = "NewAssigne")
     private String newAssigne;
-
+    @Column(name = "CreationDate")
+    protected Date creationDate;
     public TicketHistory() {
     }
 
@@ -52,10 +52,10 @@ public class TicketHistory extends BasicModelWithID {
         this.id = id;
     }
 
-    public TicketHistory(Long id, long ticketID, Date dateTime) {
-        this.id = id;
+    public TicketHistory(long ticketID) {
+
         this.ticketID = ticketID;
-        this.dateTime = dateTime;
+
     }
 
     public long getTicketID() {
@@ -66,13 +66,6 @@ public class TicketHistory extends BasicModelWithID {
         this.ticketID = ticketID;
     }
 
-    public Date getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
-    }
 
     public String getCreatedBy() {
         return createdBy;
@@ -136,6 +129,22 @@ public class TicketHistory extends BasicModelWithID {
 
     public void setNewAssigne(String newAssigne) {
         this.newAssigne = newAssigne;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     @Override

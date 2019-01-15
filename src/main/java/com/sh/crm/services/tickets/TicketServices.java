@@ -31,52 +31,50 @@ public class TicketServices {
     @Autowired
     private TicketDataRepo ticketDataRepo;
 
-    @Async
-    @Transactional
-    public void logTicketAction(Long ticketID, Integer actionID, boolean enableData, Principal principal) {
-        if (log.isTraceEnabled())
-            log.trace( "ticket action history log started successfully" );
-        if (ticketID != null) {
-            if (log.isDebugEnabled())
-                log.debug( "logging ticket action {} for ticket {} ", actionID, ticketID );
+    /* @Async
+     @Transactional
+     public void logTicketAction(Long ticketID, Integer actionID, boolean enableData, Principal principal) {
+         if (log.isTraceEnabled())
+             log.trace( "ticket action history log started successfully" );
+         if (ticketID != null) {
+             if (log.isDebugEnabled())
+                 log.debug( "logging ticket action {} for ticket {} ", actionID, ticketID );
 
-            //Ticket ticket = ticketsRepo.findOne( ticketID );
-            List<Ticketdata> ticketdataList = null;
-            if (enableData)
-                ticketdataList = ticketDataRepo.findByActionID_ActionIDAndTicketID_IdOrderByCreationDateDesc( actionID, ticketID );
-            TicketHistory history = new TicketHistory();
-            history.setActionID( actionID );
-            history.setTicketID( ticketID );
-            history.setCreatedBy( principal.getName() );
-            if (ticketdataList != null && ticketdataList.size() > 0) {
-                Ticketdata ticketdata = ticketdataList.get( 0 );
-                history.setDateTime( ticketdata.getCreationDate() );
-                history.setOldTopic( ticketdata.getOldTopic() );
-                history.setNewTopic( ticketdata.getNewTopic() );
-                history.setOldStatus( ticketdata.getOldStatus() );
-                history.setNewStatus( ticketdata.getNewStatus() );
+             //Ticket ticket = ticketsRepo.findOne( ticketID );
+             List<Ticketdata> ticketdataList = null;
+             if (enableData)
+                 ticketdataList = ticketDataRepo.findByActionID_ActionIDAndTicketID_IdOrderByCreationDateDesc( actionID, ticketID );
+             TicketHistory history = new TicketHistory();
+             history.setActionID( actionID );
+             history.setTicketID( ticketID );
+             history.setCreatedBy( principal.getName() );
+             if (ticketdataList != null && ticketdataList.size() > 0) {
+                 Ticketdata ticketdata = ticketdataList.get( 0 );
+                 history.setDateTime( ticketdata.getCreationDate() );
+                 history.setOldTopic( ticketdata.getOldTopic() );
+                 history.setNewTopic( ticketdata.getNewTopic() );
+                 history.setOldStatus( ticketdata.getOldStatus() );
+                 history.setNewStatus( ticketdata.getNewStatus() );
 
-            }
+             }
+             ticketHistoryRepo.save( history );
+             history = null;
+             if (log.isDebugEnabled())
+                 log.debug( "action saved for ticket {}", ticketID );
+             ticketdataList = null;
+         } else {
+             log.error( "error logging ticket action, ticket id is null" );
+         }
 
-            ticketHistoryRepo.save( history );
-            history = null;
-            if (log.isDebugEnabled())
-                log.debug( "action saved for ticket {}", ticketID );
-            ticketdataList = null;
-        } else {
-            log.error( "error logging ticket action, ticket id is null" );
-        }
-
-        if (log.isTraceEnabled())
-            log.trace( "ticket action history log completed successfully" );
-    }
-
+         if (log.isTraceEnabled())
+             log.trace( "ticket action history log completed successfully" );
+     }
+ */
     @Async
     @Transactional
     public void logTicketHistory(TicketHistory history, Principal principal) {
         if (log.isTraceEnabled())
             log.trace( "ticket history log started successfully" );
-
 
         history.setCreatedBy( principal.getName() );
         history.setCreationDate( java.util.Calendar.getInstance().getTime() );

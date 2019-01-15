@@ -5,7 +5,6 @@ import com.sh.crm.general.Errors;
 import com.sh.crm.general.exceptions.GeneralException;
 import com.sh.crm.general.utils.LoggingUtils;
 import com.sh.crm.jpa.entities.Maincategory;
-import com.sh.crm.jpa.entities.Users;
 import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.TicketsAdmin;
 import org.springframework.http.MediaType;
@@ -13,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/categories")
@@ -49,9 +49,10 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
             if (log.isDebugEnabled())
                 log.debug( "Received request to modify main category {}", maincategory );
             try {
-                Maincategory original = mainCategoryRepo.findOne( maincategory.getId() );
-                if (original == null)
+                Optional<Maincategory> optional = mainCategoryRepo.findById( maincategory.getId() );
+                if (!optional.isPresent())
                     throw new GeneralException( Errors.CANNOT_EDIT_OBJECT );
+                Maincategory original = optional.get();
                 original.setEnabled( maincategory.getEnabled() );
                 original.setArabicLabel( maincategory.getArabicLabel() );
                 original.setEnglishLabel( maincategory.getEnglishLabel() );
@@ -73,9 +74,12 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
                 log.debug( "Received request to delete main category {}", maincategory );
 
             try {
-                Maincategory original = mainCategoryRepo.findOne( maincategory.getId() );
-                if (original == null)
+                Optional<Maincategory> optionalMaincategory = mainCategoryRepo.findById( maincategory.getId() );
+                if (!optionalMaincategory.isPresent())
                     throw new GeneralException( Errors.CANNOT_EDIT_OBJECT );
+                Maincategory maincategory1 = optionalMaincategory.get();
+                maincategory1.setEnabled( false );
+                mainCategoryRepo.save( maincategory1 );
                 return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
@@ -87,7 +91,11 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
 
     @GetMapping(value = "/{ID}", produces = MediaType.APPLICATION_JSON_VALUE)
     Maincategory findByID(@PathVariable("ID") Integer topicID) {
-        return mainCategoryRepo.findOne( topicID );
+        Optional<Maincategory> optional = mainCategoryRepo.findById( topicID );
+        Maincategory maincategory = null;
+        if (optional.isPresent())
+            maincategory = optional.get();
+        return maincategory;
     }
 
     @Override

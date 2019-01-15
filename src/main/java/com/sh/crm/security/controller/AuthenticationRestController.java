@@ -4,13 +4,15 @@ package com.sh.crm.security.controller;
 import com.sh.crm.security.model.JwtAuthenticationRequest;
 import com.sh.crm.security.model.JwtUser;
 import com.sh.crm.security.service.JwtAuthenticationResponse;
+import com.sh.crm.security.service.JwtUserDetailsServiceImpl;
 import com.sh.crm.security.util.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mobile.device.Device;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,6 +33,7 @@ public class AuthenticationRestController {
     @Value("${jwt.header}")
     private String tokenHeader;
 
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -38,10 +41,10 @@ public class AuthenticationRestController {
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private JwtUserDetailsServiceImpl userDetailsService;
 
     @RequestMapping(value = "${jwt.route.authentication.path}", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest, Device device) throws AuthenticationException {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) throws AuthenticationException {
         log.debug(" >>>>>>>> Authentication Request <<<<<<<<<<< ");
 
         final Authentication authentication = authenticationManager.authenticate(
@@ -54,7 +57,7 @@ public class AuthenticationRestController {
 
         // Reload password post-security so we can generate token
         final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-        final String token = jwtTokenUtil.generateToken(userDetails, device);
+        final String token = jwtTokenUtil.generateToken( userDetails );
 
         // Return the token
         return ResponseEntity.ok(new JwtAuthenticationResponse(token, userDetails));

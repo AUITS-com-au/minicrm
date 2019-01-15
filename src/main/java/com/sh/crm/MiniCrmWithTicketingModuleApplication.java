@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @SpringBootApplication
 @EnableAutoConfiguration
 @EnableAsync
+
 public class MiniCrmWithTicketingModuleApplication {
 
     public static void main(String[] args) {

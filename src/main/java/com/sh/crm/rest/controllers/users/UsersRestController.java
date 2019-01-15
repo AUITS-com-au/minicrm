@@ -96,7 +96,7 @@ public class UsersRestController extends BasicController<UserHolder> {
         log.debug( "Received request to edit user: " + userHolder );
         try {
             if (user != null && user.getId() != null && user.getUserID() != null) {
-                Users origianlUser = userRepo.findById( user.getId() );
+                Users origianlUser = userRepo.findById( user.getId() ).orElse( null );
                 //validateSuperUser(user);
                 if (!user.getLDAPUser() && userHolder.getPassword() != null && !userHolder.getPassword().equals( "" )) {
                     // origianlUser.setLastPasswordResetDate(Calendar.getInstance().getTime());
@@ -134,7 +134,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     @GetMapping("disable/{userID}")
     @Transactional
     public ResponseEntity<?> disableUser(@PathVariable("userID") Integer userID) throws GeneralException {
-        Users user = userRepo.findById( userID );
+        Users user = userRepo.findById( userID ).orElse( null );
         // validateSuperUser(user);
         user.setEnabled( false );
         userRepo.save( user );
@@ -144,7 +144,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     @Transactional
     @GetMapping("enable/{userID}")
     public ResponseEntity<?> enableUser(@PathVariable("userID") Integer userID) throws GeneralException {
-        Users user = userRepo.findById( userID );
+        Users user = userRepo.findById( userID ).orElse( null );
         user.setEnabled( true );
         userRepo.save( user );
         return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
@@ -227,7 +227,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     @GetMapping("id/{userID}")
     public ResponseEntity<Users> getUserbyId(@Valid @PathVariable("userID") Integer userID) {
 
-        Users user = userRepo.findById( userID );
+        Users user = userRepo.findById( userID ).orElse( null );
         if (user != null) {
             return ResponseEntity.ok( user );
         } else

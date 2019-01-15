@@ -79,7 +79,7 @@ public class SubcategoryRestController extends BasicController<Subcategory> {
 
     @GetMapping(value = "/{ID}", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<?> findByID(@PathVariable("ID") Integer id) {
-        return ResponseEntity.ok( subcategoryRepo.findOne( id ) );
+        return ResponseEntity.ok( subcategoryRepo.findById( id ).orElse( null ) );
     }
 
     @Override

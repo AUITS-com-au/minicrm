@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -67,10 +68,11 @@ public class RolesRestController extends BasicController<RoleHolder> {
     public ResponseEntity<?> edit(@RequestBody RoleHolder roleHolder, Principal principal) throws GeneralException {
         if (roleHolder != null && roleHolder.getRole() != null && roleHolder.getPermissions() != null && !roleHolder.getPermissions().isEmpty()) {
             Roles role = roleHolder.getRole();
-            Roles originalRole = rolesRepo.findOne( role.getId() );
-            if (originalRole == null)
+            Optional<Roles> optionalRoles = rolesRepo.findById( role.getId() );
+            if (!optionalRoles.isPresent())
                 throw new GeneralException( "Cannot find role" );
             try {
+                Roles originalRole = optionalRoles.get();
                 originalRole.setRole( role.getRole() );
                 rolesRepo.save( originalRole );
                 deleteRolePermissions( role );

@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
@@ -76,7 +77,11 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     log.info( "ticket {} created successfully", ticket.getId() );
                     if (log.isDebugEnabled())
                         log.debug( "log ticket action after creation" );
-                    ticketServices.logTicketAction( ticket.getId(), ticketaction.getActionID(), false
+                    TicketHistory history = new TicketHistory();
+                    history.setTicketID( ticket.getId() );
+                    history.setActionID( TicketAction.CREATE );
+
+                    ticketServices.logTicketHistory( history
                             , principal );
                     if (ticketHolder.getExtDataList() != null && !ticketHolder.getExtDataList().isEmpty()) {
                         List<TicketExtData> updatedList = new ArrayList<>( ticketHolder.getExtDataList().size() );
@@ -85,16 +90,16 @@ public class TicketRestController extends BasicController<TicketHolder> {
                             data.setId( null );
                             updatedList.add( data );
                         }
-                        updatedList = ticketExtDataRepo.save( updatedList );
+                        updatedList = ticketExtDataRepo.saveAll( updatedList );
                         ticket.setTicketExtData( updatedList );
                         if (log.isDebugEnabled())
                             log.debug( "Ticket ID {} extended data created successfuly", ticket.getId() );
                     }
                     ticketHolder = null;
-                    ticket = null;
+
                     ticketaction = null;
 
-                    return ResponseEntity.ok( ticket );
+                    return ResponseEntity.ok( ticketsRepo.findById( ticket.getId() ).orElse( null ) );
                 } else {
                     return new ResponseEntity( new ResponseCode( Errors.UNAUTHORIZED ), HttpStatus.UNAUTHORIZED );
                 }
@@ -112,27 +117,29 @@ public class TicketRestController extends BasicController<TicketHolder> {
                               Principal principal) throws GeneralException {
         if (log.isDebugEnabled())
             log.debug( "acquiring lock for ticket {} user {} action ID {}", ticket, principal.getName(), actionID );
-        Ticket ticketObject = ticketsRepo.findOne( ticket );
-        if (ticketObject == null)
+        Ticket ticketObject = null;
+
+        Optional<Ticket> optionalTicket = ticketsRepo.findById( ticket );
+
+        if (!optionalTicket.isPresent())
             throw new GeneralException( Errors.INVALID_TICKET );
 
+        ticketObject = optionalTicket.orElse( null );
         ticketLocksRepo.invalidateExistingUserLocks( principal.getName() );
 
         if (topicPermissionsService.isAllowedPermission( ticketObject.getTopic().getId(), principal.getName(), new Ticketactions( actionID ) )) {
             //if open ticket for read only no need to make a lock
             TicketHistory history = new TicketHistory();
             history.setTicketID( ticket );
+            history.setActionID( actionID );
             if (actionID == TicketAction.READ) {
-                ticketServices.logTicketAction( ticket, actionID, false, principal );
-
-                history.setActionID( TicketAction.READ );
                 ticketServices.logTicketHistory( history, principal );
                 return ResponseEntity.ok( true );
             }
 
             List<Ticketlock> locks = ticketLocksRepo.getByTicketIDAndExpiresOnAfterAndExpiredIsFalse( ticketObject, Calendar.getInstance().getTime() );
             if (locks == null || locks.isEmpty()) {
-                Topic topic = topicRepo.findOne( ticketObject.getTopic().getId() );
+                Topic topic = topicRepo.findById( ticketObject.getTopic().getId() ).orElse( null );
                 ObjectMapper objectMapper = new ObjectMapper();
                 TopicConfiguration configuration = null;
                 try {
@@ -191,7 +198,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 case TicketAction.REOPEN:
                 case TicketAction.RESOLVED:
                     handleTicketData( ticketHolder, principal );
-                    return ResponseEntity.ok( ticketsRepo.findOne( ticketHolder.getTicket().getId() ) );
+                    return ResponseEntity.ok( ticketsRepo.findById( ticketHolder.getTicket().getId() ).orElse( null ) );
                 case TicketAction.ASSIGN:
                     Set<Ticket> response = assignTickets( ticketHolder, principal );
                     return ResponseEntity.ok( response );
@@ -223,7 +230,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             }
 
             for (Long ticketID : tickets) {
-                Ticket ticket = ticketsRepo.findOne( ticketID );
+                Ticket ticket = ticketsRepo.findById( ticketID ).orElse( null );
                 if (ticket == null)
                     continue;
                 if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), TicketAction.ASSIGN )) {
@@ -267,19 +274,21 @@ public class TicketRestController extends BasicController<TicketHolder> {
         Integer newTopic = ticketHolder.getNewTopic();
 
         log.debug( "Trying to persist ticket action data" );
-        Ticketactions ticketactions = ticketActionsRepo.findOne( actionID );
+        Ticketactions ticketactions = ticketActionsRepo.findById( actionID ).orElse( null );
         Ticket ticket = null;
         try {
             if (log.isDebugEnabled())
                 log.debug( "fetching data base to get ticket id first before editing, ticket id {}", ticketHolder.getTicket().getId() );
-            ticket = ticketsRepo.findOne( ticketHolder.getTicket().getId() );
+            Optional<Ticket> optionalTicket = ticketsRepo.findById( ticketHolder.getTicket().getId() );
 
-            if (ticket == null) {
+            if (!optionalTicket.isPresent()) {
                 String error = String.format( "Ticket ID %s cannot be found", ticketHolder.getTicket().getId() );
                 if (log.isDebugEnabled())
                     log.debug( error );
                 throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, error );
             }
+            ticket = optionalTicket.orElse( null );
+
             Integer currentStatus = ticket.getCurrentStatus();
             Topic currentTopic = ticket.getTopic();
             //action ID 8 is
@@ -314,7 +323,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 TicketHistory history = new TicketHistory();
                 history.setActionID( actionID );
                 history.setTicketID( ticket.getId() );
-                history.setDateTime( Calendar.getInstance().getTime() );
+
                 history.setOldTopic( currentTopic.getId() );
                 history.setNewTopic( ticket.getTopic().getId() );
                 history.setOldStatus( currentStatus );
@@ -354,7 +363,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             log.debug( "received modify ticket request from user {}  , ticket: \n{} ", principal.getName(), ticket );
             log.debug( "getting original ticket from db" );
         }
-        Ticket originalTicket = ticketsRepo.findOne( ticket.getId() );
+        Ticket originalTicket = ticketsRepo.findById( ticket.getId() ).orElse( null );
         if (originalTicket == null) {
             if (log.isDebugEnabled())
                 log.debug( "cannot find original ticket with ID {} ", ticket.getId() );
@@ -461,7 +470,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
     @GetMapping("/{ticketID}")
     ResponseEntity<?> getTicketByID(@PathVariable("ticketID") Long ticketID, Principal principal) {
-        Ticket ticket = ticketsRepo.findOne( ticketID );
+        Ticket ticket = ticketsRepo.findById( ticketID ).orElse( null );
         if (ticket == null)
             return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
 
@@ -495,7 +504,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
      * @throws GeneralException
      */
     private void validateTicketLock(Long ticketLock, Long ticketID) throws GeneralException {
-        Ticketlock ticketlock = ticketLocksRepo.findOne( ticketLock );
+        Ticketlock ticketlock = ticketLocksRepo.findById( ticketLock ).orElse( null );
         if (ticketlock == null)
             throw new GeneralException( Errors.INVALID_TICKET_LOCK );
 

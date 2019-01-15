@@ -3,7 +3,7 @@ package com.sh.crm.config.general;
 
 import com.sh.crm.general.exceptions.BasicException;
 import com.sh.crm.general.exceptions.GeneralException;
-import org.springframework.boot.context.config.ResourceNotFoundException;
+//import org.springframework.boot.context.config.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -36,6 +36,7 @@ public class GeneralHandler {
         return new ResponseEntity<ResponseCode>(responseCode, HttpStatus.BAD_REQUEST);
 
     }
+/*
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseCode> ExceptionHandler(ResourceNotFoundException ex) {
@@ -43,5 +44,6 @@ public class GeneralHandler {
         return new ResponseEntity<ResponseCode>(responseCode, HttpStatus.BAD_REQUEST);
 
     }
+*/
 
 }

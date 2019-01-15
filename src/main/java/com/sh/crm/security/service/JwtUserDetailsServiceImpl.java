@@ -27,7 +27,6 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private PermissionsRepo permissionsRepo;
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Users user = userRepository.findByUserID(username);

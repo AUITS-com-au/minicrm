@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.EntityManagerFactory;
 
-@Configuration
+//@Configuration
 public class HibernateSessionBean {
     @Autowired
     private EntityManagerFactory em;

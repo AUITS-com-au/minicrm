@@ -80,7 +80,7 @@ public class GroupsRestController extends BasicController<GroupHolder> {
 
     public ResponseEntity<?> edit(@RequestBody @Valid GroupHolder groupHolder, Principal principal) throws GeneralException {
         log.debug( "Received modify Groups request: " + groupHolder.toString() );
-        Groups group = groupRepo.findOne( groupHolder.getGroup().getId() );
+        Groups group = groupRepo.findById( groupHolder.getGroup().getId() ).orElse( null );
         group.setGroupName( groupHolder.getName() );
         try {
             groupRepo.save( group );
@@ -117,7 +117,7 @@ public class GroupsRestController extends BasicController<GroupHolder> {
 
     @GetMapping("{groupID}")
     public ResponseEntity<Groups> getById(@PathVariable("groupID") Integer id) {
-        Groups group = groupRepo.findOne( id );
+        Groups group = groupRepo.findById( id ).orElse( null );
         if (group != null) {
             return ResponseEntity.ok( group );
         }
