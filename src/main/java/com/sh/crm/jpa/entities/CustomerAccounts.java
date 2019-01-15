@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 @Entity
 @Table(name = "CustomerAccounts")
@@ -19,7 +18,6 @@ public class CustomerAccounts extends BasicModelWithID {
     @Size(max = 250)
     @Column(name = "CustomerNameEn")
     private String customerNameEn;
-    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Size(max = 50)
     @Column(name = "Email")
     private String email;
@@ -32,6 +30,13 @@ public class CustomerAccounts extends BasicModelWithID {
     @Size(max = 50)
     @Column(name = "Segment")
     private String segment;
+    @Size(max = 10)
+    @Column(name = "CustomerCIF")
+    private String customerCIF;
+    @Size(max = 300)
+    @Column(name = "BranchName")
+    private String branchName;
+
 
     public CustomerAccounts() {
     }
@@ -88,6 +93,22 @@ public class CustomerAccounts extends BasicModelWithID {
         this.segment = segment;
     }
 
+    public String getCustomerCIF() {
+        return customerCIF;
+    }
+
+    public void setCustomerCIF(String customerCIF) {
+        this.customerCIF = customerCIF;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -97,7 +118,6 @@ public class CustomerAccounts extends BasicModelWithID {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof CustomerAccounts)) {
             return false;
         }

@@ -92,4 +92,19 @@ public class TicketHolder {
     public void setNewTopic(Integer newTopic) {
         this.newTopic = newTopic;
     }
+
+    @Override
+    public String toString() {
+        return "TicketHolder{" +
+                "ticket=" + ticket +
+                ", customerAccount=" + customerAccount +
+                ", extDataList=" + extDataList +
+                ", ticketdata=" + ticketdata +
+                ", lockID=" + lockID +
+                ", actionID=" + actionID +
+                ", newTopic=" + newTopic +
+                ", ticketList=" + ticketList +
+                ", targetUser='" + targetUser + '\'' +
+                '}';
+    }
 }

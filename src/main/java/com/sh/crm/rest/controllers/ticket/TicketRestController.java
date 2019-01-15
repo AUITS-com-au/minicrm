@@ -60,13 +60,15 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 if (ticket == null)
                     throw new GeneralException( Errors.CANNOT_CREATE_OBJECT, "Ticket record is empty" );
                 // Topic topic = topicRepo.findOne( ticket.getTopic() );
-                Ticketactions ticketaction = new Ticketactions( 4 );
+                Ticketactions ticketaction = new Ticketactions( TicketAction.CREATE );
                 if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), ticketaction )) {
                     if (log.isDebugEnabled())
                         log.debug( "User {} is allowed to create a ticket", principal.getName() );
-                    ticket.setCustomerAccount( accounts != null ? accounts.getId() : null );
+                    // ticket.setCustomerAccount( accounts != null ? accounts.getId() : null );
                     ticket.setId( Long.parseLong( getNextTicketID( ticket.getTopic().getId() ) ) );
                     ticket.setOriginalTopic( ticket.getTopic() );
+                    ticket.setCurrentStatus( TicketStatus.Opened );
+
                     ticket.setEscalationCalDate( java.util.Calendar.getInstance().getTime() );
                     if (log.isDebugEnabled())
                         log.debug( "persisting ticket  {} into database", ticket );
@@ -183,6 +185,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
     }
 
     @PostMapping("action")
+    @PutMapping("action")
     ResponseEntity<?> ticketAction(
             @RequestBody TicketHolder ticketHolder, Principal principal) throws GeneralException {
         if (log.isDebugEnabled())
@@ -202,6 +205,9 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 case TicketAction.ASSIGN:
                     Set<Ticket> response = assignTickets( ticketHolder, principal );
                     return ResponseEntity.ok( response );
+                case TicketAction.MODIFYINFO:
+                    return modifyTicketInfo( ticketHolder.getTicket(), principal );
+
             }
         } else {
             throw new GeneralException( Errors.CANNOT_EDIT_OBJECT, "Action ID is empty" );
@@ -370,22 +376,30 @@ public class TicketRestController extends BasicController<TicketHolder> {
             return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_FIND_TICKET ) );
         }
         //action is 7
-        if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), new Ticketactions( 7 ) )) {
-            originalTicket.setCustomerAccount( ticket.getCustomerAccount() );
-            originalTicket.setLanguage( ticket.getLanguage() );
-            originalTicket.setSourceChannel( ticket.getSourceChannel() );
-            originalTicket.setSubject( ticket.getSubject() );
-            originalTicket.setTicketType( ticket.getTicketType() );
-            originalTicket.setTicketExtData( ticket.getTicketExtData() );
+        if (topicPermissionsService.isAllowedPermission( originalTicket.getTopic().getId(), principal.getName(), new Ticketactions( TicketAction.MODIFYINFO ) )) {
+            if (ticket.getCustomerAccount() != null)
+                originalTicket.setCustomerAccount( ticket.getCustomerAccount() );
+            if (ticket.getLanguage() != null)
+                originalTicket.setLanguage( ticket.getLanguage() );
+            if (ticket.getSourceChannel() != null)
+                originalTicket.setSourceChannel( ticket.getSourceChannel() );
+            if (ticket.getSubject() != null)
+                originalTicket.setSubject( ticket.getSubject() );
+            if (ticket.getTicketType() != null)
+                originalTicket.setTicketType( ticket.getTicketType() );
+
+            if (ticket.getTicketExtData() != null && !ticket.getTicketExtData().isEmpty())
+                originalTicket.setTicketExtData( ticket.getTicketExtData() );
+
             TicketHistory history = new TicketHistory();
             history.setTicketID( ticket.getId() );
             history.setActionID( TicketAction.MODIFYINFO );
             ticketsRepo.save( originalTicket );
             ticketServices.logTicketHistory( history, principal );
             log.info( "Ticket {} has been modified by user {}", ticket.getId(), principal.getName() );
-            originalTicket = null;
+
             ticket = null;
-            return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+            return ResponseEntity.ok( originalTicket );
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
     }

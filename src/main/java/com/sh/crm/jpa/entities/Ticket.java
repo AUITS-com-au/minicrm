@@ -7,8 +7,6 @@ package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -42,8 +40,9 @@ public class Ticket extends BasicModel {
     private Integer currentStatus;
     @Column(name = "CrossedMainSLA")
     private boolean crossedMainSLA;
-    @Column(name = "CustomerAccount")
-    private Long customerAccount;
+    @JoinColumn(name = "CustomerAccount", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private CustomerAccounts customerAccount;
     @Column(name = "SourceChannel")
     private Integer sourceChannel;
     @Size(max = 300)
@@ -170,11 +169,11 @@ public class Ticket extends BasicModel {
         this.crossedMainSLA = crossedMainSLA;
     }
 
-    public Long getCustomerAccount() {
+    public CustomerAccounts getCustomerAccount() {
         return customerAccount;
     }
 
-    public void setCustomerAccount(Long customerAccount) {
+    public void setCustomerAccount(CustomerAccounts customerAccount) {
         this.customerAccount = customerAccount;
     }
 
