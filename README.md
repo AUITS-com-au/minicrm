@@ -6,3 +6,6 @@ use this command to run the application
 mvn spring-boot:run
 Navigate to `
 **http://localhost:8080/swagger/index.html#/**
+
+**`_database located under resources/db**_
+`
