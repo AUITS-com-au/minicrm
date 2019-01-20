@@ -7,6 +7,7 @@ package com.sh.crm.jpa.entities;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -18,6 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = "usergroups")
 @XmlRootElement
+@EntityListeners(AuditingEntityListener.class)
 public class Usergroups {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

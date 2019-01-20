@@ -12,6 +12,7 @@ import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.UsersAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping(value = "users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 @UsersAdmin
 public class UsersRestController extends BasicController<UserHolder> {
     @Autowired
@@ -39,13 +40,11 @@ public class UsersRestController extends BasicController<UserHolder> {
         return userRepo.findAll();
     }
 
-    public ResponseEntity<?> getActive() {
+    @Override
+    public Iterable<?> active() {
         List<Users> usersList = userRepo.findByEnabledAndSystemUser( true, false );
         log.debug( "Getting active users list" );
-        if (usersList != null) {
-            return ResponseEntity.ok( usersList );
-        }
-        return ResponseEntity.noContent().build();
+        return usersList;
 
     }
 
@@ -59,6 +58,7 @@ public class UsersRestController extends BasicController<UserHolder> {
 
     }
 
+    @Transactional
     public ResponseEntity<?> create(@RequestBody @Valid UserHolder userHolder, Principal principal) throws GeneralException {
         log.debug( "received a request to create user: " + userHolder.getUser().toString() );
         if (userHolder.getUser().getUserID() != null) {
@@ -70,9 +70,9 @@ public class UsersRestController extends BasicController<UserHolder> {
                 user.setPassword( encoder.encode( userHolder.getPassword() ) );
             user.setEnabled( true );
             user.setSystemUser( false );
-
+            user.setLoginAttempts( 5 );
             try {
-                userRepo.save( user );
+                user = userRepo.save( user );
                 log.info( "User : " + user.getUserID() + " created successfully" );
             } catch (Exception e) {
                 log.error( "Error Creating user: " + user + ", error: " + e );
@@ -80,8 +80,6 @@ public class UsersRestController extends BasicController<UserHolder> {
                 throw new
                         GeneralException( Errors.CANNOT_CREATE_USER, e );
             }
-
-
             createRoles( user, userHolder.getSelectedRoles() );
             createGroups( user, userHolder.getSelectedGroups() );
             log.info( "User groups and Roles for User: " + user.getUserID() + " created sucessfully" );
@@ -91,6 +89,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     }
 
 
+    @Transactional
     public ResponseEntity<?> edit(@RequestBody @Valid UserHolder userHolder, Principal principal) throws GeneralException {
         Users user = userHolder.getUser();
         log.debug( "Received request to edit user: " + userHolder );
@@ -98,15 +97,25 @@ public class UsersRestController extends BasicController<UserHolder> {
             if (user != null && user.getId() != null && user.getUserID() != null) {
                 Users origianlUser = userRepo.findById( user.getId() ).orElse( null );
                 //validateSuperUser(user);
+                if (origianlUser == null) {
+                    throw new GeneralException( Errors.USER_EDIT_FAILED.getCode(),
+                            Errors.USER_EDIT_FAILED.getDesc() + ", exception: Cannot find user" );
+                }
                 if (!user.getLDAPUser() && userHolder.getPassword() != null && !userHolder.getPassword().equals( "" )) {
                     // origianlUser.setLastPasswordResetDate(Calendar.getInstance().getTime());
                     origianlUser.setPassword( encoder.encode( userHolder.getPassword() ) );
                 }
-                origianlUser.setLastName( user.getLastName() );
-                origianlUser.setFirstName( user.getFirstName() );
-                origianlUser.setEmail( user.getEmail() );
-                origianlUser.setEnabled( user.getEnabled() );
-                userRepo.save( origianlUser );
+                if (user.getLastName() != null)
+                    origianlUser.setLastName( user.getLastName() );
+                if (user.getFirstName() != null)
+                    origianlUser.setFirstName( user.getFirstName() );
+                if (user.getEmail() != null)
+                    origianlUser.setEmail( user.getEmail() );
+
+                if (user.getEnabled() != null)
+                    origianlUser.setEnabled( user.getEnabled() );
+
+                user = userRepo.save( origianlUser );
             }
         } catch (Exception e) {
             log.error( "Error Editing user : " + user.getUserID() + ", error: " + e );
@@ -165,7 +174,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     private void createGroups(Users user, List<Integer> groups) throws GeneralException {
 
         try {
-            if (groups != null)
+            if (groups != null && !groups.isEmpty())
                 for (Integer group : groups) {
                     Usergroups ug = new Usergroups();
                     ug.setGroupID( new Groups( group ) );
@@ -183,7 +192,7 @@ public class UsersRestController extends BasicController<UserHolder> {
 
     private void createRoles(Users user, List<Integer> roles) throws GeneralException {
         try {
-            if (roles != null)
+            if (roles != null && !roles.isEmpty())
                 for (Integer role : roles) {
                     Userroles ur = new Userroles();
                     ur.setRoleID( new Roles( role ) );

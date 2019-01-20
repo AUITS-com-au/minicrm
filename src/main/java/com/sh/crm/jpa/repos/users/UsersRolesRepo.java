@@ -11,6 +11,7 @@ import java.util.List;
 public interface UsersRolesRepo extends CrudRepository<Userroles, Long> {
     void deleteByUserID(Users userID);
     List<Userroles> findByUserID(Integer userID);
-    @Query( value = "SELECT  ur.roleID FROM  Userroles ur   where ur.userID=?1")
+
+    @Query(value = "SELECT  ur.roleID FROM  Userroles ur   where ur.userID.id=?1")
     List<Roles> getUserRoles(Integer id);
 }
