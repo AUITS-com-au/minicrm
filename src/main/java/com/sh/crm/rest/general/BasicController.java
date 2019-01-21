@@ -52,6 +52,7 @@ public abstract class BasicController<T> extends BasicGeneralController {
     }
 
     @PostMapping("create")
+    @Transactional
     public abstract ResponseEntity<?> create(@RequestBody T object, Principal principal) throws GeneralException;
 
     @PostMapping("edit")

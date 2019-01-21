@@ -1,26 +1,19 @@
 package com.sh.crm.security.service;
 
-import com.sh.crm.security.model.JwtUser;
- ;
-
+import com.sh.crm.jpa.entities.Users;
 import java.io.Serializable;
-
 
 public class JwtAuthenticationResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     private final String token;
-
-    private JwtUser user;
-
+    private Users user;
 
     public JwtAuthenticationResponse(String token) {
         this.token = token;
     }
 
-
-    public JwtAuthenticationResponse(String token, JwtUser user) {
+    public JwtAuthenticationResponse(String token, Users user) {
         super();
         this.token = token;
         this.user = user;
@@ -30,11 +23,11 @@ public class JwtAuthenticationResponse implements Serializable {
         return this.token;
     }
 
-    public JwtUser getUser() {
+    public Users getUser() {
         return user;
     }
 
-    public void setUser(JwtUser user) {
+    public void setUser(Users user) {
         this.user = user;
     }
 

@@ -1,25 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
+import javax.xml.bind.annotation.XmlTransient;
 
-/**
- * @author achah
- */
 @Entity
 @Table(name = "users")
 @XmlRootElement
@@ -38,7 +28,6 @@ public class Users extends BasicModelWithIDInt {
     @Column(name = "LastName")
     private String lastName;
     @Pattern(regexp = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message = "Invalid email")
-//if the field contains email address consider using this annotation to enforce field validation
     @Size(max = 250)
     @Column(name = "Email")
     private String email;
@@ -52,9 +41,7 @@ public class Users extends BasicModelWithIDInt {
     @Column(name = "Enabled")
     private Boolean enabled;
 
-    @Size(max = 10)
-    @Column(name = "Locale")
-    private String locale;
+
     @Column(name = "LoginAttempts")
     private Integer loginAttempts;
     @Column(name = "SystemUser")
@@ -67,6 +54,9 @@ public class Users extends BasicModelWithIDInt {
     private String department;
     @Column(name = "LDAPUser")
     private Boolean lDAPUser;
+
+    @Transient
+    private Userpreferences preferences;
 
     public Users() {
     }
@@ -145,15 +135,6 @@ public class Users extends BasicModelWithIDInt {
         this.enabled = enabled;
     }
 
-
-    public String getLocale() {
-        return locale;
-    }
-
-    public void setLocale(String locale) {
-        this.locale = locale;
-    }
-
     public Integer getLoginAttempts() {
         return loginAttempts;
     }
@@ -194,6 +175,16 @@ public class Users extends BasicModelWithIDInt {
         this.lDAPUser = lDAPUser;
     }
 
+    @Transient
+    public Userpreferences getPreferences() {
+        return preferences;
+    }
+
+    @Transient
+    public void setPreferences(Userpreferences preferences) {
+        this.preferences = preferences;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -203,12 +194,11 @@ public class Users extends BasicModelWithIDInt {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Users)) {
             return false;
         }
         Users other = (Users) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
@@ -216,7 +206,25 @@ public class Users extends BasicModelWithIDInt {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Users[ id=" + id + " ]";
+        return "Users{" +
+                "userID='" + userID + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", staffID='" + staffID + '\'' +
+                ", enabled=" + enabled +
+                ", loginAttempts=" + loginAttempts +
+                ", systemUser=" + systemUser +
+                ", title='" + title + '\'' +
+                ", department='" + department + '\'' +
+                ", lDAPUser=" + lDAPUser +
+                ", preferences=" + preferences +
+                ", id=" + id +
+                ", createdBy='" + createdBy + '\'' +
+                ", modificationDate=" + modificationDate +
+                ", modifiedBy='" + modifiedBy + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
     }
-
 }

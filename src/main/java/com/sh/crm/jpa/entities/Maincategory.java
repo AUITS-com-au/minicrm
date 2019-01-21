@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,9 +10,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.List;
 
-/**
- * @author achah
- */
 @Entity
 @Table(name = "maincategory")
 @XmlRootElement
@@ -33,7 +25,6 @@ public class Maincategory extends BasicModelWithIDInt {
     @Size(min = 1, max = 150)
     @Column(name = "EnglishLabel")
     private String englishLabel;
-
     @Column(name = "Enabled")
     private Boolean enabled;
     @JsonIgnore
@@ -45,7 +36,6 @@ public class Maincategory extends BasicModelWithIDInt {
 
     public Maincategory() {
     }
-
     public Maincategory(Integer id) {
         this.id = id;
     }

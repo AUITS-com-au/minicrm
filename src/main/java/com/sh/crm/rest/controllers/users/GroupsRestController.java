@@ -11,22 +11,19 @@ import com.sh.crm.jpa.repos.users.GroupsRepo;
 import com.sh.crm.jpa.repos.users.UserGroupsRepo;
 import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.GroupsAdmin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/groups")
+@RequestMapping(value = "groups", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 @GroupsAdmin
 public class GroupsRestController extends BasicController<GroupHolder> {
 
@@ -54,7 +51,7 @@ public class GroupsRestController extends BasicController<GroupHolder> {
         group.setEnabled( true );
         group.setGroupName( groupHolder.getName() );
         try {
-            groupRepo.save( group );
+            group = groupRepo.save( group );
             log.info( "Group {} has been created", group );
         } catch (Exception e) {
             log.error( "Error creating group: " + groupHolder.getName() + ", error: " + e );
@@ -74,16 +71,19 @@ public class GroupsRestController extends BasicController<GroupHolder> {
             throw new GeneralException( Errors.GROUP_CREATED_OTHER_FAILED, e.toString() );
 
         }
-        return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
+        return ResponseEntity.ok( group );
     }
 
 
     public ResponseEntity<?> edit(@RequestBody @Valid GroupHolder groupHolder, Principal principal) throws GeneralException {
         log.debug( "Received modify Groups request: " + groupHolder.toString() );
         Groups group = groupRepo.findById( groupHolder.getGroup().getId() ).orElse( null );
+        if (group == null)
+            throw new GeneralException( Errors.GROUP_EDIT_FAILED, "Cannot find group" );
+
         group.setGroupName( groupHolder.getName() );
         try {
-            groupRepo.save( group );
+            group = groupRepo.save( group );
         } catch (Exception e) {
             log.error( "Error modifying group: {} , Exception {}", groupHolder.getName(), e );
             e.printStackTrace();
@@ -107,7 +107,7 @@ public class GroupsRestController extends BasicController<GroupHolder> {
             e.printStackTrace();
             throw new GeneralException( Errors.GROUP_EDIT_OTHER_FAILED, e.toString() );
         }
-        return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
+        return ResponseEntity.ok( group );
     }
 
     @GetMapping("users/{groupID}")
@@ -131,7 +131,6 @@ public class GroupsRestController extends BasicController<GroupHolder> {
             return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
         } else
             return new ResponseEntity( new ResponseCode( Errors.GROUP_NOT_EXISTS ), HttpStatus.OK );
-
     }
 
     @Override
@@ -147,7 +146,6 @@ public class GroupsRestController extends BasicController<GroupHolder> {
             groupRolesRepo.save( gr );
             gr = null;
         }
-
     }
 
     public void deleteGroupRoles(Groups groupID) {

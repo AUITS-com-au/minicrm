@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
 import javax.persistence.*;
@@ -11,9 +7,7 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
-/**
- * @author achah
- */
+
 @Entity
 @Table(name = "userpreferences")
 @XmlRootElement
@@ -28,7 +22,7 @@ public class Userpreferences extends BasicModelWithID {
     @Basic(optional = false)
     @NotNull
     @Column(name = "EmailsNotifications")
-    private short emailsNotifications;
+    private Boolean emailsNotifications;
     @Size(max = 20)
     @Column(name = "Language")
     private String language;
@@ -36,25 +30,25 @@ public class Userpreferences extends BasicModelWithID {
     @Column(name = "Avatar")
     private byte[] avatar;
     @Column(name = "SLAEmails")
-    private Short sLAEmails;
+    private Boolean sLAEmails;
     @Column(name = "TicketCreationEmails")
-    private Short ticketCreationEmails;
+    private Boolean ticketCreationEmails;
     @Column(name = "TicketEditEmails")
-    private Short ticketEditEmails;
+    private Boolean ticketEditEmails;
     @Column(name = "TicketAssignEmails")
-    private Short ticketAssignEmails;
+    private Boolean ticketAssignEmails;
     @Column(name = "EmailDigest")
-    private Short emailDigest;
+    private Boolean emailDigest;
     @Column(name = "IncludeAttatchments")
-    private Short includeAttatchments;
+    private Boolean includeAttatchments;
     @Column(name = "AutoSubOnCreate")
-    private Short autoSubOnCreate;
+    private Boolean autoSubOnCreate;
     @Column(name = "AutoSubOnClose")
-    private Short autoSubOnClose;
+    private Boolean autoSubOnClose;
     @Column(name = "AutoSubOnEdit")
-    private Short autoSubOnEdit;
+    private Boolean autoSubOnEdit;
     @Column(name = "AutoSubOnAssign")
-    private Short autoSubOnAssign;
+    private Boolean autoSubOnAssign;
 
     public Userpreferences() {
     }
@@ -80,11 +74,11 @@ public class Userpreferences extends BasicModelWithID {
         this.userID = userID;
     }
 
-      public short getEmailsNotifications() {
+    public Boolean getEmailsNotifications() {
         return emailsNotifications;
     }
 
-    public void setEmailsNotifications(short emailsNotifications) {
+    public void setEmailsNotifications(Boolean emailsNotifications) {
         this.emailsNotifications = emailsNotifications;
     }
 
@@ -104,83 +98,83 @@ public class Userpreferences extends BasicModelWithID {
         this.avatar = avatar;
     }
 
-    public Short getSLAEmails() {
+    public Boolean getSLAEmails() {
         return sLAEmails;
     }
 
-    public void setSLAEmails(Short sLAEmails) {
+    public void setSLAEmails(Boolean sLAEmails) {
         this.sLAEmails = sLAEmails;
     }
 
-    public Short getTicketCreationEmails() {
+    public Boolean getTicketCreationEmails() {
         return ticketCreationEmails;
     }
 
-    public void setTicketCreationEmails(Short ticketCreationEmails) {
+    public void setTicketCreationEmails(Boolean ticketCreationEmails) {
         this.ticketCreationEmails = ticketCreationEmails;
     }
 
-    public Short getTicketEditEmails() {
+    public Boolean getTicketEditEmails() {
         return ticketEditEmails;
     }
 
-    public void setTicketEditEmails(Short ticketEditEmails) {
+    public void setTicketEditEmails(Boolean ticketEditEmails) {
         this.ticketEditEmails = ticketEditEmails;
     }
 
-    public Short getTicketAssignEmails() {
+    public Boolean getTicketAssignEmails() {
         return ticketAssignEmails;
     }
 
-    public void setTicketAssignEmails(Short ticketAssignEmails) {
+    public void setTicketAssignEmails(Boolean ticketAssignEmails) {
         this.ticketAssignEmails = ticketAssignEmails;
     }
 
-    public Short getEmailDigest() {
+    public Boolean getEmailDigest() {
         return emailDigest;
     }
 
-    public void setEmailDigest(Short emailDigest) {
+    public void setEmailDigest(Boolean emailDigest) {
         this.emailDigest = emailDigest;
     }
 
-    public Short getIncludeAttatchments() {
+    public Boolean getIncludeAttatchments() {
         return includeAttatchments;
     }
 
-    public void setIncludeAttatchments(Short includeAttatchments) {
+    public void setIncludeAttatchments(Boolean includeAttatchments) {
         this.includeAttatchments = includeAttatchments;
     }
 
-    public Short getAutoSubOnCreate() {
+    public Boolean getAutoSubOnCreate() {
         return autoSubOnCreate;
     }
 
-    public void setAutoSubOnCreate(Short autoSubOnCreate) {
+    public void setAutoSubOnCreate(Boolean autoSubOnCreate) {
         this.autoSubOnCreate = autoSubOnCreate;
     }
 
-    public Short getAutoSubOnClose() {
+    public Boolean getAutoSubOnClose() {
         return autoSubOnClose;
     }
 
-    public void setAutoSubOnClose(Short autoSubOnClose) {
+    public void setAutoSubOnClose(Boolean autoSubOnClose) {
         this.autoSubOnClose = autoSubOnClose;
     }
 
-    public Short getAutoSubOnEdit() {
+    public Boolean getAutoSubOnEdit() {
         return autoSubOnEdit;
     }
 
-    public void setAutoSubOnEdit(Short autoSubOnEdit) {
+    public void setAutoSubOnEdit(Boolean autoSubOnEdit) {
         this.autoSubOnEdit = autoSubOnEdit;
     }
 
-    public Short getAutoSubOnAssign() {
+    public Boolean getAutoSubOnAssign() {
         return autoSubOnAssign;
     }
 
-    public void setAutoSubOnAssign(Short autoSubOnAssign) {
+    public void setAutoSubOnAssign(Boolean autoSubOnAssign) {
         this.autoSubOnAssign = autoSubOnAssign;
     }
 

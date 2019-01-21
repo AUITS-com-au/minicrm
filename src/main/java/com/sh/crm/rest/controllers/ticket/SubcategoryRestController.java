@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("subcategories")
+@RequestMapping(value = "subcategories", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class SubcategoryRestController extends BasicController<Subcategory> {
 
     @Autowired

@@ -15,7 +15,7 @@ import java.security.Principal;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping(value = "categories", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class MainCategoryRestController extends BasicController<Maincategory> {
     @TicketsAdmin
     public ResponseEntity<?> create(@RequestBody Maincategory maincategory, Principal principal) {
@@ -72,7 +72,6 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
         if (maincategory != null) {
             if (log.isDebugEnabled())
                 log.debug( "Received request to delete main category {}", maincategory );
-
             try {
                 Optional<Maincategory> optionalMaincategory = mainCategoryRepo.findById( maincategory.getId() );
                 if (!optionalMaincategory.isPresent())
@@ -84,7 +83,6 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
-
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
     }

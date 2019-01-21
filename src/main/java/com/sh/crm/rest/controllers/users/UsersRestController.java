@@ -6,6 +6,7 @@ import com.sh.crm.general.exceptions.GeneralException;
 import com.sh.crm.general.holders.UserHolder;
 import com.sh.crm.jpa.entities.*;
 import com.sh.crm.jpa.repos.users.UserGroupsRepo;
+import com.sh.crm.jpa.repos.users.UserPreferencesRepo;
 import com.sh.crm.jpa.repos.users.UsersRepos;
 import com.sh.crm.jpa.repos.users.UsersRolesRepo;
 import com.sh.crm.rest.general.BasicController;
@@ -33,6 +34,8 @@ public class UsersRestController extends BasicController<UserHolder> {
     @Autowired
     private UserGroupsRepo userGroupsRepo;
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    @Autowired
+    private UserPreferencesRepo userPreferencesRepo;
 
     @GetMapping("all")
     public List<Users> all() {
@@ -83,7 +86,7 @@ public class UsersRestController extends BasicController<UserHolder> {
             createRoles( user, userHolder.getSelectedRoles() );
             createGroups( user, userHolder.getSelectedGroups() );
             log.info( "User groups and Roles for User: " + user.getUserID() + " created sucessfully" );
-            return ResponseEntity.ok( new ResponseCode( "0", Errors.SUCCESSFUL.getDesc() ) );
+            return ResponseEntity.ok( user );
         }
         return ResponseEntity.ok( new ResponseCode( Errors.CANNOT_CREATE_USER ) );
     }
@@ -136,7 +139,7 @@ public class UsersRestController extends BasicController<UserHolder> {
                 log.info( "User: " + user.getUserID() + " Roles have been updated" );
             }
         }
-        return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+        return ResponseEntity.ok( user );
 
     }
 
@@ -169,6 +172,28 @@ public class UsersRestController extends BasicController<UserHolder> {
     public List<Roles> getUsersRole(@Valid @PathVariable("userID") Integer userID) {
         List<Roles> userRoles = usersRolesRepo.getUserRoles( userID );
         return userRoles;
+    }
+
+
+    public ResponseEntity<?> getUserPreferences(@PathVariable("userID") String userID) {
+
+        Userpreferences userpreferences = userPreferencesRepo.findByUserID( userID );
+        if (userpreferences == null)
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok( userpreferences );
+    }
+
+    @GetMapping("preferences/{id}")
+    public ResponseEntity<?> getUserPreferences(@PathVariable("id") Integer id) {
+
+        Users user = userRepo.findById( id ).orElse( null );
+
+        if (user == null) {
+            log.debug( "user with ID {} cannot be found ,return bad request", id );
+            return ResponseEntity.badRequest().build();
+        }
+
+        return getUserPreferences( user.getUserID() );
     }
 
     private void createGroups(Users user, List<Integer> groups) throws GeneralException {
@@ -206,7 +231,6 @@ public class UsersRestController extends BasicController<UserHolder> {
             throw new GeneralException( Errors.USER_CREATED_ROLES_FAILED.getCode(),
                     Errors.USER_CREATED_ROLES_FAILED.getDesc() + ", exception: " + e );
         }
-
     }
 
     private void deleteRoles(Users userID) throws GeneralException {

@@ -1,6 +1,5 @@
 package com.sh.crm.rest.controllers.users;
 
-import com.sh.crm.config.general.ResponseCode;
 import com.sh.crm.general.Errors;
 import com.sh.crm.general.exceptions.GeneralException;
 import com.sh.crm.general.holders.RoleHolder;
@@ -12,17 +11,19 @@ import com.sh.crm.jpa.repos.users.RolesRepo;
 import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.RolesAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Example;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/roles")
+@RequestMapping(value = "roles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 @RolesAdmin
 public class RolesRestController extends BasicController<RoleHolder> {
     @Autowired
@@ -42,9 +43,11 @@ public class RolesRestController extends BasicController<RoleHolder> {
     }
 
 
+    @Transactional
     public ResponseEntity<?> create(@RequestBody RoleHolder roleHolder, Principal principal) throws GeneralException {
+        Roles role = null;
         if (roleHolder != null && roleHolder.getRole() != null && roleHolder.getPermissions() != null && !roleHolder.getPermissions().isEmpty()) {
-            Roles role = roleHolder.getRole();
+            role = roleHolder.getRole();
             role.setId( null );
             try {
                 rolesRepo.save( role );
@@ -62,12 +65,17 @@ public class RolesRestController extends BasicController<RoleHolder> {
                 throw new GeneralException( Errors.ROLE_CREATE_FAILED, e.toString() );
             }
         }
-        return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
+        return ResponseEntity.ok( rolesRepo.findOne( Example.of( role ) ).orElse( null ) );
     }
 
+    @Transactional
     public ResponseEntity<?> edit(@RequestBody RoleHolder roleHolder, Principal principal) throws GeneralException {
+        Roles role = null;
         if (roleHolder != null && roleHolder.getRole() != null && roleHolder.getPermissions() != null && !roleHolder.getPermissions().isEmpty()) {
-            Roles role = roleHolder.getRole();
+            role = roleHolder.getRole();
+            if (role == null) {
+                throw new GeneralException( Errors.ROLE_EDIT_FAILED, "received role object is null" );
+            }
             Optional<Roles> optionalRoles = rolesRepo.findById( role.getId() );
             if (!optionalRoles.isPresent())
                 throw new GeneralException( "Cannot find role" );
@@ -78,20 +86,19 @@ public class RolesRestController extends BasicController<RoleHolder> {
                 deleteRolePermissions( role );
                 List<Permissions> permissions = roleHolder.getPermissions();
                 for (Permissions permission : permissions) {
-                    Rolepermissions rp = new Rolepermissions();
-                    rp.setPermissionID( permission );
-                    rp.setRoleID( originalRole );
-                    rolesPermissionsRepo.save( rp );
-                    rp = null;
+                    Rolepermissions rp1 = new Rolepermissions();
+                    rp1.setPermissionID( permission );
+                    rp1.setRoleID( originalRole );
+                    rolesPermissionsRepo.save( rp1 );
+                    rp1 = null;
                 }
                 roleHolder = null;
-
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new GeneralException( Errors.ROLE_EDIT_FAILED, e.toString() );
             }
         }
-        return new ResponseEntity<ResponseCode>( new ResponseCode( Errors.SUCCESSFUL ), HttpStatus.OK );
+        return ResponseEntity.ok( rolesRepo.findOne( Example.of( role ) ).orElse( null ) );
     }
 
     @Override
