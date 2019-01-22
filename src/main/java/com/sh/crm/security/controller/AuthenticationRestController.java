@@ -1,6 +1,7 @@
 package com.sh.crm.security.controller;
 
 
+import com.sh.crm.jpa.entities.Permissions;
 import com.sh.crm.jpa.entities.Userpreferences;
 import com.sh.crm.jpa.entities.Users;
 import com.sh.crm.jpa.repos.users.UserPreferencesRepo;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 public class AuthenticationRestController {
@@ -60,11 +62,15 @@ public class AuthenticationRestController {
         //final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final Users user = usersRepos.findByUserID( authenticationRequest.getUsername() );
 
+        final List<Permissions> authorities = userDetailsService.getUserAuthorities( user.getUserID() );
+        user.setAuthorities( authorities );
         final String token = jwtTokenUtil.generateToken( user );
 
         user.setPassword( null );
         user.setLoginAttempts( null );
         Userpreferences userpreferences = userPreferencesRepo.findByUserID( user.getUserID() );
+        if (userpreferences == null)
+            userpreferences = new Userpreferences( user.getUserID() );
         user.setPreferences( userpreferences );
         // Return the token
         return ResponseEntity.ok( new JwtAuthenticationResponse( token, user ) );

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -57,6 +57,8 @@ public class Users extends BasicModelWithIDInt {
 
     @Transient
     private Userpreferences preferences;
+    @Transient
+    private List<Permissions> authorities;
 
     public Users() {
     }
@@ -183,6 +185,14 @@ public class Users extends BasicModelWithIDInt {
     @Transient
     public void setPreferences(Userpreferences preferences) {
         this.preferences = preferences;
+    }
+
+    public List<Permissions> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(List<Permissions> authorities) {
+        this.authorities = authorities;
     }
 
     @Override

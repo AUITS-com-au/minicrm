@@ -5,7 +5,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 
 @Entity
@@ -57,6 +56,9 @@ public class Userpreferences extends BasicModelWithID {
         this.id = id;
     }
 
+    public Userpreferences(String userID) {
+        this.userID = userID;
+    }
 
     public Long getId() {
         return id;
@@ -192,7 +194,7 @@ public class Userpreferences extends BasicModelWithID {
             return false;
         }
         Userpreferences other = (Userpreferences) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

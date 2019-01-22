@@ -41,7 +41,7 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
         }
     }
 
-    private List<Permissions> getUserAuthorities(String id) {
+    public List<Permissions> getUserAuthorities(String id) {
 
         List<Permissions> userAuthorities = permissionsRepo.usersPermission(id);
         if (logger.isDebugEnabled())
