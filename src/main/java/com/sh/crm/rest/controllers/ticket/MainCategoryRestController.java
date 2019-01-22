@@ -15,7 +15,7 @@ import java.security.Principal;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "categories", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "categories", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MainCategoryRestController extends BasicController<Maincategory> {
     @TicketsAdmin
     public ResponseEntity<?> create(@RequestBody Maincategory maincategory, Principal principal) {

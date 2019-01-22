@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "usersP", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "usersP", produces = MediaType.APPLICATION_JSON_VALUE)
 @PreAuthorize("isAuthenticated()")
 public class UsersPublicController {
     @Autowired

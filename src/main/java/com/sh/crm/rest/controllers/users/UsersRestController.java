@@ -24,7 +24,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "users", produces = MediaType.APPLICATION_JSON_VALUE)
 @UsersAdmin
 public class UsersRestController extends BasicController<UserHolder> {
     @Autowired

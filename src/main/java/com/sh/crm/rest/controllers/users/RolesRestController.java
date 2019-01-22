@@ -23,7 +23,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping(value = "roles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "roles", produces = MediaType.APPLICATION_JSON_VALUE)
 @RolesAdmin
 public class RolesRestController extends BasicController<RoleHolder> {
     @Autowired

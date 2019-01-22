@@ -23,7 +23,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(value = "groups", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "groups", produces = MediaType.APPLICATION_JSON_VALUE)
 @GroupsAdmin
 public class GroupsRestController extends BasicController<GroupHolder> {
 
