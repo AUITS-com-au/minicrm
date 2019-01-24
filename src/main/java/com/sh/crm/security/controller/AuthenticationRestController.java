@@ -68,10 +68,7 @@ public class AuthenticationRestController {
 
         user.setPassword( null );
         user.setLoginAttempts( null );
-        Userpreferences userpreferences = userPreferencesRepo.findByUserID( user.getUserID() );
-        if (userpreferences == null)
-            userpreferences = new Userpreferences( user.getUserID() );
-        user.setPreferences( userpreferences );
+
         // Return the token
         return ResponseEntity.ok( new JwtAuthenticationResponse( token, user ) );
     }

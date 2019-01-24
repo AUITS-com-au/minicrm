@@ -42,7 +42,7 @@ public class Subcategory extends BasicModelWithIDInt {
     private List<Topic> topicList;
 
     @JoinColumn(name = "MainCategory", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Maincategory mainCategory;
 
     public Subcategory() {

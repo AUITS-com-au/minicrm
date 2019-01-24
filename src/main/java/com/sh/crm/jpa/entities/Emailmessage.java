@@ -1,27 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
-import java.io.Serializable;
-import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import java.io.Serializable;
+import java.util.List;
 
-/**
- *
- * @author achah
- */
 @Entity
 @Table(name = "emailmessage")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Emailmessage.findAll", query = "SELECT e FROM Emailmessage e")})
+        @NamedQuery(name = "Emailmessage.findAll", query = "SELECT e FROM Emailmessage e")})
 public class Emailmessage implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -39,6 +31,10 @@ public class Emailmessage implements Serializable {
     @Size(min = 1, max = 2147483647)
     @Column(name = "EmailMessage")
     private String emailMessage;
+    @Size(min = 1, max = 2147483647)
+    @Column(name = "AttachmentsID")
+    private String attachmentsID;
+
     @OneToMany(mappedBy = "emailMessage", fetch = FetchType.LAZY)
     private List<Emailhistory> emailhistoryList;
 
@@ -79,6 +75,14 @@ public class Emailmessage implements Serializable {
         this.emailMessage = emailMessage;
     }
 
+    public String getAttachmentsID() {
+        return attachmentsID;
+    }
+
+    public void setAttachmentsID(String attachmentsID) {
+        this.attachmentsID = attachmentsID;
+    }
+
     @XmlTransient
     public List<Emailhistory> getEmailhistoryList() {
         return emailhistoryList;
@@ -97,12 +101,11 @@ public class Emailmessage implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Emailmessage)) {
             return false;
         }
         Emailmessage other = (Emailmessage) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
@@ -112,5 +115,5 @@ public class Emailmessage implements Serializable {
     public String toString() {
         return "com.sh.crm.jpa.entities.Emailmessage[ id=" + id + " ]";
     }
-    
+
 }

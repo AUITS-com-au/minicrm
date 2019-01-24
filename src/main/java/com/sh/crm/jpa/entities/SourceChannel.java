@@ -9,7 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * @author achah
@@ -42,6 +41,11 @@ public class SourceChannel extends BasicModel {
 
     public SourceChannel(Integer channelID) {
         this.channelID = channelID;
+    }
+
+    public SourceChannel(String arabicLabel, String englishLabel) {
+        this.arabicLabel = arabicLabel;
+        this.englishLabel = englishLabel;
     }
 
     public SourceChannel(Integer channelID, String arabicLabel, String englishLabel) {
@@ -96,7 +100,7 @@ public class SourceChannel extends BasicModel {
             return false;
         }
         SourceChannel other = (SourceChannel) object;
-        if ((this.channelID == null && other.channelID != null) || (this.channelID != null && !this.channelID.equals(other.channelID))) {
+        if ((this.channelID == null && other.channelID != null) || (this.channelID != null && !this.channelID.equals( other.channelID ))) {
             return false;
         }
         return true;

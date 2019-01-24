@@ -55,7 +55,7 @@ public class Topic extends BasicModelWithIDInt {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "topic", fetch = FetchType.LAZY)
     private List<Ticket> ticketList;
     @JoinColumn(name = "SubCategory", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Subcategory subCategory;
 
     public Topic() {

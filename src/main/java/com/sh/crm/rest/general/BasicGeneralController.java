@@ -5,10 +5,13 @@ import com.sh.crm.jpa.entities.Users;
 import com.sh.crm.jpa.repos.tickets.*;
 import com.sh.crm.jpa.repos.users.UsersRepos;
 import com.sh.crm.security.util.SecurityUtils;
+import com.sh.crm.services.notification.NotificationData;
 import com.sh.crm.services.tickets.TicketServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.bus.Event;
+import reactor.bus.EventBus;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -50,6 +53,8 @@ public abstract class BasicGeneralController {
 
     @Autowired
     protected TicketServices ticketServices;
+    @Autowired
+    protected EventBus eventBus;
 
     protected Users getAuthorizedUser() {
         return usersRepos.findByUserID( SecurityUtils.getPrincipal() );
@@ -73,6 +78,11 @@ public abstract class BasicGeneralController {
             log.debug( "generate ticket ID with topic {} , current date {}, and generated value {}", topicID, dateValue, currentSeqPadded );
         }
         return dateValue + currentSeqPadded;
+    }
+
+    protected void notifyAction(long actionID) {
+        NotificationData notificationData = new NotificationData( actionID );
+        eventBus.notify( "NC", Event.wrap( notificationData ) );
     }
 
     private String getFormattedDateOfToday() {

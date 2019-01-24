@@ -1,0 +1,46 @@
+ActionTaken
+### Ticket
+Ticket_ID
+Topic_En
+MainCat_En
+SubCat_En
+OriginalTopic_En
+OriginalMainCat_En
+OriginalSubCat_En
+CurrentStatus_En
+Topic_Ar
+MainCat_Ar
+SubCat_Ar
+OriginalTopic_Ar
+OriginalMainCat_Ar
+OriginalSubCat_Ar
+CurrentStatus_Ar
+CreatedBy
+ModifiedBy
+CreationDate
+ModificationDate
+CrossedMainSLA
+SourceChannel_Ar
+SourceChannel_En
+Subject
+TicketType_Ar
+TicketType_En
+Details
+AssignedTo
+Priority
+
+### Customer Account
+CustomerAccount_CustomerNameAR
+CustomerAccount_customerNameEn
+CustomerAccount_Email
+CustomerAccount_Mobile
+CustomerAccount_Nin
+CustomerAccount_Segment
+CustomerAccount_CustomerCIF
+CustomerAccount_BranchName
+
+## ticket data
+TicketData_Title
+TicketData_TicketData
+TicketData_CreatedBy
+TicketData_CreationDate

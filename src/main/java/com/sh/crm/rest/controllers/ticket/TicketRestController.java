@@ -38,6 +38,7 @@ import java.util.Calendar;
 @PreAuthorize("hasAnyAuthority('TICKET:USER','TICKET:ADMIN','Administrator')")
 public class TicketRestController extends BasicController<TicketHolder> {
 
+
     @Autowired
     private TopicPermissionsService topicPermissionsService;
 

@@ -9,7 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * @author achah
@@ -21,9 +20,8 @@ public class Tickettypes extends BasicModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Size(min = 1, max = 50)
     @Column(name = "TypeID")
-    private String typeID;
+    private Integer typeID;
 
     @Basic(optional = false)
     @NotNull
@@ -41,21 +39,21 @@ public class Tickettypes extends BasicModel {
     public Tickettypes() {
     }
 
-    public Tickettypes(String typeID) {
+    public Tickettypes(Integer typeID) {
         this.typeID = typeID;
     }
 
-    public Tickettypes(String typeID, String arabicLabel, String englishLabel) {
+    public Tickettypes(Integer typeID, String arabicLabel, String englishLabel) {
         this.typeID = typeID;
         this.arabicLabel = arabicLabel;
         this.englishLabel = englishLabel;
     }
 
-    public String getTypeID() {
+    public Integer getTypeID() {
         return typeID;
     }
 
-    public void setTypeID(String typeID) {
+    public void setTypeID(Integer typeID) {
         this.typeID = typeID;
     }
 
@@ -92,20 +90,15 @@ public class Tickettypes extends BasicModel {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Tickettypes)) {
             return false;
         }
         Tickettypes other = (Tickettypes) object;
-        if ((this.typeID == null && other.typeID != null) || (this.typeID != null && !this.typeID.equals(other.typeID))) {
+        if ((this.typeID == null && other.typeID != null) || (this.typeID != null && !this.typeID.equals( other.typeID ))) {
             return false;
         }
         return true;
     }
 
-    @Override
-    public String toString() {
-        return "com.sh.crm.jpa.entities.Tickettypes[ typeID=" + typeID + " ]";
-    }
 
 }
