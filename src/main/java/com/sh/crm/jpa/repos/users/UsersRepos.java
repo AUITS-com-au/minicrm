@@ -12,7 +12,7 @@ public interface UsersRepos extends JpaRepository<Users, Integer> {
     Users findByUserID(String username);
 
     @Override
-    @Query("select u from Users u where u.systemUser=false")
+    @Query("select u from Users u order by u.creationDate desc")
     List<Users> findAll();
 
     @Modifying
@@ -21,7 +21,7 @@ public interface UsersRepos extends JpaRepository<Users, Integer> {
     @Modifying
     void deleteById(Integer id);
 
-    @Query("select u from Users u where u.id=?1 and u.systemUser=false")
+    @Query("select u from Users u where u.id=?1")
     Optional<Users> findById(Integer id);
 
     List<Users> findByEnabledAndSystemUser(boolean enabled, boolean systemUser);

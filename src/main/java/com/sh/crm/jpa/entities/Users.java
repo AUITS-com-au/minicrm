@@ -31,7 +31,7 @@ public class Users extends BasicModelWithIDInt {
     @Size(max = 250)
     @Column(name = "Email")
     private String email;
-    @JsonIgnore
+ //   @JsonIgnore
     @Size(max = 256)
     @Column(name = "Password")
     private String password;

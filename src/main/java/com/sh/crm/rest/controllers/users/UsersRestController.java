@@ -66,13 +66,15 @@ public class UsersRestController extends BasicController<UserHolder> {
         log.debug( "received a request to create user: " + userHolder.getUser().toString() );
         if (userHolder.getUser().getUserID() != null) {
             if (userRepo.findByUserID( userHolder.getUser().getUserID() ) != null) {
-                throw new GeneralException( Errors.USER_ALREADY_EXISTS, userHolder.getUser().getUserID() );
+                throw new GeneralException( Errors.USER_ALREADY_EXISTS, " User ID : " +userHolder.getUser().getUserID() );
             }
             Users user = userHolder.getUser();
             if (!user.getLDAPUser())
                 user.setPassword( encoder.encode( userHolder.getPassword() ) );
-            user.setEnabled( true );
-            user.setSystemUser( false );
+
+            user.setEnabled( userHolder.getUser().getEnabled());
+            user.setSystemUser( userHolder.getUser().getSystemUser() );
+            user.setLDAPUser( userHolder.getUser().getLDAPUser() );
             user.setLoginAttempts( 5 );
             try {
                 user = userRepo.save( user );
@@ -99,11 +101,11 @@ public class UsersRestController extends BasicController<UserHolder> {
         try {
             if (user != null && user.getId() != null && user.getUserID() != null) {
                 Users origianlUser = userRepo.findById( user.getId() ).orElse( null );
-                //validateSuperUser(user);
                 if (origianlUser == null) {
                     throw new GeneralException( Errors.USER_EDIT_FAILED.getCode(),
                             Errors.USER_EDIT_FAILED.getDesc() + ", exception: Cannot find user" );
                 }
+                log.debug( "Original user: " + origianlUser );
                 if (!user.getLDAPUser() && userHolder.getPassword() != null && !userHolder.getPassword().equals( "" )) {
                     // origianlUser.setLastPasswordResetDate(Calendar.getInstance().getTime());
                     origianlUser.setPassword( encoder.encode( userHolder.getPassword() ) );
@@ -114,10 +116,18 @@ public class UsersRestController extends BasicController<UserHolder> {
                     origianlUser.setFirstName( user.getFirstName() );
                 if (user.getEmail() != null)
                     origianlUser.setEmail( user.getEmail() );
-
                 if (user.getEnabled() != null)
                     origianlUser.setEnabled( user.getEnabled() );
 
+//                if (user.getLDAPUser() != null && user.getLDAPUser()) {
+//                    origianlUser.setLDAPUser(true);
+//                    origianlUser.setSystemUser(false);
+//                }else{
+//                    origianlUser.setLDAPUser(false);
+//                    origianlUser.setSystemUser(true);
+//                }
+
+                log.debug( "Before Save: " + origianlUser );
                 user = userRepo.save( origianlUser );
             }
         } catch (Exception e) {
@@ -165,6 +175,7 @@ public class UsersRestController extends BasicController<UserHolder> {
     @GetMapping("groups/{userID}")
     public List<Groups> getUsersGroup(@Valid @PathVariable("userID") Integer userID) {
         List<Groups> usergroupsList = userGroupsRepo.findGroupsOfUser( userID );
+        log.debug( "Getting Groups List for User :" + userID );
         return usergroupsList;
     }
 

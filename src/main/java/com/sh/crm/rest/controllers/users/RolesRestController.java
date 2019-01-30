@@ -8,6 +8,7 @@ import com.sh.crm.jpa.entities.Rolepermissions;
 import com.sh.crm.jpa.entities.Roles;
 import com.sh.crm.jpa.repos.users.RolesPermissionsRepo;
 import com.sh.crm.jpa.repos.users.RolesRepo;
+import com.sh.crm.jpa.repos.users.UsersRolesRepo;
 import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.RolesAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class RolesRestController extends BasicController<RoleHolder> {
     private RolesRepo rolesRepo;
     @Autowired
     private RolesPermissionsRepo rolesPermissionsRepo;
+    @Autowired
+    private UsersRolesRepo usersRolesRepo;
 
 
     @GetMapping("all")
@@ -41,6 +44,7 @@ public class RolesRestController extends BasicController<RoleHolder> {
     List<Permissions> getPermissions(@PathVariable("roleID") Integer roleID) {
         return rolesPermissionsRepo.getRolePermissions( new Roles( roleID ) );
     }
+
 
 
     @Transactional
