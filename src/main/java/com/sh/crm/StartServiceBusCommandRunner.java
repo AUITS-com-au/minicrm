@@ -1,7 +1,8 @@
 package com.sh.crm;
 
-import com.sh.crm.jpa.entities.Emailtemplates;
+import com.sh.crm.jpa.entities.Ticket;
 import com.sh.crm.jpa.repos.notifications.EmailTemplatesRepo;
+import com.sh.crm.jpa.repos.tickets.TicketsRepo;
 import com.sh.crm.services.notification.Config;
 import com.sh.crm.services.notification.consumer.NotificationConsumer;
 import com.sh.crm.services.notification.service.impl.NotificationServiceImpl;
@@ -26,10 +27,15 @@ public class StartServiceBusCommandRunner implements CommandLineRunner {
     private EmailTemplatesRepo emailTemplatesRepo;
     @Autowired
     private NotificationConsumer notificationConsumer;
+    @Autowired
+    private TicketsRepo ticketsRepo;
 
     @Override
     public void run(String... args) throws Exception {
         eventBus.on( $( "NC" ), notificationConsumer );
         // notificationService.formatTemplate( 1, 19011500016l, "" );
+        //  Ticket ticket = ticketsRepo.findById( Long.parseLong( "18121600001" ) ).orElse( null );
+
+        //  System.out.println( "ticket : " + ticket );
     }
 }

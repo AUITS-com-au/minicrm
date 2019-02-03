@@ -6,7 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SlaUsersRepo extends JpaRepository<Slausers, Long> {
-
-    List<Slausers> findBySlaAndEnabledIsTrue(Integer sla);
-
+    List<Slausers> findByTopicSLAAndEnabledIsTrue(Integer topicSLA);
 }

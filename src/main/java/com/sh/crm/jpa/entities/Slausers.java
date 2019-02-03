@@ -26,8 +26,8 @@ public class Slausers  extends BasicModelWithID{
     private String userId;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "Sla")
-    private int sla;
+    @Column(name = "Topicsla")
+    private int topicSLA;
     @Basic(optional = false)
     @NotNull
     @Column(name = "Enabled")
@@ -63,12 +63,13 @@ public class Slausers  extends BasicModelWithID{
         this.userId = userId;
     }
 
-    public int getSla() {
-        return sla;
+
+    public int getTopicSLA() {
+        return topicSLA;
     }
 
-    public void setSla(int sla) {
-        this.sla = sla;
+    public void setTopicSLA(int topicSLA) {
+        this.topicSLA = topicSLA;
     }
 
     public Boolean getEnabled() {

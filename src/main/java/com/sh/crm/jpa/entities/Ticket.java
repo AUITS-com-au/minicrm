@@ -38,10 +38,10 @@ public class Ticket extends BasicModel {
     private Topic originalTopic;
     @Column(name = "CurrentStatus")
     private Integer currentStatus;
-    @Column(name = "CrossedMainSLA")
-    private boolean crossedMainSLA;
+    @Column(name = "CrossedAllSLA")
+    private boolean crossedAllSLA;
     @JoinColumn(name = "CustomerAccount", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private CustomerAccounts customerAccount;
     @Column(name = "SourceChannel")
     private Integer sourceChannel;
@@ -74,7 +74,12 @@ public class Ticket extends BasicModel {
     private boolean closed;
     @Column(name = "Deleted")
     private boolean deleted;
-
+    @Column(name = "NumberOfCrossedSLA")
+    private Integer numberOfCrossedSLA;
+    @Column(name = "TotalCrossedTime")
+    private Long totalCrossedTime;
+    @Column(name = "NumberOfSLA")
+    private Integer numberOfSLA;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY)
     private List<Ticketdata> ticketdataList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY)
@@ -161,13 +166,6 @@ public class Ticket extends BasicModel {
         this.modificationDate = modificationDate;
     }
 
-    public boolean getCrossedMainSLA() {
-        return crossedMainSLA;
-    }
-
-    public void setCrossedMainSLA(boolean crossedMainSLA) {
-        this.crossedMainSLA = crossedMainSLA;
-    }
 
     public CustomerAccounts getCustomerAccount() {
         return customerAccount;
@@ -289,6 +287,37 @@ public class Ticket extends BasicModel {
         this.deleted = deleted;
     }
 
+    public boolean isCrossedAllSLA() {
+        return crossedAllSLA;
+    }
+
+    public void setCrossedAllSLA(boolean crossedAllSLA) {
+        this.crossedAllSLA = crossedAllSLA;
+    }
+
+    public Integer getNumberOfCrossedSLA() {
+        return numberOfCrossedSLA;
+    }
+
+    public void setNumberOfCrossedSLA(Integer numberOfCrossedSLA) {
+        this.numberOfCrossedSLA = numberOfCrossedSLA;
+    }
+
+    public Long getTotalCrossedTime() {
+        return totalCrossedTime;
+    }
+
+    public void setTotalCrossedTime(Long totalCrossedTime) {
+        this.totalCrossedTime = totalCrossedTime;
+    }
+
+    public Integer getNumberOfSLA() {
+        return numberOfSLA;
+    }
+
+    public void setNumberOfSLA(Integer numberOfSLA) {
+        this.numberOfSLA = numberOfSLA;
+    }
 
     @XmlTransient
     public List<Ticketdata> getTicketdataList() {
@@ -338,8 +367,6 @@ public class Ticket extends BasicModel {
 
     @Override
     public String toString() {
-        return "Ticket{" +
-                "id=" + id +
-                '}';
+        return String.valueOf( id );
     }
 }

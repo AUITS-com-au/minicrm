@@ -5,6 +5,7 @@ import java.util.List;
 public class EmailPref {
     private String userID;
     private String emailID;
+    private boolean disabled;
     private boolean includeAttatchments;
     private boolean slaEmail;
     private boolean copyCC;
@@ -19,6 +20,13 @@ public class EmailPref {
     public EmailPref(String userID, String emailID, boolean includeAttatchments) {
         this.userID = userID;
         this.emailID = emailID;
+        this.includeAttatchments = includeAttatchments;
+    }
+
+    public EmailPref(String userID, String emailID, boolean disabled, boolean includeAttatchments) {
+        this.userID = userID;
+        this.emailID = emailID;
+        this.disabled = disabled;
         this.includeAttatchments = includeAttatchments;
     }
 
@@ -84,5 +92,28 @@ public class EmailPref {
 
     public void setBccList(List<String> bccList) {
         this.bccList = bccList;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    @Override
+    public String toString() {
+        return "EmailPref{" +
+                "userID='" + userID + '\'' +
+                ", emailID='" + emailID + '\'' +
+                ", disabled=" + disabled +
+                ", includeAttatchments=" + includeAttatchments +
+                ", slaEmail=" + slaEmail +
+                ", copyCC=" + copyCC +
+                ", copyBBC=" + copyBBC +
+                ", ccList=" + ccList +
+                ", bccList=" + bccList +
+                '}';
     }
 }

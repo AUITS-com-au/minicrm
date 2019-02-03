@@ -6,7 +6,6 @@ import com.sh.crm.general.holders.SearchTicketsSorting;
 import com.sh.crm.jpa.entities.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -54,8 +53,8 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getClosed() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.closed ), st.getClosed() ) );
         }
-        if (st.getCrossedMainSla() != null) {
-            predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.crossedMainSLA ), st.getCrossedMainSla() ) );
+        if (st.getCrossedAllSla() != null) {
+            predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.crossedAllSLA ), st.getCrossedAllSla() ) );
         }
         if (st.getDeleted() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.deleted ), st.getDeleted() ) );

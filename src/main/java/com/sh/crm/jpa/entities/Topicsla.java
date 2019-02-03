@@ -7,7 +7,6 @@ package com.sh.crm.jpa.entities;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -16,21 +15,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "topicsla")
 @XmlRootElement
+@NamedStoredProcedureQueries({
+        @NamedStoredProcedureQuery(name = "GetEscalatedTickets",
+                procedureName = "dbo.GetEscalatedTickets")
+})
 public class Topicsla extends BasicModelWithIDInt {
 
     @Basic(optional = false)
     @NotNull
     @Column(name = "SLALevel")
-    private int sLALevel;
+    private int slaLevel;
 
-    @Size(max = 500)
-    @Column(name = "SLAImpl")
-    private String sLAImpl;
     @JoinColumn(name = "SLAID", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Sla slaid;
     @JoinColumn(name = "TopicID", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Topic topicID;
 
     public Topicsla() {
@@ -42,7 +42,7 @@ public class Topicsla extends BasicModelWithIDInt {
 
     public Topicsla(Integer id, int sLALevel) {
         this.id = id;
-        this.sLALevel = sLALevel;
+        this.slaLevel = sLALevel;
     }
 
     public Integer getId() {
@@ -54,19 +54,11 @@ public class Topicsla extends BasicModelWithIDInt {
     }
 
     public int getSLALevel() {
-        return sLALevel;
+        return slaLevel;
     }
 
     public void setSLALevel(int sLALevel) {
-        this.sLALevel = sLALevel;
-    }
-
-    public String getSLAImpl() {
-        return sLAImpl;
-    }
-
-    public void setSLAImpl(String sLAImpl) {
-        this.sLAImpl = sLAImpl;
+        this.slaLevel = sLALevel;
     }
 
     public Sla getSlaid() {
@@ -99,7 +91,7 @@ public class Topicsla extends BasicModelWithIDInt {
             return false;
         }
         Topicsla other = (Topicsla) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

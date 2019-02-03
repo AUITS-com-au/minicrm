@@ -19,7 +19,6 @@ CreatedBy
 ModifiedBy
 CreationDate
 ModificationDate
-CrossedMainSLA
 SourceChannel_Ar
 SourceChannel_En
 Subject
@@ -28,7 +27,7 @@ TicketType_En
 Details
 AssignedTo
 Priority
-
+CrossedAllSLA
 ### Customer Account
 CustomerAccount_CustomerNameAR
 CustomerAccount_customerNameEn

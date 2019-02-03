@@ -17,6 +17,7 @@ import com.sh.crm.security.annotation.TicketsUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -32,11 +33,9 @@ public class TopicRestController extends BasicController<Topic> {
     private GeneratedTopicsPermissionsRepo generatedTopicsPermissions;
     @Autowired
     private TopicRepo topicRepo;
-
     @Autowired
     private TopicsPermissionsRepo topicsPermissionsRepo;
-    @Autowired
-    private UsersRepos usersRepos;
+
 
     @Override
     @TicketsAdmin
@@ -78,13 +77,13 @@ public class TopicRestController extends BasicController<Topic> {
 
     @TicketsAdmin
     @PostMapping("/permissions/create")
+    @Transactional
     public ResponseEntity<?> createTopicPermissions(@RequestBody List<Topicspermissions> topicspermissions) throws GeneralException {
 
         if (topicspermissions != null && !topicspermissions.isEmpty()) {
             try {
-
                 for (Topicspermissions tp : topicspermissions) {
-                    Set<Topicspermissions> existing = topicsPermissionsRepo.findByAssigneAndType( tp.getAssigne(), tp.getType() );
+                    Set<Topicspermissions> existing = topicsPermissionsRepo.findByAssigneAndTypeAndTopicId( tp.getAssigne(), tp.getType(), tp.getTopicId() );
 
                     try {
                         //delete old permissions for the same topic and assigne
@@ -137,7 +136,6 @@ public class TopicRestController extends BasicController<Topic> {
     public Iterable<Topicspermissions> getGroupTopicPermissions(@PathVariable("groupId") Integer groupID) {
         return topicsPermissionsRepo.findByAssigneAndType( groupID, "group" );
     }
-
 
     @Override
     @TicketsAdmin

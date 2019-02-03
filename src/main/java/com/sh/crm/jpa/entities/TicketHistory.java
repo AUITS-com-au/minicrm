@@ -45,6 +45,13 @@ public class TicketHistory {
     private String newAssigne;
     @Column(name = "CreationDate")
     protected Date creationDate;
+
+    @Column(name = "DataID")
+    private Long dataID;
+
+    @Column(name = "EscalationHisID")
+    private Long escalationHisID;
+
     public TicketHistory() {
     }
 
@@ -145,6 +152,22 @@ public class TicketHistory {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Long getDataID() {
+        return dataID;
+    }
+
+    public void setDataID(Long dataID) {
+        this.dataID = dataID;
+    }
+
+    public Long getEscalationHisID() {
+        return escalationHisID;
+    }
+
+    public void setEscalationHisID(Long escalationHisID) {
+        this.escalationHisID = escalationHisID;
     }
 
     @Override

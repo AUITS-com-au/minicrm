@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -102,4 +104,36 @@ public class FileStorageService {
 
         }
     }
+
+    public UploadFileResponse getFileContent(UploadFileResponse fileInfo) throws Exception {
+
+        Path path = loadFile( fileInfo.getFileName() );
+        byte[] fileContent = Files.readAllBytes( path );
+        fileInfo.setContent( fileContent );
+
+
+        return fileInfo;
+
+    }
+
+    @Async
+    public void deleteFiles(List<UploadFileResponse> files) {
+        if (files != null) {
+            for (UploadFileResponse file : files) {
+                try {
+                    Path filePath = this.fileStorageLocation.resolve( file.getFileName() ).normalize();
+                    if (log.isDebugEnabled())
+                        log.debug( "deleting file {} ", filePath.toString() );
+                    Files.deleteIfExists( filePath );
+                    if (log.isDebugEnabled())
+                        log.debug( "file {} deleted successfully", filePath );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+            files = null;
+        }
+    }
+
 }

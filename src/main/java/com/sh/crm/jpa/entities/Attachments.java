@@ -5,6 +5,8 @@
  */
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,12 +32,15 @@ public class Attachments extends BasicModelWithID {
     @Column(name = "Hash")
     private String hash;
     @Lob
+    @JsonIgnore
     @Column(name = "RAWContent")
     private byte[] rawContent;
     @Size(max = 500)
+    @JsonIgnore
     @Column(name = "FilePath")
     private String filePath;
     @Size(max = 1000)
+    @JsonIgnore
     @Column(name = "FileDesc")
     private String fileDesc;
 

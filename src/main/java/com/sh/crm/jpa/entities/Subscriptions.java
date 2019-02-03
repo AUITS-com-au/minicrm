@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -21,10 +17,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author achah
- */
+
 @Entity
 @Table(name = "subscriptions")
 @XmlRootElement
@@ -34,7 +27,7 @@ public class Subscriptions extends BasicModelWithID {
     private Integer topic;
 
     @Column(name = "TicketID")
-    private BigInteger ticketID;
+    private Long ticketID;
     @Size(max = 50)
     @Column(name = "userID")
     private String userID;
@@ -74,12 +67,11 @@ public class Subscriptions extends BasicModelWithID {
     }
 
 
-
-    public BigInteger getTicketID() {
+    public Long getTicketID() {
         return ticketID;
     }
 
-    public void setTicketID(BigInteger ticketID) {
+    public void setTicketID(Long ticketID) {
         this.ticketID = ticketID;
     }
 

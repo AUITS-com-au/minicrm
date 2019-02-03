@@ -1,46 +1,28 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
-import java.io.Serializable;
-import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
 
-/**
- *
- * @author achah
- */
+
 @Entity
 @Table(name = "calendar")
 @XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "Calendar.findAll", query = "SELECT c FROM Calendar c")})
-public class Calendar implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Calendar {
+
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "dt")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date dt;
+    private Date date;
     @Column(name = "isWeekday")
-    private Short isWeekday;
+    private Boolean isWeekday;
     @Column(name = "isHoliday")
-    private Short isHoliday;
+    private Boolean isHoliday;
     @Column(name = "Y")
     private Short y;
     @Column(name = "FY")
@@ -68,31 +50,31 @@ public class Calendar implements Serializable {
     public Calendar() {
     }
 
-    public Calendar(Date dt) {
-        this.dt = dt;
+    public Calendar(Date date) {
+        this.date = date;
     }
 
-    public Date getDt() {
-        return dt;
+    public Date getDate() {
+        return date;
     }
 
-    public void setDt(Date dt) {
-        this.dt = dt;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    public Short getIsWeekday() {
+    public Boolean getIsWeekday() {
         return isWeekday;
     }
 
-    public void setIsWeekday(Short isWeekday) {
+    public void setIsWeekday(Boolean isWeekday) {
         this.isWeekday = isWeekday;
     }
 
-    public Short getIsHoliday() {
+    public Boolean getIsHoliday() {
         return isHoliday;
     }
 
-    public void setIsHoliday(Short isHoliday) {
+    public void setIsHoliday(Boolean isHoliday) {
         this.isHoliday = isHoliday;
     }
 
@@ -179,7 +161,7 @@ public class Calendar implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (dt != null ? dt.hashCode() : 0);
+        hash += (date != null ? date.hashCode() : 0);
         return hash;
     }
 
@@ -190,7 +172,7 @@ public class Calendar implements Serializable {
             return false;
         }
         Calendar other = (Calendar) object;
-        if ((this.dt == null && other.dt != null) || (this.dt != null && !this.dt.equals(other.dt))) {
+        if ((this.date == null && other.date != null) || (this.date != null && !this.date.equals( other.date ))) {
             return false;
         }
         return true;
@@ -198,7 +180,10 @@ public class Calendar implements Serializable {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Calendar[ dt=" + dt + " ]";
+        return "Calendar{" +
+                "date=" + date +
+                ", isWeekday=" + isWeekday +
+                ", isHoliday=" + isHoliday +
+                '}';
     }
-    
 }

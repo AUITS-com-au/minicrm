@@ -9,14 +9,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "TicketAttachments")
 @XmlRootElement
-public class TicketAttachments implements Serializable {
+public class TicketAttachments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
-    @Column(name = "HistoryID")
-    private Long historyID;
+    @Column(name = "DataID")
+    private Long dataID;
     @Column(name = "AttachmentID")
     private Long attachmentID;
     @Column(name = "TicketID")
@@ -37,12 +37,12 @@ public class TicketAttachments implements Serializable {
         this.id = id;
     }
 
-    public Long getHistoryID() {
-        return historyID;
+    public Long getDataID() {
+        return dataID;
     }
 
-    public void setHistoryID(Long historyID) {
-        this.historyID = historyID;
+    public void setDataID(Long dataID) {
+        this.dataID = dataID;
     }
 
     public Long getAttachmentID() {

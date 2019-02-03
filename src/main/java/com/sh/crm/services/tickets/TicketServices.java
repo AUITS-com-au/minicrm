@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import reactor.bus.Event;
 import reactor.bus.EventBus;
+
 import javax.transaction.Transactional;
 import java.security.Principal;
 
@@ -41,8 +42,10 @@ public class TicketServices {
     public void logTicketHistory(TicketHistory history, Principal principal) {
         if (log.isTraceEnabled())
             log.trace( "ticket history log started successfully" );
-
-        history.setCreatedBy( principal.getName() );
+        if (principal != null)
+            history.setCreatedBy( principal.getName() );
+        else
+            history.setCreatedBy( "system" );
         history.setCreationDate( java.util.Calendar.getInstance().getTime() );
         history = ticketHistoryRepo.save( history );
 
@@ -54,4 +57,6 @@ public class TicketServices {
         if (log.isTraceEnabled())
             log.trace( "ticket  history log completed successfully" );
     }
+
+
 }

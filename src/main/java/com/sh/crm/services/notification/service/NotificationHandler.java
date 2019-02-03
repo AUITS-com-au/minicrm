@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.*;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationHandler extends BasicService {
-
     @Async
     public void handleAction(Long actionID) {
         try {
@@ -26,6 +26,10 @@ public class NotificationHandler extends BasicService {
             TicketHistory history = historyRepo.findById( actionID ).orElse( null );
             String assignedUser = null;
             if (history != null && history.getActionID() != null) {
+                if (history.getActionID() == TicketAction.ESC) {
+                    handleSLA( history );
+                    return;
+                }
                 String operation = Utils.getOperationFromAction( history.getActionID() );
                 String template = null;
                 Integer templateID = null;
@@ -63,22 +67,17 @@ public class NotificationHandler extends BasicService {
                     default:
                         logger.debug( "action {} doesn't need notification, ignore it", history.getActionID() );
                 }
-
                 try {
                     templateID = Integer.parseInt( template );
                 } catch (Exception e) {
                     logger.error( "template ID for template {} is not an Integer value please set a template as no emails will be generated".toUpperCase(), EmailTemplatName.UPDATE );
                     return;
                 }
-
                 //now get list of notified users/emails
-
                 Set<EmailPref> emailPrefSet = getNotifiedEmailsForTicketAction( history.getTicketID(), notificationStatus, assignedUser );
-
                 if (emailPrefSet != null && !emailPrefSet.isEmpty()) {
-                    createEmails( emailPrefSet, templateID, history.getTicketID(), history.getId(), history.getActionID(), operation );
+                    createEmails( emailPrefSet, templateID, history.getTicketID(), history, null, operation );
                 }
-
             }
             //history is null  or action id is null so nothing to do....
         } catch (Exception e) {
@@ -86,18 +85,24 @@ public class NotificationHandler extends BasicService {
         }
     }
 
-    @Async
-    public void handleSLA(Integer slaID, Long ticketID) {
+
+    @Transactional(rollbackFor = Exception.class)
+    public void handleSLA(TicketHistory history) {
         try {
             if (logger.isDebugEnabled())
-                logger.debug( "handling ticket SLA {} for ticket ID {}", slaID, ticketID );
+                logger.debug( "handling ticket SLA  for ticket ID {}", history.getTicketID() );
 
-            Ticket ticket = ticketsRepo.findById( ticketID ).orElse( null );
+            Escalationhistory escalationhistory = escalationHistoryRepo.findById( history.getEscalationHisID() ).orElse( null );
+            if (escalationhistory == null) {
+                logger.error( "error handling escalation for ticket ID {} because escalation history is null", history.getTicketID() );
+                return;
+            }
 
-            Sla sla = slaRepo.findById( slaID ).orElse( null );
+            Ticket ticket = escalationhistory.getTicketID();
 
-            if (ticket != null && sla != null) {
-                String operation = "Escalation";
+
+            if (ticket != null) {
+                String operation = TicketOperation.ESC;
                 String template = null;
                 Integer templateID = null;
 
@@ -110,15 +115,12 @@ public class NotificationHandler extends BasicService {
                     logger.error( "template ID for template {} is not an Integer value please set a template as no emails will be generated".toUpperCase(), EmailTemplatName.SLA );
                     return;
                 }
-
                 //now get list of notified users/emails
-
-                List<EmailPref> emailPrefSet = getNotifiedEmailsForSLA( slaID );
-
+                List<EmailPref> emailPrefSet = getNotifiedEmailsForSLA( escalationhistory.getTopicSLA(), ticket );
                 if (emailPrefSet != null && !emailPrefSet.isEmpty()) {
-                    createEmails( emailPrefSet, templateID, ticketID, null, slaID, operation );
-
+                    createEmails( emailPrefSet, templateID, ticket.getId(), history, escalationhistory, operation );
                 }
+
             }
             //history is null  or action id is null so nothing to do....
         } catch (Exception e) {
@@ -127,21 +129,22 @@ public class NotificationHandler extends BasicService {
     }
 
 
-    private void createEmails(Collection<EmailPref> emailPrefSet, Integer templateID, Long ticketID, Long histroyID, Integer actionID, String operation) {
+    private void createEmails(Collection<EmailPref> emailPrefSet, Integer templateID, Long ticketID, TicketHistory histroy, Escalationhistory escalationhistory, String operation) {
         Emailtemplates emailtemplates = null;
+        Integer actionID = (histroy == null) ? 0 : histroy.getActionID();
         try {
-            emailtemplates = formatTemplate( templateID, ticketID, null, null, operation );
-
+            emailtemplates = formatTemplate( templateID, ticketID, escalationhistory == null ? null : escalationhistory.getTopicSLA(), null, operation );
         } catch (Exception e) {
             LoggingUtils.logStackTrace( logger, e, "error" );
+            return;
         }
         Emailmessage emailmessage = new Emailmessage();
         emailmessage.setEmailTitle( emailtemplates.getTemplateTitle() );
         emailmessage.setEmailMessage( emailtemplates.getTemplateData() );
         List<Long> attachmentsList = null;
-        if (histroyID != null)
-            attachmentsList = ticketAttachmentsRepo.getAttachmentsID( histroyID );
-        else if (ticketID != null) {
+        if (histroy != null && histroy.getDataID() != null) {
+            attachmentsList = ticketAttachmentsRepo.getAttachmentsByDataID( histroy.getDataID() );
+        } else if (ticketID != null && (histroy.getActionID() == TicketAction.CREATE || histroy.getActionID() == TicketAction.CHGDEPT || histroy.getActionID() == TicketAction.ASSIGN)) {
             attachmentsList = ticketAttachmentsRepo.getAttachmentsIDByTicketID( ticketID );
         }
         if (attachmentsList != null && !attachmentsList.isEmpty()) {
@@ -154,9 +157,10 @@ public class NotificationHandler extends BasicService {
             emailhistory.setEmailMessage( emailmessage );
             emailhistory.setCreationDate( Calendar.getInstance().getTime() );
             emailhistory.setEmailID( emailPref.getEmailID() );
-
+            emailhistory.setStatus( emailPref.isDisabled() ? 1000 : null );
             if (actionID != null) {
-                Ticketactions action = ticketActionsRepo.getOne( actionID );
+                Ticketactions action = ticketActionsRepo.findById( actionID ).orElse( null );
+                logger.debug( "ticket action {}", action );
                 if (action != null && !StringUtils.isEmpty( action.getEnglishLabel() ))
                     emailhistory.setSendingOn( action.getEnglishLabel() );
                 action = null;
@@ -165,11 +169,11 @@ public class NotificationHandler extends BasicService {
             }
 
             if (actionID != null)
-                emailhistory.setType( "ActionEmail" );
+                emailhistory.setType( "Action Email" );
             else if (operation != null) {
                 emailhistory.setType( operation );
             }
-            emailhistory.setTicketID( actionID );
+            emailhistory.setTicketID( ticketID );
             emailHistoryRepo.save( emailhistory );
             emailhistory = null;
         }
@@ -186,7 +190,7 @@ public class NotificationHandler extends BasicService {
         List<Subscriptions> allSub = new ArrayList<>();
         Set<String> usersList = new HashSet<>();
         Set<EmailPref> notifiedEmails = new HashSet<>();
-        List<Users> listOFUsers = usersRepos.getUsersByUserName( usersList );
+        List<Users> listOFUsers = new ArrayList<>();
         switch (status) {
             case NotificationStatus
                     .OnClose:
@@ -211,63 +215,67 @@ public class NotificationHandler extends BasicService {
                 else
                     return null;
                 break;
-
-
         }
 
-        if (notificationsListTicket != null)
-            allSub.addAll( notificationsListTicket );
-        if (notificationsListTopic != null)
-            allSub.addAll( notificationsListTopic );
+        if (listOFUsers.isEmpty()) {
+            if (notificationsListTicket != null)
+                allSub.addAll( notificationsListTicket );
+            if (notificationsListTopic != null)
+                allSub.addAll( notificationsListTopic );
 
 
-        if (!allSub.isEmpty()) {
-            for (Subscriptions subscription : allSub) {
-                if (subscription.getUserID() != null) {
-                    usersList.add( subscription.getUserID() );
+            if (!allSub.isEmpty()) {
+                for (Subscriptions subscription : allSub) {
+                    if (subscription.getUserID() != null) {
+                        usersList.add( subscription.getUserID() );
+                    }
                 }
             }
+            listOFUsers = usersRepos.getUsersByUserName( usersList );
         }
+
         allSub = null;
         notificationsListTicket = null;
         notificationsListTopic = null;
         if (listOFUsers == null || listOFUsers.isEmpty())
-            throw new GeneralException( "Users List is Empty or NULL !!!!" );
+            throw new GeneralException( "Users List is Empty or NULL !!!! For Status: " + status + " Ticket:" + ticketID );
 
         for (Users user : listOFUsers) {
             if (user.getPreferences() != null) {
                 EmailPref pref = null;
                 switch (status) {
-
                     case NotificationStatus
                             .OnClose:
-                        if (user.getPreferences().getTicketCLoseEmails() != null && user.getPreferences().getTicketCLoseEmails()) {
+                        if (user.getPreferences() != null && user.getPreferences().getEmailsNotifications() != null && user.getPreferences().getEmailsNotifications() && user.getPreferences().getTicketCLoseEmails() != null && user.getPreferences().getTicketCLoseEmails()) {
                             pref = new EmailPref( user.getUserID(), user.getEmail(), user.getPreferences().getIncludeAttatchments() );
 
                         } else {
                             if (logger.isDebugEnabled()) {
                                 logger.debug( "user {} {} disabled notifications for ticket Close notifications", user.getFirstName(), user.getLastName() );
                             }
+                            pref = new EmailPref( user.getUserID(), user.getEmail(), true, false );
                         }
                         break;
 
                     case NotificationStatus.OnCreate:
-                        if (user.getPreferences().getTicketCreationEmails() != null && user.getPreferences().getTicketCLoseEmails()) {
+                        if (user.getPreferences() != null && user.getPreferences().getEmailsNotifications() != null && user.getPreferences().getEmailsNotifications() && user.getPreferences().getTicketCreationEmails() != null && user.getPreferences().getTicketCreationEmails()) {
                             pref = new EmailPref( user.getUserID(), user.getEmail(), user.getPreferences().getIncludeAttatchments() );
                         } else {
                             if (logger.isDebugEnabled()) {
                                 logger.debug( "user {} {} disabled notifications for ticket create notifications", user.getFirstName(), user.getLastName() );
                             }
+                            pref = new EmailPref( user.getUserID(), user.getEmail(), true, false );
                         }
                         break;
 
                     case NotificationStatus.OnUpdate:
-                        if (user.getPreferences().getTicketEditEmails() != null && user.getPreferences().getTicketEditEmails()) {
+                        if (user.getPreferences() != null && user.getPreferences().getEmailsNotifications() != null && user.getPreferences().getEmailsNotifications() && user.getPreferences().getTicketEditEmails() != null && user.getPreferences().getTicketEditEmails()) {
                             pref = new EmailPref( user.getUserID(), user.getEmail(), user.getPreferences().getIncludeAttatchments() );
                         } else {
                             if (logger.isDebugEnabled()) {
                                 logger.debug( "user {} {} disabled notifications for ticket create notifications", user.getFirstName(), user.getLastName() );
                             }
+                            pref = new EmailPref( user.getUserID(), user.getEmail(), true, false );
                         }
                         break;
                     case NotificationStatus.OnAssign:
@@ -295,12 +303,15 @@ public class NotificationHandler extends BasicService {
 
     }
 
-    private List<EmailPref> getNotifiedEmailsForSLA(Integer slaID) {
+
+    private List<EmailPref> getNotifiedEmailsForSLA(Topicsla topicSLA, Ticket ticketID) {
         List<EmailPref> emailPrefList = null;
 
-        List<Slausers> slausersList = slaUsersRepo.findBySlaAndEnabledIsTrue( slaID );
+        List<Slausers> slausersList = slaUsersRepo.
+                findByTopicSLAAndEnabledIsTrue( topicSLA.getId() );
         if (slausersList == null || slausersList.isEmpty()) {
-            logger.error( "Sla users list for SLA {} is empty please add sla users for this SLA ", slaID );
+            logger.error( "Sla users list for TOPIC SLA {} " +
+                    "is empty please add sla users for this SLA ", topicSLA );
 
         } else {
             emailPrefList = new ArrayList<>();
@@ -309,16 +320,21 @@ public class NotificationHandler extends BasicService {
 
                 if (slausers.getUserId() != null && !slausers.getUserId().isEmpty()) {
                     // user is defined ignore emails
-                    Users user = usersRepos.findByUserIDAndEnabledIsTrue( slausers.getUserId() );
+                    Users user = usersRepos.
+                            findByUserIDAndEnabledIsTrue( slausers.getUserId() );
                     emailPref = getPrefFromUser( user );
                     emailPref.setSlaEmail( true );
 
-                } else if (slausers.getEmails() != null && !slausers.getEmails().isEmpty()) {
+                } else if (slausers.getEmails() != null &&
+                        !slausers.getEmails().isEmpty()) {
                     emailPref = new EmailPref();
                     emailPref.setEmailID( slausers.getEmails() );
                 } else {
-                    logger.error( "sla user record defined for SLA {} , SLA User ID {} doesn't have email ID or user ID, this must be fixed" +
-                            " to avoid missing emails notification ", slaID, slausers.getId() );
+                    logger.error( "sla user record defined for TOPIC SLA {}" +
+                                    " , SLA User ID {} doesn't have email ID or user" +
+                                    " ID, this must be fixed" +
+                                    " to avoid missing emails notification ",
+                            topicSLA, slausers.getId() );
                 }
                 if (emailPref != null)
                     emailPrefList.add( emailPref );
@@ -329,7 +345,16 @@ public class NotificationHandler extends BasicService {
     }
 
 
-    private Emailtemplates formatTemplate(Integer tempID, Long ticketID, Integer sla, String user, String operation) throws GeneralException {
+    /**
+     * @param tempID
+     * @param ticketID
+     * @param topicsla
+     * @param user
+     * @param operation
+     * @return
+     * @throws GeneralException
+     */
+    private Emailtemplates formatTemplate(Integer tempID, Long ticketID, Topicsla topicsla, String user, String operation) throws GeneralException {
 
         if (tempID == null || !emailTemplatesRepo.existsById( tempID ))
             throw new GeneralException( "Email template is NULL !!!!" );
@@ -397,7 +422,7 @@ public class NotificationHandler extends BasicService {
             substitutes.put( "ModifiedBy", ticket.getModifiedBy() == null ? "" : ticket.getModifiedBy() );
             substitutes.put( "CreationDate", df.format( ticket.getCreationDate() ) );
             substitutes.put( "ModificationDate", ticket.getModificationDate() == null ? "" : df.format( ticket.getModificationDate() ) );
-            substitutes.put( "CrossedMainSLA", getTrueFalseLabel( ticket.getCrossedMainSLA() ) );
+            substitutes.put( "CrossedAllSLA", getTrueFalseLabel( ticket.isCrossedAllSLA() ) );
             substitutes.put( "SourceChannel_Ar", sourceChannelRepo.findById( ticket.getSourceChannel() ).orElse( new SourceChannel( "", "" ) ).getArabicLabel() );
             substitutes.put( "SourceChannel_En", sourceChannelRepo.findById( ticket.getSourceChannel() ).orElse( new SourceChannel( "", "" ) ).getEnglishLabel() );
             substitutes.put( "Subject", ticket.getSubject() );
@@ -468,9 +493,16 @@ public class NotificationHandler extends BasicService {
 
     private EmailPref getPrefFromUser(Users user) {
         EmailPref emailPref = null;
-        if (user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
+        if (user != null) {
+            emailPref = new EmailPref( user.getUserID(), user.getEmail(), user.getPreferences() != null ? user.getPreferences().getEmailsNotifications() : false );
+        }
+
+        if (emailPref != null) {
             if (user.getPreferences() != null && user.getPreferences().getEmailsNotifications() != null && user.getPreferences().getEmailsNotifications()) {
-                emailPref = new EmailPref( user.getUserID(), user.getEmail(), user.getPreferences().getIncludeAttatchments() );
+                emailPref.setIncludeAttatchments( user.getPreferences().getIncludeAttatchments() );
+                emailPref.setDisabled( false );
+            } else {
+                emailPref.setDisabled( true );
             }
         }
         return emailPref;

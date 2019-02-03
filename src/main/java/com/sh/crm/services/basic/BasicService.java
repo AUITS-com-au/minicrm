@@ -1,6 +1,5 @@
 package com.sh.crm.services.basic;
 
-import com.sh.crm.jpa.repos.TicketAttachmentsRepo;
 import com.sh.crm.jpa.repos.global.GlobalConfigRepo;
 import com.sh.crm.jpa.repos.notifications.EmailHistoryRepo;
 import com.sh.crm.jpa.repos.notifications.EmailMessageRepo;
@@ -52,4 +51,7 @@ public abstract class BasicService {
     protected SlaRepo slaRepo;
     @Autowired
     protected TicketActionsRepo ticketActionsRepo;
+
+    @Autowired
+    protected EscalationHistoryRepo escalationHistoryRepo;
 }

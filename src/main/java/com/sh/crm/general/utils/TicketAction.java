@@ -12,7 +12,6 @@ public interface TicketAction {
     public final static int READ = 9;
     public final static int LOCK = 10;
     public final static int ASSIGN = 11;
-
     public final static int REPLY = 12;
-
+    public final static int ESC = 13;
 }

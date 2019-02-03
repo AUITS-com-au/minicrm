@@ -28,4 +28,13 @@ public class FileInfo {
     public void setFileExt(String fileExt) {
         this.fileExt = fileExt;
     }
+
+    @Override
+    public String toString() {
+        return "FileInfo{" +
+                "originalFileName='" + originalFileName + '\'' +
+                ", newFileName='" + newFileName + '\'' +
+                ", fileExt='" + fileExt + '\'' +
+                '}';
+    }
 }

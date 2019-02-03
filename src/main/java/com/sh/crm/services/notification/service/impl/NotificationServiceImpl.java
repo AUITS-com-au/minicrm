@@ -26,9 +26,6 @@ public class NotificationServiceImpl implements NotificationService {
                 //handle action
                 notificationHandler.handleAction( notificationData.getActionId() );
                 break;
-            case NotificationType.ESCALATION:
-                notificationHandler.handleSLA( notificationData.getSlaID(), notificationData.getTicketID() );
-                break;
             default:
                 logger.error( "Notification type {} is not mapped please fix it", notificationData.getNotificationType() );
                 break;

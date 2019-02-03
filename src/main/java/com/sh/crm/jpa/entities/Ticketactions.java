@@ -28,7 +28,7 @@ public class Ticketactions extends BasicModel {
     @Column(name = "Enabled")
     private Boolean enabled;
     @JsonIgnore
-    @ManyToOne(targetEntity = Status.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Status.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "SetStatusTo")
     private Status setStatusTo;
 

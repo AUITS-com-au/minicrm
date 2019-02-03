@@ -24,7 +24,6 @@ public class Emailhistory {
     @Column(name = "ID")
     private Long id;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "TicketID")
     private long ticketID;
     @Basic(optional = false)
@@ -44,8 +43,6 @@ public class Emailhistory {
     @Column(name = "SendDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date sendDate;
-    @Basic(optional = false)
-    @NotNull
     @Size(min = 1, max = 120)
     @Column(name = "SendingOn")
     private String sendingOn;

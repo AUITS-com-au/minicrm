@@ -3,7 +3,6 @@ package com.sh.crm.jpa.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
-import com.sh.crm.config.SpringSecurityAuditorAware;
 import com.sh.crm.jpa.entities.Users;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
