@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
 import java.io.Serializable;
@@ -25,17 +21,11 @@ import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- *
- * @author achah
- */
 @Entity
 @Table(name = "sla")
 @XmlRootElement
-@NamedQueries({
-    @NamedQuery(name = "Sla.findAll", query = "SELECT s FROM Sla s")})
-public class Sla implements Serializable {
-    private static final long serialVersionUID = 1L;
+
+public class Sla {
     @Id
     @Basic(optional = false)
     @NotNull
@@ -64,8 +54,6 @@ public class Sla implements Serializable {
     private Integer catID;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "slaid", fetch = FetchType.LAZY)
     private List<Topicsla> topicslaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sla", fetch = FetchType.LAZY)
-    private List<Escalationhistory> escalationhistoryList;
 
     public Sla() {
     }
@@ -152,14 +140,7 @@ public class Sla implements Serializable {
         this.topicslaList = topicslaList;
     }
 
-    @XmlTransient
-    public List<Escalationhistory> getEscalationhistoryList() {
-        return escalationhistoryList;
-    }
 
-    public void setEscalationhistoryList(List<Escalationhistory> escalationhistoryList) {
-        this.escalationhistoryList = escalationhistoryList;
-    }
 
     @Override
     public int hashCode() {
@@ -170,7 +151,6 @@ public class Sla implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Sla)) {
             return false;
         }

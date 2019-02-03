@@ -13,5 +13,6 @@ public interface TicketOperation {
     public final static String MODIFYINFO = "modifyticket";
     public final static String CHGDPT = "changedepartment";
     public final static String ASSIGN = "assign";
+    public final static String ESC = "escalation";
 
 }

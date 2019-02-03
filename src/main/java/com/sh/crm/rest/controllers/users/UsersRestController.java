@@ -16,9 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -184,7 +183,6 @@ public class UsersRestController extends BasicController<UserHolder> {
         List<Roles> userRoles = usersRolesRepo.getUserRoles( userID );
         return userRoles;
     }
-
 
     public ResponseEntity<?> getUserPreferences(@PathVariable("userID") String userID) {
 

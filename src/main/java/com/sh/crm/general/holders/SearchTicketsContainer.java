@@ -23,7 +23,7 @@ public class SearchTicketsContainer {
     private List<Integer> status;
     private List<Long> customerAccounts;
     private List<String> assignedTo;
-    private Boolean crossedMainSla;
+    private Boolean crossedAllSla;
     private List<Integer> language;
     private List<Integer> priority;
     private Boolean deleted;
@@ -188,12 +188,12 @@ public class SearchTicketsContainer {
         this.assignedTo = assignedTo;
     }
 
-    public Boolean getCrossedMainSla() {
-        return crossedMainSla;
+    public Boolean getCrossedAllSla() {
+        return crossedAllSla;
     }
 
-    public void setCrossedMainSla(Boolean crossedMainSla) {
-        this.crossedMainSla = crossedMainSla;
+    public void setCrossedAllSla(Boolean crossedAllSla) {
+        this.crossedAllSla = crossedAllSla;
     }
 
     public List<Integer> getLanguage() {

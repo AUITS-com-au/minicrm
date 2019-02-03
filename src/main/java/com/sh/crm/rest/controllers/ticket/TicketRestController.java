@@ -8,10 +8,7 @@ import com.sh.crm.general.exceptions.UserNotAllowedException;
 import com.sh.crm.general.holders.SearchTicketsContainer;
 import com.sh.crm.general.holders.SearchTicketsResult;
 import com.sh.crm.general.holders.TicketHolder;
-import com.sh.crm.general.utils.LoggingUtils;
-import com.sh.crm.general.utils.TicketAction;
-import com.sh.crm.general.utils.TicketOperation;
-import com.sh.crm.general.utils.TicketStatus;
+import com.sh.crm.general.utils.*;
 import com.sh.crm.jpa.entities.*;
 import com.sh.crm.misc.TopicConfiguration;
 import com.sh.crm.rest.general.BasicController;
@@ -25,13 +22,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "tickets", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,75 +39,95 @@ public class TicketRestController extends BasicController<TicketHolder> {
     private TopicPermissionsService topicPermissionsService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<?> create(@RequestBody TicketHolder ticketHolder, Principal principal) throws GeneralException {
-        try {
-            if (ticketHolder != null) {
+
+        if (ticketHolder != null) {
+            if (log.isDebugEnabled())
+                log.debug( "creating ticket {}", ticketHolder );
+            CustomerAccounts accounts = ticketHolder.getCustomerAccount();
+
+            Ticket ticket = ticketHolder.getTicket();
+            if (ticket == null)
+                throw new GeneralException( Errors.CANNOT_CREATE_OBJECT, "Ticket record is empty" );
+            // Topic topic = topicRepo.findOne( ticket.getTopic() );
+            if (accounts != null) {
                 if (log.isDebugEnabled())
-                    log.debug( "creating ticket {}", ticketHolder );
-                CustomerAccounts accounts = ticketHolder.getCustomerAccount();
-                if (accounts != null) {
-                    if (log.isDebugEnabled())
-                        log.debug( "adding/updating customer account {} ", accounts );
-                    customerAccountsRepo.save( accounts );
-                    if (log.isDebugEnabled())
-                        log.debug( "customer account {} added/updated successfully ", accounts );
-                }
-                Ticket ticket = ticketHolder.getTicket();
-                if (ticket == null)
-                    throw new GeneralException( Errors.CANNOT_CREATE_OBJECT, "Ticket record is empty" );
-                // Topic topic = topicRepo.findOne( ticket.getTopic() );
-                Ticketactions ticketaction = new Ticketactions( TicketAction.CREATE );
-                if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), ticketaction )) {
-                    if (log.isDebugEnabled())
-                        log.debug( "User {} is allowed to create a ticket", principal.getName() );
-                    // ticket.setCustomerAccount( accounts != null ? accounts.getId() : null );
-                    ticket.setId( Long.parseLong( getNextTicketID( ticket.getTopic().getId() ) ) );
-                    ticket.setOriginalTopic( ticket.getTopic() );
-                    ticket.setCurrentStatus( TicketStatus.Opened );
-
-                    ticket.setEscalationCalDate( java.util.Calendar.getInstance().getTime() );
-                    if (log.isDebugEnabled())
-                        log.debug( "persisting ticket  {} into database", ticket );
-                    ticket = ticketsRepo.save( ticket );
-
-                    if (log.isDebugEnabled())
-                        log.debug( "ticket {} persisted successfully", ticket );
-                    log.info( "ticket {} created successfully", ticket.getId() );
-                    if (log.isDebugEnabled())
-                        log.debug( "log ticket action after creation" );
-                    TicketHistory history = new TicketHistory();
-                    history.setTicketID( ticket.getId() );
-                    history.setActionID( TicketAction.CREATE );
-
-                    ticketServices.logTicketHistory( history
-                            , principal );
-                    if (ticketHolder.getExtDataList() != null && !ticketHolder.getExtDataList().isEmpty()) {
-                        List<TicketExtData> updatedList = new ArrayList<>( ticketHolder.getExtDataList().size() );
-                        for (TicketExtData data : ticketHolder.getExtDataList()) {
-                            data.setTicketID( ticket );
-                            data.setId( null );
-                            updatedList.add( data );
-                        }
-                        updatedList = ticketExtDataRepo.saveAll( updatedList );
-                        ticket.setTicketExtData( updatedList );
-                        if (log.isDebugEnabled())
-                            log.debug( "Ticket ID {} extended data created successfuly", ticket.getId() );
-                    }
-                    ticketHolder = null;
-
-                    ticketaction = null;
-
-                    return ResponseEntity.ok( ticketsRepo.findById( ticket.getId() ).orElse( null ) );
+                    log.debug( "adding/updating customer account {} ", accounts );
+                // find account first
+                CustomerAccounts originalAcct = customerAccountsRepo.checkExistingAccount( accounts.getId(), accounts.getNin(), accounts.getCustomerCIF() );
+                if (originalAcct != null) {
+                    Utils.copyAccount( accounts, originalAcct );
+                    accounts = customerAccountsRepo.save( originalAcct );
                 } else {
-                    return new ResponseEntity( new ResponseCode( Errors.UNAUTHORIZED ), HttpStatus.UNAUTHORIZED );
+                    if ((accounts.getCustomerCIF() == null || accounts.getCustomerCIF().isEmpty()) && (accounts.getNin() == null || accounts.getNin().isEmpty()))
+                        throw new GeneralException( Errors.CANNOT_CREATE_OBJECT, "Customer Account is NOT Valid" );
+                    accounts = customerAccountsRepo.save( accounts );
                 }
+
+                if (log.isDebugEnabled())
+                    log.debug( "customer account {} added/updated successfully ", accounts );
+            } else {
+                accounts = customerAccountsRepo.findById( 1l ).orElse( null );
             }
-        } catch (Exception e) {
-            LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
-            throw new GeneralException( Errors.CANNOT_CREATE_OBJECT, e );
+            ticket.setCustomerAccount( accounts );
+
+            Ticketactions ticketaction = new Ticketactions( TicketAction.CREATE );
+            if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), ticketaction )) {
+                if (log.isDebugEnabled())
+                    log.trace( "User {} is allowed to create a ticket", principal.getName() );
+                // ticket.setCustomerAccount( accounts != null ? accounts.getId() : null );
+                ticket.setId( Long.parseLong( getNextTicketID( ticket.getTopic().getId() ) ) );
+                ticket.setOriginalTopic( ticket.getTopic() );
+                ticket.setCurrentStatus( TicketStatus.Opened );
+
+                updateTotalNumberOfSLA( ticket );
+
+                if (ticket.getSourceChannel() == null)
+                    ticket.setSourceChannel( 1 );
+                ticket.setEscalationCalDate( java.util.Calendar.getInstance().getTime() );
+                if (log.isDebugEnabled())
+                    log.debug( "persisting ticket  {} into database", ticket );
+                ticket = ticketsRepo.save( ticket );
+
+                if (log.isDebugEnabled())
+                    log.debug( "ticket {} persisted successfully", ticket );
+                log.info( "ticket {} created successfully", ticket.getId() );
+                if (log.isDebugEnabled())
+                    log.debug( "log ticket action after creation" );
+                TicketHistory history = new TicketHistory();
+                history.setTicketID( ticket.getId() );
+                history.setActionID( TicketAction.CREATE );
+                if (ticketHolder.getExtDataList() != null && !ticketHolder.getExtDataList().isEmpty()) {
+                    List<TicketExtData> updatedList = new ArrayList<>( ticketHolder.getExtDataList().size() );
+                    for (TicketExtData data : ticketHolder.getExtDataList()) {
+                        data.setTicketID( ticket );
+                        data.setId( null );
+                        updatedList.add( data );
+                    }
+                    updatedList = ticketExtDataRepo.saveAll( updatedList );
+                    ticket.setTicketExtData( updatedList );
+                    if (log.isDebugEnabled())
+                        log.debug( "Ticket ID {} extended data created successfuly", ticket.getId() );
+                }
+
+                /**
+                 * add attachments
+                 */
+                handleAttachments( ticket.getId(), null, ticketHolder );
+
+                ticketServices.logTicketHistory( history
+                        , principal );
+
+                ticketHolder = null;
+                ticketaction = null;
+                return ResponseEntity.ok( ticketsRepo.findById( ticket.getId() ).orElse( null ) );
+            } else {
+                return new ResponseEntity( new ResponseCode( Errors.UNAUTHORIZED ), HttpStatus.UNAUTHORIZED );
+            }
         }
-        throw new GeneralException( Errors.CANNOT_CREATE_OBJECT );
+
+        return null;
     }
 
     @GetMapping("lock/{ticketID}/{actionID}")
@@ -179,7 +196,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 ticketlock.setTicketID( null );
                 return ResponseEntity.badRequest().body( locks.get( 0 ) );
             }
-
         }
         return ResponseEntity.badRequest().body( Errors.UNAUTHORIZED );
     }
@@ -219,10 +235,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
     Set<Ticket> assignTickets(TicketHolder ticketHolder, Principal principal) throws GeneralException {
         Set<Ticket> successSet = new LinkedHashSet<>();
         if (ticketHolder != null) {
-
             List<Long> tickets = new ArrayList<>();
-
-
             if (ticketHolder.getTicketList() != null && !ticketHolder.getTicketList().isEmpty()) {
                 tickets.addAll( ticketHolder.getTicketList() );
             } else if (ticketHolder.getTicket() != null) {
@@ -271,7 +284,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
         ticketServices.logTicketHistory( history, principal );
     }
 
-
     @Transactional
     void handleTicketData(TicketHolder ticketHolder, Principal principal) throws GeneralException {
         validateTicketLock( ticketHolder );
@@ -309,13 +321,15 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 ticketdata.setOldTopic( ticket.getTopic().getId() );
                 if (newTopic != null) {
                     ticketdata.setNewTopic( newTopic );
+
                     ticket.setTopic( topicRepo.getOne( newTopic ) );
                 }
                 ticketdata.setActionID( ticketactions );
-                tikcetDataRepo.save( ticketdata );
-                log.debug( "Ticket action saved successfully for ticket {}\n action {} \n data {}",
-                        ticket.getId(),
-                        ticketactions, ticketdata );
+                ticketdata = tikcetDataRepo.save( ticketdata );
+                if (log.isDebugEnabled())
+                    log.debug( "Ticket action saved successfully for ticket {}\n action {} \n data {}",
+                            ticket.getId(),
+                            ticketactions, ticketdata );
                 // updating ticket record
                 if (newStatus != null)
                     ticket.setCurrentStatus( newStatus.getId() );
@@ -329,14 +343,14 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 TicketHistory history = new TicketHistory();
                 history.setActionID( actionID );
                 history.setTicketID( ticket.getId() );
-
+                history.setDataID( ticketdata.getId() );
                 history.setOldTopic( currentTopic.getId() );
                 history.setNewTopic( ticket.getTopic().getId() );
                 history.setOldStatus( currentStatus );
                 history.setNewStatus( ticket.getCurrentStatus() );
                 history.setOldAssigne( ticket.getAssignedTo() );
                 ticketServices.logTicketHistory( history, principal );
-
+                handleAttachments( ticket.getId(), ticketdata.getId(), ticketHolder );
                 if (log.isDebugEnabled())
                     log.debug( "Ticket action for ticket {}  handled", ticket.getId() );
 
@@ -357,10 +371,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
         }
     }
 
-    @Transactional
-    void changeTktDept() {
-
-    }
 
     @PostMapping("modifyInfo")
     @Transactional
@@ -408,8 +418,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
     void updateTicketRecord(Ticket ticket, Integer ticketactions,
                             Integer newTopic, Principal principal) {
         Integer currentStatus = ticket.getCurrentStatus();
-
-
         switch (currentStatus) {
             case TicketStatus.Closed:
                 //closed
@@ -424,26 +432,23 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 ticket.setDeleted( true );
                 break;
         }
-
         if (ticketactions != null) {
-            if (ticketactions == TicketAction.CLOSE || ticketactions == TicketAction.REOPEN
+            if (ticketactions == TicketAction.REOPEN
                     || ticketactions == TicketAction.CHGDEPT) {
                 /**
-                 * closed
                  * reopen
                  * move to other department
                  */
                 ticket.setEscalationCalDate( Calendar.getInstance().getTime() );
                 ticket.setLastSLA( null );
-                if (ticketactions == TicketAction.CHGDEPT) {
-                    ticket.setAssignedTo( null );
-                }
+                ticket.setCrossedAllSLA( false );
+                ticket.setNumberOfCrossedSLA( 0 );
+                updateTotalNumberOfSLA( ticket );
+
             }
         }
         ticketsRepo.save( ticket );
-
     }
-
 
     @GetMapping("list/{page}/{size}")
     Page<Ticket> getPagingList(@PathVariable("page") int page, @PathVariable("size") int size) {
@@ -487,13 +492,11 @@ public class TicketRestController extends BasicController<TicketHolder> {
         Ticket ticket = ticketsRepo.findById( ticketID ).orElse( null );
         if (ticket == null)
             return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
-
         if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), TicketOperation.READ )) {
             return ResponseEntity.ok( ticket );
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
     }
-
 
     /**
      * This method validates the ticket lock using ticketholder container
@@ -532,5 +535,35 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 log.debug( "Ticket lock {} has expired on {} will try to accquire another lock", ticketlock.getLockID(), ticketlock.getExpiresOn() );
             throw new GeneralException( Errors.EXPIRED_TICKET_LOCK );
         }
+    }
+
+    @Transactional
+    void handleAttachments(long ticketID, Long dataID, TicketHolder ticketHolder) throws GeneralException {
+        if (ticketHolder.getAttachments() != null && !ticketHolder.getAttachments().isEmpty()) {
+            if (log.isDebugEnabled())
+                log.debug( "ticket attachments found, Linking ticket with attachments {}", ticketHolder.getAttachments() );
+
+            for (Long attachID : ticketHolder.getAttachments()) {
+                if (attachID != null) {
+                    TicketAttachments ticketAttachments = new TicketAttachments();
+                    ticketAttachments.setTicketID( ticketID );
+                    if (dataID != null)
+                        ticketAttachments.setDataID( dataID );
+                    ticketAttachments.setAttachmentID( attachID );
+                    ticketAttachmentRepo.save( ticketAttachments );
+                }
+            }
+        }
+    }
+
+    public Ticket updateTotalNumberOfSLA(Ticket ticket) {
+        if (ticket.getTopic() == null || ticket.getTopic().getId() == null)
+            ticket.setNumberOfSLA( 0 );
+
+        Integer totalSLA = topicSlaRepo.countDistinctByTopicID( ticket.getTopic() );
+        if (totalSLA != null) {
+            ticket.setNumberOfSLA( totalSLA );
+        }
+        return ticket;
     }
 }

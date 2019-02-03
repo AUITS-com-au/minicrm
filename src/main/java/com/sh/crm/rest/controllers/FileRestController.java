@@ -2,82 +2,80 @@ package com.sh.crm.rest.controllers;
 
 import com.sh.crm.general.exceptions.GeneralException;
 import com.sh.crm.general.utils.LoggingUtils;
-import com.sh.crm.services.storage.FileInfo;
-import com.sh.crm.services.storage.FileStorageService;
-import com.sh.crm.services.storage.UploadFileResponse;
+import com.sh.crm.jpa.entities.Attachments;
+import com.sh.crm.services.storage.DownloadFile;
+import com.sh.crm.services.storage.FileDBStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/upload")
 public class FileRestController {
 
     private static final Logger logger = LoggerFactory.getLogger( FileRestController.class );
 
-    @Autowired
-    private FileStorageService fileStorageService;
 
-    @PostMapping("/uploadFile")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) throws GeneralException {
-        FileInfo fileInfo = fileStorageService.storeFile( file );
+    @Autowired
+    private FileDBStorageService fileDBStorageService;
+
+    @PostMapping("uploadFile")
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws GeneralException {
+        // FileInfo fileInfo = fileStorageService.storeFile( file );
 
 //        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
 //                .path( "/downloadFile/" )
 //                .path( fileInfo.getNewFileName() )
 //                .toUriString();
 
-        return new UploadFileResponse( fileInfo.getNewFileName(),
-                file.getContentType(), file.getSize(), fileInfo.getOriginalFileName() );
+        Attachments attachments = fileDBStorageService.storeFile( file );
+
+        return ResponseEntity.ok( attachments.getId() );
     }
 
-    @PostMapping("/uploadMultipleFiles")
-    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) throws GeneralException {
+    @PostMapping("uploadMultipleFiles")
+    public List<?> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) throws GeneralException {
+        logger.debug( "received request to upload multiple files" );
         return Arrays.asList( files )
                 .stream()
                 .map( file -> {
-                    UploadFileResponse response = null;
+                    Attachments attachments = null;
                     try {
-                        response = uploadFile( file );
+                        attachments = fileDBStorageService.storeFile( file );
                     } catch (Exception e) {
                         LoggingUtils.logStackTrace( logger, e, "error" );
                     }
-                    return response;
+                    return attachments.getId();
                 } )
                 .collect( Collectors.toList() );
     }
 
-    @PostMapping("/downloadFile")
-    public ResponseEntity<Resource> downloadFile(@RequestBody UploadFileResponse fileInfo, HttpServletRequest request) throws GeneralException, Exception {
+    @GetMapping("downloadFile/{attachmentID}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("attachmentID") Long attachmentID, HttpServletRequest request) throws GeneralException, Exception {
         // Load file as Resource
         // Resource resource = fileStorageService.loadFileAsResource( fileInfo.getNewFileName() );
-        Path path = fileStorageService.loadFile( fileInfo.getFileName() );
-        Resource resource = new UrlResource( path.toUri() );
-
-        String contentType = fileInfo.getFileType();
-
+        DownloadFile downloadFile = fileDBStorageService.getFile( attachmentID );
+        Resource resource = downloadFile.getResource();
+        String contentType = downloadFile.getContentType();
         if (contentType == null) {
             contentType = "application/octet-stream";
         }
-
         return ResponseEntity.ok()
                 .contentType( MediaType.parseMediaType( contentType ) )
-                .header( HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileInfo.getOrignalFileName() + "\"" )
+                .header( HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadFile.getFileName() + "\"" )
                 .body( resource );
     }
+
+
 }

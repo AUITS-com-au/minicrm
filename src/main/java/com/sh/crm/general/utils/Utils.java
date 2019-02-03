@@ -1,5 +1,6 @@
 package com.sh.crm.general.utils;
 
+import com.sh.crm.jpa.entities.CustomerAccounts;
 import com.sh.crm.jpa.entities.Ticketactions;
 import com.sh.crm.security.model.JwtUser;
 import org.slf4j.Logger;
@@ -124,6 +125,9 @@ public class Utils {
             case 11:
                 operation = TicketOperation.ASSIGN;
                 break;
+            case 13:
+                operation = TicketOperation.ESC;
+                break;
             default:
                 operation = null;
                 break;
@@ -133,6 +137,22 @@ public class Utils {
 
     public static String getOperationFromAction(Integer ticketactions) {
         return getOperationFromAction( new Ticketactions( ticketactions ) );
+    }
+
+    public static void copyAccount(CustomerAccounts copyFrom, CustomerAccounts copyTo) {
+        if (copyFrom.getBranchName() != null)
+            copyTo.setBranchName( copyFrom.getBranchName() );
+        if (copyFrom.getCustomerNameAR() != null)
+            copyTo.setCustomerNameAR( copyFrom.getCustomerNameAR() );
+        if (copyFrom.getCustomerNameEn() != null)
+            copyTo.setCustomerNameEn( copyFrom.getCustomerNameEn() );
+        if (copyFrom.getEmail() != null)
+            copyTo.setEmail( copyFrom.getEmail() );
+        if (copyFrom.getMobile() != null)
+            copyTo.setMobile( copyFrom.getMobile() );
+        if (copyFrom.getSegment() != null)
+            copyTo.setSegment( copyFrom.getSegment() );
+
     }
 
     public static void main(String[] args) {

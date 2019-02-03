@@ -20,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -68,10 +69,7 @@ public class AuthenticationRestController {
 
         user.setPassword( null );
         user.setLoginAttempts( null );
-        Userpreferences userpreferences = userPreferencesRepo.findByUserID( user.getUserID() );
-        if (userpreferences == null)
-            userpreferences = new Userpreferences( user.getUserID() );
-        user.setPreferences( userpreferences );
+
         // Return the token
         return ResponseEntity.ok( new JwtAuthenticationResponse( token, user ) );
     }

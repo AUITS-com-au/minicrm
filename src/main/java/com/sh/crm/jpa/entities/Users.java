@@ -55,7 +55,9 @@ public class Users extends BasicModelWithIDInt {
     @Column(name = "LDAPUser")
     private Boolean lDAPUser;
 
-    @Transient
+    @OneToOne(fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            mappedBy = "userID")
     private Userpreferences preferences;
     @Transient
     private List<Permissions> authorities;
@@ -177,12 +179,12 @@ public class Users extends BasicModelWithIDInt {
         this.lDAPUser = lDAPUser;
     }
 
-    @Transient
+
     public Userpreferences getPreferences() {
         return preferences;
     }
 
-    @Transient
+
     public void setPreferences(Userpreferences preferences) {
         this.preferences = preferences;
     }

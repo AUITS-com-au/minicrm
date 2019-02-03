@@ -1,6 +1,8 @@
 
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -12,12 +14,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Userpreferences extends BasicModelWithID {
 
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
-    @Column(name = "UserID")
-    private String userID;
-
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "UserID", nullable = false)
+    @JsonIgnore
+    private Users userID;
     @Basic(optional = false)
     @NotNull
     @Column(name = "EmailsNotifications")
@@ -36,18 +36,13 @@ public class Userpreferences extends BasicModelWithID {
     private Boolean ticketEditEmails;
     @Column(name = "TicketAssignEmails")
     private Boolean ticketAssignEmails;
+    @Column(name = "TicketCLoseEmails")
+    private Boolean ticketCLoseEmails;
     @Column(name = "EmailDigest")
     private Boolean emailDigest;
     @Column(name = "IncludeAttatchments")
     private Boolean includeAttatchments;
-    @Column(name = "AutoSubOnCreate")
-    private Boolean autoSubOnCreate;
-    @Column(name = "AutoSubOnClose")
-    private Boolean autoSubOnClose;
-    @Column(name = "AutoSubOnEdit")
-    private Boolean autoSubOnEdit;
-    @Column(name = "AutoSubOnAssign")
-    private Boolean autoSubOnAssign;
+
 
     public Userpreferences() {
     }
@@ -56,7 +51,7 @@ public class Userpreferences extends BasicModelWithID {
         this.id = id;
     }
 
-    public Userpreferences(String userID) {
+    public Userpreferences(Users userID) {
         this.userID = userID;
     }
 
@@ -68,11 +63,11 @@ public class Userpreferences extends BasicModelWithID {
         this.id = id;
     }
 
-    public String getUserID() {
+    public Users getUserID() {
         return userID;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(Users userID) {
         this.userID = userID;
     }
 
@@ -148,36 +143,12 @@ public class Userpreferences extends BasicModelWithID {
         this.includeAttatchments = includeAttatchments;
     }
 
-    public Boolean getAutoSubOnCreate() {
-        return autoSubOnCreate;
+    public Boolean getTicketCLoseEmails() {
+        return ticketCLoseEmails;
     }
 
-    public void setAutoSubOnCreate(Boolean autoSubOnCreate) {
-        this.autoSubOnCreate = autoSubOnCreate;
-    }
-
-    public Boolean getAutoSubOnClose() {
-        return autoSubOnClose;
-    }
-
-    public void setAutoSubOnClose(Boolean autoSubOnClose) {
-        this.autoSubOnClose = autoSubOnClose;
-    }
-
-    public Boolean getAutoSubOnEdit() {
-        return autoSubOnEdit;
-    }
-
-    public void setAutoSubOnEdit(Boolean autoSubOnEdit) {
-        this.autoSubOnEdit = autoSubOnEdit;
-    }
-
-    public Boolean getAutoSubOnAssign() {
-        return autoSubOnAssign;
-    }
-
-    public void setAutoSubOnAssign(Boolean autoSubOnAssign) {
-        this.autoSubOnAssign = autoSubOnAssign;
+    public void setTicketCLoseEmails(Boolean ticketCLoseEmails) {
+        this.ticketCLoseEmails = ticketCLoseEmails;
     }
 
     @Override

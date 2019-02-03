@@ -130,7 +130,16 @@ public class CustomerAccounts extends BasicModelWithID {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.CustomerAccounts[ id=" + id + " ]";
+        return "CustomerAccounts{" +
+                "customerNameAR='" + customerNameAR + '\'' +
+                ", customerNameEn='" + customerNameEn + '\'' +
+                ", email='" + email + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", nin='" + nin + '\'' +
+                ", segment='" + segment + '\'' +
+                ", customerCIF='" + customerCIF + '\'' +
+                ", branchName='" + branchName + '\'' +
+                ", id=" + id +
+                '}';
     }
-
 }

@@ -4,6 +4,7 @@ import com.sh.crm.jpa.entities.CustomerAccounts;
 import com.sh.crm.jpa.entities.Ticket;
 import com.sh.crm.jpa.entities.TicketExtData;
 import com.sh.crm.jpa.entities.Ticketdata;
+import com.sh.crm.services.storage.UploadFileResponse;
 
 import java.util.List;
 
@@ -17,6 +18,9 @@ public class TicketHolder {
     private Integer newTopic;
     private List<Long> ticketList;
     private String targetUser;
+
+    private List<Long> attachments;
+
 
     public TicketHolder() {
     }
@@ -91,6 +95,14 @@ public class TicketHolder {
 
     public void setNewTopic(Integer newTopic) {
         this.newTopic = newTopic;
+    }
+
+    public List<Long> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Long> attachments) {
+        this.attachments = attachments;
     }
 
     @Override
