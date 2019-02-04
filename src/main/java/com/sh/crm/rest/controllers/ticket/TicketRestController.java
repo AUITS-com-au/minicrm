@@ -450,12 +450,14 @@ public class TicketRestController extends BasicController<TicketHolder> {
         ticketsRepo.save( ticket );
     }
 
+/*
     @GetMapping("list/{page}/{size}")
     Page<Ticket> getPagingList(@PathVariable("page") int page, @PathVariable("size") int size) {
         if (log.isDebugEnabled())
             log.debug( "Getting page of tickets with size {} , page number {} ", size, page );
         return ticketsRepo.findByDeletedFalseOrderByCreationDateDesc( new PageRequest( page, size, Sort.Direction.ASC, "priority" ) );
     }
+*/
 
     @PostMapping("list")
     SearchTicketsResult getTickets(@RequestBody SearchTicketsContainer searchTicketsContainer, Principal principal) {

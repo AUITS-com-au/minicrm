@@ -4,8 +4,8 @@ package com.sh.crm.general.holders;
 import java.util.List;
 
 public class SearchTicketsContainer {
-    private Integer size;
-    private Integer page;
+    private Integer size = 20;
+    private Integer page = 0;
     private String searchUser;
     private boolean skipValidation;
     private Boolean runningReport;
@@ -29,7 +29,11 @@ public class SearchTicketsContainer {
     private Boolean deleted;
     private Boolean solved;
     private Boolean closed;
+    private Integer numberOfCrossedSLA;
+    private Boolean crossedAllSLA;
+    private Long totalCrossedTime;
     private SearchTicketsSorting sorting;
+
 
     public SearchTicketsContainer() {
 
@@ -188,13 +192,7 @@ public class SearchTicketsContainer {
         this.assignedTo = assignedTo;
     }
 
-    public Boolean getCrossedAllSla() {
-        return crossedAllSla;
-    }
 
-    public void setCrossedAllSla(Boolean crossedAllSla) {
-        this.crossedAllSla = crossedAllSla;
-    }
 
     public List<Integer> getLanguage() {
         return language;
@@ -242,5 +240,29 @@ public class SearchTicketsContainer {
 
     public void setSorting(SearchTicketsSorting sorting) {
         this.sorting = sorting;
+    }
+
+    public Integer getNumberOfCrossedSLA() {
+        return numberOfCrossedSLA;
+    }
+
+    public void setNumberOfCrossedSLA(Integer numberOfCrossedSLA) {
+        this.numberOfCrossedSLA = numberOfCrossedSLA;
+    }
+
+    public Boolean getCrossedAllSLA() {
+        return crossedAllSLA;
+    }
+
+    public void setCrossedAllSLA(Boolean crossedAllSLA) {
+        this.crossedAllSLA = crossedAllSLA;
+    }
+
+    public Long getTotalCrossedTime() {
+        return totalCrossedTime;
+    }
+
+    public void setTotalCrossedTime(Long totalCrossedTime) {
+        this.totalCrossedTime = totalCrossedTime;
     }
 }

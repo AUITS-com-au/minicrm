@@ -60,7 +60,7 @@ public class SLAService {
 
         if (lock.tryLock( slaPeriodTime, TimeUnit.MILLISECONDS )) {
 
-            logger.debug( "................Locking for 60 SEC................" );
+            logger.debug( "................Locking for {} Milli-Second................", slaPeriodTime );
             try {
                 List<EsclatedTickets> escalatedTicketsList = slaRepo.getEscalatedTickets();
                 if (escalatedTicketsList != null && !escalatedTicketsList.isEmpty()) {
@@ -137,7 +137,6 @@ public class SLAService {
                             e.printStackTrace();
                         }
                     }
-
                 }
 
             } catch (Exception e) {
