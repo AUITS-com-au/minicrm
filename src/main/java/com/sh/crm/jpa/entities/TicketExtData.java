@@ -25,7 +25,6 @@ public class TicketExtData {
     @Column(name = "ID")
     private Long id;
     @JsonIgnore
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ticketID", nullable = false, insertable = true)
     private Ticket ticketID;

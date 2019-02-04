@@ -1,6 +1,8 @@
 
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -52,6 +54,7 @@ public class Sla {
     private String sLAName;
     @Column(name = "CatID")
     private Integer catID;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "slaid", fetch = FetchType.LAZY)
     private List<Topicsla> topicslaList;
 

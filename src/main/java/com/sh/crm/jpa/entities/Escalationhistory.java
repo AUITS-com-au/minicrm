@@ -1,6 +1,8 @@
 
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,6 +28,7 @@ public class Escalationhistory {
     private Topicsla topicSLA;
     @JoinColumn(name = "TicketID", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JsonIgnore
     private Ticket ticketID;
 
 
