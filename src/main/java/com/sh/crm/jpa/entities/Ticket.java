@@ -84,9 +84,11 @@ public class Ticket extends BasicModel {
     private List<Ticketdata> ticketdataList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY)
     private List<Escalationhistory> escalationhistoryList;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketID", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<TicketExtData> ticketExtData;
+
+    @Transient
+    private List<TicketHistory> ticketHistoryList;
 
     public Ticket() {
     }
@@ -316,6 +318,14 @@ public class Ticket extends BasicModel {
 
     public void setNumberOfSLA(Integer numberOfSLA) {
         this.numberOfSLA = numberOfSLA;
+    }
+
+    public List<TicketHistory> getTicketHistoryList() {
+        return ticketHistoryList;
+    }
+
+    public void setTicketHistoryList(List<TicketHistory> ticketHistoryList) {
+        this.ticketHistoryList = ticketHistoryList;
     }
 
     @XmlTransient

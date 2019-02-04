@@ -31,7 +31,6 @@ public class Escalationhistory {
     @JsonIgnore
     private Ticket ticketID;
 
-
     public Escalationhistory() {
     }
 

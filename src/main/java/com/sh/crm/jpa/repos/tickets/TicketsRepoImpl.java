@@ -43,11 +43,6 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
             Expression<String> userExp = permissionsJoin.get( GeneratedTopicPermissions_.userName );
             predicates.add( getCriteriaBuilder().equal( userExp, st.getSearchUser() ) );
             Expression<Boolean> canReadExp = permissionsJoin.get( GeneratedTopicPermissions_.canRead );
-//            Expression<Boolean> canWriteExp = permissionsJoin.get( (GeneratedTopicPermissions_.canModify) );
-//            Expression<Boolean> canWriteReplyExp= permissionsJoin.get( (GeneratedTopicPermissions_.canReply) );
-//            Expression<Boolean> canReopenExp = permissionsJoin.get( (GeneratedTopicPermissions_.canReopen) );
-//            Expression<Boolean> canResolve = permissionsJoin.get( (GeneratedTopicPermissions_.canResolve) );
-//            Expression<Boolean> canRunReport = permissionsJoin.get( (GeneratedTopicPermissions_.canRunReport) );
             predicates.add( getCriteriaBuilder().isTrue( canReadExp ) );
         }
 
@@ -90,22 +85,22 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
             predicates.add( root.get( Ticket_.currentStatus ).in( st.getStatus() ) );
         }
         if (st.getTopics() != null && !st.getTopics().isEmpty()) {
-            predicates.add( root.get( Ticket_.topic ).get( "ID" ).in( st.getTopics() ) );
+            predicates.add( root.get( Ticket_.topic ).get( "id" ).in( st.getTopics() ) );
         }
         if (st.getSubCats() != null && !st.getSubCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( "ID" ).in( st.getSubCats() ) );
+            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( "id" ).in( st.getSubCats() ) );
         }
         if (st.getMainCats() != null && !st.getMainCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "ID" ).in( st.getMainCats() ) );
+            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "id" ).in( st.getMainCats() ) );
         }
         if (st.getOriginalTopics() != null && !st.getOriginalTopics().isEmpty()) {
-            predicates.add( root.get( Ticket_.originalTopic ).get( "ID" ).in( st.getOriginalTopics() ) );
+            predicates.add( root.get( Ticket_.originalTopic ).get( "id" ).in( st.getOriginalTopics() ) );
         }
         if (st.getOriginalSubCats() != null && !st.getOriginalSubCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( "ID" ).in( st.getOriginalSubCats() ) );
+            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( "id" ).in( st.getOriginalSubCats() ) );
         }
         if (st.getOriginalMainCats() != null && !st.getOriginalMainCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "ID" ).in( st.getOriginalMainCats() ) );
+            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "id" ).in( st.getOriginalMainCats() ) );
         }
         if (st.getCrossedAllSLA() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.crossedAllSLA ), st.getCrossedAllSLA() ) );
@@ -113,7 +108,6 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getTotalCrossedTime() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.totalCrossedTime ), st.getTotalCrossedTime() ) );
         }
-
         if (st.getNumberOfCrossedSLA() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.numberOfCrossedSLA ), st.getNumberOfCrossedSLA() ) );
         }
@@ -125,7 +119,6 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (sorting != null && sorting.getSortBy() != null && !sorting.getSortBy().isEmpty()) {
             orderBy = sorting.getSortType() == 1 ? getCriteriaBuilder().asc( root.get( sorting.getSortBy() ) ) :
                     getCriteriaBuilder().desc( root.get( sorting.getSortBy() ) );
-
         }
         return orderBy;
     }

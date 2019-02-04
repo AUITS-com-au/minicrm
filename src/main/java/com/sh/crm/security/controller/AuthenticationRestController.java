@@ -1,11 +1,12 @@
 package com.sh.crm.security.controller;
 
 
+import com.sh.crm.general.holders.TicketExtras;
 import com.sh.crm.jpa.entities.Permissions;
-import com.sh.crm.jpa.entities.Userpreferences;
 import com.sh.crm.jpa.entities.Users;
 import com.sh.crm.jpa.repos.users.UserPreferencesRepo;
 import com.sh.crm.jpa.repos.users.UsersRepos;
+import com.sh.crm.rest.controllers.ticket.TicketExtrasController;
 import com.sh.crm.security.model.JwtAuthenticationRequest;
 import com.sh.crm.security.service.JwtAuthenticationResponse;
 import com.sh.crm.security.service.JwtUserDetailsServiceImpl;
@@ -20,7 +21,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,6 +46,8 @@ public class AuthenticationRestController {
     private UserPreferencesRepo userPreferencesRepo;
     @Autowired
     private JwtUserDetailsServiceImpl userDetailsService;
+    @Autowired
+    private TicketExtrasController ticketExtrasController;
 
     @RequestMapping(value = "${jwt.route.authentication.path}", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest) throws AuthenticationException {
@@ -70,8 +72,10 @@ public class AuthenticationRestController {
         user.setPassword( null );
         user.setLoginAttempts( null );
 
+        TicketExtras ticketExtras = ticketExtrasController.getTicketExtras();
+
         // Return the token
-        return ResponseEntity.ok( new JwtAuthenticationResponse( token, user ) );
+        return ResponseEntity.ok( new JwtAuthenticationResponse( token, user, ticketExtras ) );
     }
 
     @RequestMapping(value = "${jwt.route.authentication.refresh}", method = RequestMethod.GET, consumes = "application/json")
