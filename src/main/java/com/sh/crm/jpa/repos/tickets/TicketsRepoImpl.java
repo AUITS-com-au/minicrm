@@ -6,6 +6,7 @@ import com.sh.crm.general.holders.SearchTicketsSorting;
 import com.sh.crm.jpa.entities.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -53,9 +54,7 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getClosed() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.closed ), st.getClosed() ) );
         }
-        if (st.getCrossedAllSla() != null) {
-            predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.crossedAllSLA ), st.getCrossedAllSla() ) );
-        }
+
         if (st.getDeleted() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.deleted ), st.getDeleted() ) );
         }
@@ -108,20 +107,32 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getOriginalMainCats() != null && !st.getOriginalMainCats().isEmpty()) {
             predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "ID" ).in( st.getOriginalMainCats() ) );
         }
+        if (st.getCrossedAllSLA() != null) {
+            predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.crossedAllSLA ), st.getCrossedAllSLA() ) );
+        }
+        if (st.getTotalCrossedTime() != null) {
+            predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.totalCrossedTime ), st.getTotalCrossedTime() ) );
+        }
 
+        if (st.getNumberOfCrossedSLA() != null) {
+            predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.numberOfCrossedSLA ), st.getNumberOfCrossedSLA() ) );
+        }
         return predicates;
     }
 
-    private List<Order> getOrderBy(SearchTicketsSorting sorting) {
-        List<Order> orderList = new ArrayList<>();
-        return orderList;
+    private Order getOrderBy(Root root, SearchTicketsSorting sorting) {
+        Order orderBy = null;
+        if (sorting != null && sorting.getSortBy() != null && !sorting.getSortBy().isEmpty()) {
+            orderBy = sorting.getSortType() == 1 ? getCriteriaBuilder().asc( root.get( sorting.getSortBy() ) ) :
+                    getCriteriaBuilder().desc( root.get( sorting.getSortBy() ) );
+
+        }
+        return orderBy;
     }
 
     @Override
     public SearchTicketsResult searchTickets(SearchTicketsContainer searchTicketsContainer) {
         SearchTicketsResult result = new SearchTicketsResult();
-
-
         CriteriaBuilder cb = getCriteriaBuilder();
         CriteriaQuery<Ticket> cq = (CriteriaQuery<Ticket>) getCriteriaQuery( cb, Ticket.class );
         Root<Ticket> root = (Root<Ticket>) getRoot( cq, Ticket.class );
@@ -129,10 +140,11 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (predicates != null && !predicates.isEmpty()) {
             cq.where( predicates.toArray( new Predicate[]{} ) ).distinct( true );
         }
+
         if (searchTicketsContainer.getSorting() != null) {
-            List<Order> orderList = getOrderBy( searchTicketsContainer.getSorting() );
-            if (!orderList.isEmpty()) {
-                cq.orderBy( orderList );
+            Order orderby = getOrderBy( root, searchTicketsContainer.getSorting() );
+            if (orderby != null) {
+                cq.orderBy( orderby );
             }
         }
         TypedQuery<Ticket> query = em.createQuery( cq );

@@ -323,7 +323,8 @@ public class NotificationHandler extends BasicService {
                     Users user = usersRepos.
                             findByUserIDAndEnabledIsTrue( slausers.getUserId() );
                     emailPref = getPrefFromUser( user );
-                    emailPref.setSlaEmail( true );
+                    if (emailPref != null)
+                        emailPref.setSlaEmail( true );
 
                 } else if (slausers.getEmails() != null &&
                         !slausers.getEmails().isEmpty()) {
