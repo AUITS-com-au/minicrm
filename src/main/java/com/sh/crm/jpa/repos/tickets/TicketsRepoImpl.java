@@ -91,22 +91,22 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
             predicates.add( root.get( Ticket_.currentStatus ).in( st.getStatus() ) );
         }
         if (st.getTopics() != null && !st.getTopics().isEmpty()) {
-            predicates.add( root.get( Ticket_.topic ).get( "ID" ).in( st.getTopics() ) );
+            predicates.add( root.get( Ticket_.topic ).get( "id" ).in( st.getTopics() ) );
         }
         if (st.getSubCats() != null && !st.getSubCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( "ID" ).in( st.getSubCats() ) );
+            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( "id" ).in( st.getSubCats() ) );
         }
         if (st.getMainCats() != null && !st.getMainCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "ID" ).in( st.getMainCats() ) );
+            predicates.add( root.get( Ticket_.topic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "id" ).in( st.getMainCats() ) );
         }
         if (st.getOriginalTopics() != null && !st.getOriginalTopics().isEmpty()) {
-            predicates.add( root.get( Ticket_.originalTopic ).get( "ID" ).in( st.getOriginalTopics() ) );
+            predicates.add( root.get( Ticket_.originalTopic ).get( "id" ).in( st.getOriginalTopics() ) );
         }
         if (st.getOriginalSubCats() != null && !st.getOriginalSubCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( "ID" ).in( st.getOriginalSubCats() ) );
+            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( "id" ).in( st.getOriginalSubCats() ) );
         }
         if (st.getOriginalMainCats() != null && !st.getOriginalMainCats().isEmpty()) {
-            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "ID" ).in( st.getOriginalMainCats() ) );
+            predicates.add( root.get( Ticket_.originalTopic ).get( Topic_.subCategory ).get( Subcategory_.mainCategory ).get( "id" ).in( st.getOriginalMainCats() ) );
         }
 
         return predicates;
