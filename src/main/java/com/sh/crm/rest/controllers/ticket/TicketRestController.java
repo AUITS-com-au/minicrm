@@ -15,9 +15,6 @@ import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.Administrator;
 import com.sh.crm.services.tickets.TopicPermissionsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +38,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<?> create(@RequestBody TicketHolder ticketHolder, Principal principal) throws GeneralException {
-
         if (ticketHolder != null) {
             if (log.isDebugEnabled())
                 log.debug( "creating ticket {}", ticketHolder );
@@ -101,7 +97,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 if (ticketHolder.getExtDataList() != null && !ticketHolder.getExtDataList().isEmpty()) {
                     List<TicketExtData> updatedList = new ArrayList<>( ticketHolder.getExtDataList().size() );
                     for (TicketExtData data : ticketHolder.getExtDataList()) {
-                        data.setTicketID( ticket );
+                        data.setTicketID( ticket.getId() );
                         data.setId( null );
                         updatedList.add( data );
                     }
@@ -110,7 +106,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     if (log.isDebugEnabled())
                         log.debug( "Ticket ID {} extended data created successfuly", ticket.getId() );
                 }
-
                 /**
                  * add attachments
                  */
@@ -151,10 +146,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             TicketHistory history = new TicketHistory();
             history.setTicketID( ticket );
             history.setActionID( actionID );
-            if (actionID == TicketAction.READ) {
-                ticketServices.logTicketHistory( history, principal );
-                return ResponseEntity.ok( true );
-            }
+
 
             List<Ticketlock> locks = ticketLocksRepo.getByTicketIDAndExpiresOnAfterAndExpiredIsFalse( ticketObject, Calendar.getInstance().getTime() );
             if (locks == null || locks.isEmpty()) {
@@ -171,7 +163,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     configuration = new TopicConfiguration();
                     configuration.setLockTime( 10 );
                 }
-
                 Ticketlock lock = new Ticketlock();
                 lock.setTicketID( ticketObject );
                 lock.setExpired( false );
@@ -180,7 +171,9 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 calendar.add( Calendar.MINUTE, configuration.getLockTime() );
                 lock.setExpiresOn( calendar.getTime() );
                 lock.setUserID( principal.getName() );
-                ticketLocksRepo.save( lock );
+
+                lock = ticketLocksRepo.save( lock );
+
                 log.info( "Ticket lock has been created {} ", lock.toString() );
                 if (log.isDebugEnabled())
                     log.debug( "saving ticket lock action" );
@@ -188,6 +181,8 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
                 history.setActionID( TicketAction.LOCK );
                 ticketServices.logTicketHistory( history, principal );
+                Ticket ticket1 = getTicketFullInfo( lock.getTicketID() );
+                lock.setTicketID( ticket1 );
                 return ResponseEntity.ok( lock );
             } else {
                 if (log.isDebugEnabled())
@@ -325,7 +320,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     ticket.setTopic( topicRepo.getOne( newTopic ) );
                 }
                 ticketdata.setActionID( ticketactions );
-                ticketdata = tikcetDataRepo.save( ticketdata );
+                ticketdata = ticketDataRepo.save( ticketdata );
                 if (log.isDebugEnabled())
                     log.debug( "Ticket action saved successfully for ticket {}\n action {} \n data {}",
                             ticket.getId(),
@@ -450,14 +445,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
         ticketsRepo.save( ticket );
     }
 
-/*
-    @GetMapping("list/{page}/{size}")
-    Page<Ticket> getPagingList(@PathVariable("page") int page, @PathVariable("size") int size) {
-        if (log.isDebugEnabled())
-            log.debug( "Getting page of tickets with size {} , page number {} ", size, page );
-        return ticketsRepo.findByDeletedFalseOrderByCreationDateDesc( new PageRequest( page, size, Sort.Direction.ASC, "priority" ) );
-    }
-*/
 
     @PostMapping("list")
     SearchTicketsResult getTickets(@RequestBody SearchTicketsContainer searchTicketsContainer, Principal principal) {
@@ -470,7 +457,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
     @GetMapping("/data/{ticketID}")
     List<Ticketdata> getTicketData(@PathVariable("ticketID") Long ticketID) {
-        return tikcetDataRepo.findByTicketIDOrderByCreationDateDesc( new Ticket( ticketID ) );
+        return ticketDataRepo.findByTicketIDOrderByCreationDateDesc( new Ticket( ticketID ) );
     }
 
     @Override
@@ -495,9 +482,42 @@ public class TicketRestController extends BasicController<TicketHolder> {
         if (ticket == null)
             return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
         if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), TicketOperation.READ )) {
+
+            TicketHistory history = new TicketHistory();
+            history.setTicketID( ticket.getId() );
+            history.setActionID( TicketAction.READ );
+            ticketServices.logTicketHistory( history, principal );
+
+            ticket = getTicketFullInfo( ticket );
             return ResponseEntity.ok( ticket );
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
+    }
+
+    private Ticket getTicketFullInfo(Ticket ticket) {
+        if (ticket != null) {
+
+            List<TicketExtData> ticketExtDataList = ticketExtDataRepo.findByTicketID( ticket.getId() );
+            if (ticketExtDataList != null)
+                ticket.setTicketExtData( ticketExtDataList );
+
+            List<Ticketdata> ticketdataList = ticketDataRepo.findByTicketIDOrderByCreationDateDesc( ticket );
+            if (ticketdataList != null)
+                ticket.setTicketdataList( ticketdataList );
+
+
+            List<Escalationhistory> escalationhistories = escalationHistoryRepo.findByTicketID( ticket );
+            if (escalationhistories != null)
+                ticket.setEscalationhistoryList( escalationhistories );
+
+
+            List<TicketHistory> ticketHistoryList = ticketHistoryRepo.findByTicketID( ticket.getId() );
+            if (ticketHistoryList != null)
+                ticket.setTicketHistoryList( ticketHistoryList );
+
+
+        }
+        return ticket;
     }
 
     /**
@@ -558,7 +578,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
         }
     }
 
-    public Ticket updateTotalNumberOfSLA(Ticket ticket) {
+    private Ticket updateTotalNumberOfSLA(Ticket ticket) {
         if (ticket.getTopic() == null || ticket.getTopic().getId() == null)
             ticket.setNumberOfSLA( 0 );
 

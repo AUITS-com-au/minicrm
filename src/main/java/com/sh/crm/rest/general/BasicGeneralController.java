@@ -30,6 +30,10 @@ public abstract class BasicGeneralController {
     @Autowired
     protected MainCategoryRepo mainCategoryRepo;
     @Autowired
+    protected TicketTypeRepo ticketTypeRepo;
+    @Autowired
+    protected TicketStatusRepo ticketStatusRepo;
+    @Autowired
     protected TopicsPermissionsRepo topicsPermissionsRepo;
     @Autowired
     protected TopicRepo topicRepo;
@@ -44,7 +48,7 @@ public abstract class BasicGeneralController {
     @Autowired
     protected TicketExtDataRepo ticketExtDataRepo;
     @Autowired
-    protected TicketDataRepo tikcetDataRepo;
+    protected TicketDataRepo ticketDataRepo;
     @Autowired
     protected TicketActionsRepo ticketActionsRepo;
     @Autowired
@@ -63,6 +67,11 @@ public abstract class BasicGeneralController {
     protected TicketAttachmentsRepo ticketAttachmentRepo;
     @Autowired
     protected AttachmentsRepo attachmentsRepo;
+    @Autowired
+    protected EscalationHistoryRepo escalationHistoryRepo;
+
+    @Autowired
+    protected TicketHistoryRepo ticketHistoryRepo;
 
     protected Users getAuthorizedUser() {
         return usersRepos.findByUserID( SecurityUtils.getPrincipal() );

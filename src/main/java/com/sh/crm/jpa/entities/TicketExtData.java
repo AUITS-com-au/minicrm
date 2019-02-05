@@ -5,16 +5,11 @@
  */
 package com.sh.crm.jpa.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
-/**
- * @author achah
- */
 @Entity
 @Table(name = "ticketExtData")
 @XmlRootElement
@@ -24,11 +19,8 @@ public class TicketExtData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
-    @JsonIgnore
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ticketID", nullable = false, insertable = true)
-    private Ticket ticketID;
+    @Column(name = "ticketID")
+    private Long ticketID;
     @Size(max = 500)
     @Column(name = "BranchName")
     private String branchName;
@@ -124,7 +116,7 @@ public class TicketExtData {
         this.id = id;
     }
 
-    public TicketExtData(Long id, Ticket ticketID) {
+    public TicketExtData(Long id, Long ticketID) {
         this.id = id;
         this.ticketID = ticketID;
     }
@@ -137,11 +129,11 @@ public class TicketExtData {
         this.id = id;
     }
 
-    public Ticket getTicketID() {
+    public Long getTicketID() {
         return ticketID;
     }
 
-    public void setTicketID(Ticket ticketID) {
+    public void setTicketID(Long ticketID) {
         this.ticketID = ticketID;
     }
 

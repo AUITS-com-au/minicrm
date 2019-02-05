@@ -5,6 +5,8 @@
  */
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -29,6 +31,7 @@ public class Topicsla extends BasicModelWithIDInt {
     @JoinColumn(name = "SLAID", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Sla slaid;
+
     @JoinColumn(name = "TopicID", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Topic topicID;

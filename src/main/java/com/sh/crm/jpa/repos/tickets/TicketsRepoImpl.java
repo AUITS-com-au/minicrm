@@ -43,11 +43,6 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
             Expression<String> userExp = permissionsJoin.get( GeneratedTopicPermissions_.userName );
             predicates.add( getCriteriaBuilder().equal( userExp, st.getSearchUser() ) );
             Expression<Boolean> canReadExp = permissionsJoin.get( GeneratedTopicPermissions_.canRead );
-//            Expression<Boolean> canWriteExp = permissionsJoin.get( (GeneratedTopicPermissions_.canModify) );
-//            Expression<Boolean> canWriteReplyExp= permissionsJoin.get( (GeneratedTopicPermissions_.canReply) );
-//            Expression<Boolean> canReopenExp = permissionsJoin.get( (GeneratedTopicPermissions_.canReopen) );
-//            Expression<Boolean> canResolve = permissionsJoin.get( (GeneratedTopicPermissions_.canResolve) );
-//            Expression<Boolean> canRunReport = permissionsJoin.get( (GeneratedTopicPermissions_.canRunReport) );
             predicates.add( getCriteriaBuilder().isTrue( canReadExp ) );
         }
 
@@ -113,7 +108,6 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getTotalCrossedTime() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.totalCrossedTime ), st.getTotalCrossedTime() ) );
         }
-
         if (st.getNumberOfCrossedSLA() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.numberOfCrossedSLA ), st.getNumberOfCrossedSLA() ) );
         }
@@ -125,7 +119,6 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (sorting != null && sorting.getSortBy() != null && !sorting.getSortBy().isEmpty()) {
             orderBy = sorting.getSortType() == 1 ? getCriteriaBuilder().asc( root.get( sorting.getSortBy() ) ) :
                     getCriteriaBuilder().desc( root.get( sorting.getSortBy() ) );
-
         }
         return orderBy;
     }
