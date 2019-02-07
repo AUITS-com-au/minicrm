@@ -10,9 +10,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * @author achah
- */
 @Entity
 @Table(name = "topicspermissions")
 @XmlRootElement
@@ -105,7 +102,6 @@ public class Topicspermissions extends BasicModelWithID {
 
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 50)
     @Column(name = "assigne")
     private Integer assigne;
     @Basic(optional = false)
@@ -128,13 +124,13 @@ public class Topicspermissions extends BasicModelWithID {
     @Column(name = "canClose")
     private boolean canClose;
     @Column(name = "canAssign")
-    private Boolean canAssign;
+    private boolean canAssign;
     @Column(name = "canResolve")
     private boolean canResolve;
     @Column(name = "canModify")
     private boolean canModify;
     @Column(name = "canChgDpt")
-    private Boolean canChgDpt;
+    private boolean canChgDpt;
     @Column(name = "canRunReport")
     private boolean canRunReport;
     @Column(name = "canSubscribe")
@@ -142,6 +138,11 @@ public class Topicspermissions extends BasicModelWithID {
     @JoinColumn(name = "topicId", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Topic topicId;
+
+    @Transient
+    private Users user;
+    @Transient
+    private Groups group;
 
     public Topicspermissions() {
     }
@@ -292,6 +293,22 @@ public class Topicspermissions extends BasicModelWithID {
         this.canChgDpt = canChgDpt;
     }
 
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
+    public Groups getGroup() {
+        return group;
+    }
+
+    public void setGroup(Groups group) {
+        this.group = group;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -311,5 +328,27 @@ public class Topicspermissions extends BasicModelWithID {
         return true;
     }
 
-
+    @Override
+    public String toString() {
+        return "Topicspermissions{" +
+                "assigne=" + assigne +
+                ", type='" + type + '\'' +
+                ", admin=" + admin +
+                ", canCreate=" + canCreate +
+                ", canReopen=" + canReopen +
+                ", canRead=" + canRead +
+                ", canDelete=" + canDelete +
+                ", canReply=" + canReply +
+                ", canClose=" + canClose +
+                ", canAssign=" + canAssign +
+                ", canResolve=" + canResolve +
+                ", canModify=" + canModify +
+                ", canChgDpt=" + canChgDpt +
+                ", canRunReport=" + canRunReport +
+                ", canSubscribe=" + canSubscribe +
+                ", topicId=" + topicId +
+                ", user=" + user +
+                ", group=" + group +
+                '}';
+    }
 }

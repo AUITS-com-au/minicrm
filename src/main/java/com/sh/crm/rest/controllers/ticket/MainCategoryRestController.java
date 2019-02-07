@@ -43,6 +43,11 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
         return mainCategoryRepo.findAll();
     }
 
+    @Override
+    protected Iterable<?> active() {
+        return mainCategoryRepo.findByEnabledTrue();
+    }
+
     @TicketsAdmin
     public ResponseEntity<?> edit(@RequestBody Maincategory maincategory, Principal principal) throws GeneralException {
         if (maincategory != null) {

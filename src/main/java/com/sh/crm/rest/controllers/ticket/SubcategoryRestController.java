@@ -71,6 +71,11 @@ public class SubcategoryRestController extends BasicController<Subcategory> {
         return topicsPermissionsRepo.getUserSubCats( principal.getName(), mainCat );
     }
 
+    @GetMapping("/active/{mainCat}")
+    public Iterable<?> getActive(Principal principal, @PathVariable("mainCat") Integer mainCat) throws GeneralException {
+        return subcategoryRepo.findByMainCategory_IdAndEnabledTrue( mainCat );
+    }
+
     @Override
     @TicketsAdmin
     protected Iterable<?> all() {

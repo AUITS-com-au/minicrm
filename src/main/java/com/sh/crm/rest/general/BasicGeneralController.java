@@ -3,6 +3,7 @@ package com.sh.crm.rest.general;
 import com.sh.crm.general.utils.Utils;
 import com.sh.crm.jpa.entities.Users;
 import com.sh.crm.jpa.repos.tickets.*;
+import com.sh.crm.jpa.repos.users.GroupsRepo;
 import com.sh.crm.jpa.repos.users.UsersRepos;
 import com.sh.crm.security.util.SecurityUtils;
 import com.sh.crm.services.notification.NotificationData;
@@ -72,6 +73,8 @@ public abstract class BasicGeneralController {
 
     @Autowired
     protected TicketHistoryRepo ticketHistoryRepo;
+    @Autowired
+    protected GroupsRepo groupsRepo;
 
     protected Users getAuthorizedUser() {
         return usersRepos.findByUserID( SecurityUtils.getPrincipal() );

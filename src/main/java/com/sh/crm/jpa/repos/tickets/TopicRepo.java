@@ -9,4 +9,10 @@ import java.util.List;
 public interface TopicRepo extends JpaRepository<Topic, Integer> {
 
     List<Topic> findBySubCategory(Subcategory sub);
+
+    List<Topic> findByEnabledTrue();
+
+    List<Topic> findBySubCategory_IdAndEnabledTrue(Integer sub);
+
+    List<Topic> findBySubCategory_MainCategory_IdAndEnabledTrue(Integer mainCat);
 }

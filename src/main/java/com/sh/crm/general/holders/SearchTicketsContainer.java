@@ -23,7 +23,7 @@ public class SearchTicketsContainer {
     private List<Integer> status;
     private List<Long> customerAccounts;
     private List<String> assignedTo;
-    private Boolean crossedAllSla;
+
     private List<Integer> language;
     private List<Integer> priority;
     private Boolean deleted;
