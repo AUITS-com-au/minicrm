@@ -5,6 +5,7 @@ import com.sh.crm.jpa.entities.Subcategory;
 import com.sh.crm.jpa.entities.Topic;
 import com.sh.crm.jpa.entities.Topicspermissions;
 import com.sh.crm.jpa.repos.custom.GetUsersTopicsCustom;
+import org.hibernate.jpa.spi.StoredProcedureQueryParameterRegistration;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -74,9 +75,12 @@ public class TopicsPermissionsRepoImpl implements GetUsersTopicsCustom {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery( "GenerateGroupTopicsPermissions" );
 
+
+        //findUsersPerms.registerStoredProcedureParameter( 1, Integer.class, ParameterMode.IN );
         findUsersPerms.setParameter( 1, topicID );
         findUsersPerms.setParameter( 2, groupName );
         findUsersPerms.setParameter( 3, groupID );
+
         findUsersPerms.execute();
     }
 
@@ -84,7 +88,6 @@ public class TopicsPermissionsRepoImpl implements GetUsersTopicsCustom {
     public void generateUserTopicsPermission(Integer topicID, String username, Integer userID) {
         StoredProcedureQuery findUsersPerms =
                 em.createNamedStoredProcedureQuery( "GenerateUserTopicsPermissions" );
-
         findUsersPerms.setParameter( 1, topicID );
         findUsersPerms.setParameter( 2, username );
         findUsersPerms.setParameter( 3, userID );
