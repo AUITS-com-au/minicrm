@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "subcategories", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,6 +75,36 @@ public class SubcategoryRestController extends BasicController<Subcategory> {
     @GetMapping("/active/{mainCat}")
     public Iterable<?> getActive(Principal principal, @PathVariable("mainCat") Integer mainCat) throws GeneralException {
         return subcategoryRepo.findByMainCategory_IdAndEnabledTrue( mainCat );
+    }
+
+    @TicketsAdmin
+    @GetMapping("/all/{mainCat}")
+    public Iterable<?> getAllByCat(Principal principal, @PathVariable("mainCat") Integer mainCat) throws GeneralException {
+        return subcategoryRepo.findByMainCategory_IdOrderByCreatedByDesc( mainCat );
+    }
+
+    @TicketsAdmin
+    @GetMapping("change/{subCat}/{newStatus}")
+    public ResponseEntity<?> changeStatus(@PathVariable("subCat") Integer subCat,
+                                          @PathVariable("newStatus") Boolean newStatus) {
+        if (subCat != null) {
+            if (log.isDebugEnabled())
+                log.debug( "Received request to change sub category {} " +
+                        "status to {}", subCat, newStatus );
+            try {
+                Optional<Subcategory> optSub = subcategoryRepo.findById( subCat );
+                if (!optSub.isPresent())
+                    throw new GeneralException( Errors.CANNOT_EDIT_OBJECT );
+                Subcategory subcategory = optSub.get();
+                subcategory.setEnabled( newStatus );
+                subcategoryRepo.save( subcategory );
+                return ResponseEntity.ok( subcategoryRepo.findAll() );
+            } catch (Exception e) {
+                LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
+            }
+        }
+        return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
+
     }
 
     @Override

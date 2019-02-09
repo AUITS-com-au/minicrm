@@ -8,5 +8,7 @@ import java.util.List;
 public interface SubcategoryRepo extends JpaRepository<Subcategory, Integer> {
     List<Subcategory> findByEnabledTrue();
 
+    List<Subcategory> findByMainCategory_IdOrderByCreatedByDesc(Integer mainCat);
+
     List<Subcategory> findByMainCategory_IdAndEnabledTrue(Integer mainCat);
 }

@@ -1,5 +1,6 @@
 package com.sh.crm.jpa.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -12,11 +13,13 @@ import java.util.Date;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BasicModel {
+    static final String dtfPattern = "yyyy-MM-dd hh:mm:ss a";
     @Column(name = "CreatedBy")
     @CreatedBy
     protected String createdBy;
     @Column(name = "ModificationDate")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = dtfPattern)
     @LastModifiedDate
     protected Date modificationDate;
     @Column(name = "ModifiedBy")
@@ -24,6 +27,7 @@ public abstract class BasicModel {
     protected String modifiedBy;
     @CreatedDate
     @Column(name = "CreationDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = dtfPattern)
     protected Date creationDate;
 
     public String getCreatedBy() {
