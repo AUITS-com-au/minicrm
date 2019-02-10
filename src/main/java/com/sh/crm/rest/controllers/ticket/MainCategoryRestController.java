@@ -28,7 +28,7 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
                 mainCategoryRepo.save( maincategory );
                 if (log.isDebugEnabled())
                     log.debug( "Main category {} created successfully", maincategory );
-                return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+                return ResponseEntity.ok( mainCategoryRepo.findAll() );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
@@ -64,13 +64,38 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
                 mainCategoryRepo.save( original );
                 if (log.isDebugEnabled())
                     log.debug( "Main category {} modified successfully", original );
-                return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+                return ResponseEntity.ok( mainCategoryRepo.findAll() );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
     }
+
+    @TicketsAdmin
+    @GetMapping("change/{mainCat}/{newStatus}")
+    public ResponseEntity<?> changeStatus(@PathVariable("mainCat") Integer mainCat,
+                                          @PathVariable("newStatus") Boolean newStatus) {
+        if (mainCat != null) {
+            if (log.isDebugEnabled())
+                log.debug( "Received request to change main category {} " +
+                        "status to {}", mainCat, newStatus );
+            try {
+                Optional<Maincategory> optionalMaincategory = mainCategoryRepo.findById( mainCat );
+                if (!optionalMaincategory.isPresent())
+                    throw new GeneralException( Errors.CANNOT_EDIT_OBJECT );
+                Maincategory maincategory = optionalMaincategory.get();
+                maincategory.setEnabled( newStatus );
+                mainCategoryRepo.save( maincategory );
+                return ResponseEntity.ok( mainCategoryRepo.findAll() );
+            } catch (Exception e) {
+                LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
+            }
+        }
+        return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
+
+    }
+
 
     @TicketsAdmin
     public ResponseEntity<?> delete(@RequestBody Maincategory maincategory, Principal principal) throws GeneralException {
@@ -84,7 +109,7 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
                 Maincategory maincategory1 = optionalMaincategory.get();
                 maincategory1.setEnabled( false );
                 mainCategoryRepo.save( maincategory1 );
-                return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+                return ResponseEntity.ok( mainCategoryRepo.findAll() );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }

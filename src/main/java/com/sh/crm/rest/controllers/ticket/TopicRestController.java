@@ -221,7 +221,41 @@ public class TopicRestController extends BasicController<Topic> {
     @TicketsAdmin
     @PostMapping("/permissions/topics/prepareList")
     public Iterable<Topicspermissions> prepare(@RequestBody TopicPermissionsRequestHolder requestHolder) {
-        return topicsPermissionsRepo.findTopicsPermissionJoinTopic( requestHolder.getTopicList(), requestHolder.getAssigne(), requestHolder.getType() );
+        List<Topicspermissions> existingList = topicsPermissionsRepo.findTopicsPermissionByTPListAndAssigneAndType( requestHolder.getTopicList(), requestHolder.getAssigne(), requestHolder.getType() );
+        Collection<Topicspermissions> filledInfo = fillInfo( existingList );
+        if (filledInfo == null)
+            filledInfo = new ArrayList<>();
+
+        Users user = null;
+        Groups group = null;
+
+        if (requestHolder.getType().equalsIgnoreCase( "user" )) {
+            user = usersRepos.findById( requestHolder.getAssigne() ).orElse( null );
+        } else {
+            group = groupsRepo.findById( requestHolder.getAssigne() ).orElse( null );
+        }
+
+        for (Topic topic : requestHolder.getTopicList()) {
+            topic = topicRepo.findById( topic.getId() ).orElse( null );
+            if (!isTopicExistsInTp( topic, filledInfo )) {
+                Topicspermissions tp = new Topicspermissions();
+                tp.setGroup( group );
+                tp.setUser( user );
+                tp.setTopicId( topic );
+                tp.setAssigne( requestHolder.getAssigne() );
+                tp.setType( requestHolder.getType() );
+                filledInfo.add( tp );
+            }
+        }
+        return filledInfo;
+    }
+
+    private boolean isTopicExistsInTp(Topic topic, Collection<Topicspermissions> topicspermissions) {
+        for (Topicspermissions item : topicspermissions) {
+            if (item.getTopicId().getId() == topic.getId())
+                return true;
+        }
+        return false;
     }
 
     @Override

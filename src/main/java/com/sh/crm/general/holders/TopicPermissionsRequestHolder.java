@@ -2,9 +2,13 @@ package com.sh.crm.general.holders;
 
 import com.sh.crm.jpa.entities.Topic;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class TopicPermissionsRequestHolder {
+    @NotNull
+    @NotEmpty
     private List<Topic> topicList;
     private Integer assigne;
     private String type;

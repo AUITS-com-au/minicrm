@@ -24,8 +24,6 @@ public interface TopicsPermissionsRepo extends JpaRepository<Topicspermissions, 
     /*@Query("select tp.id,tp.assigne, t ,tp.admin,tp.canAssign,tp.canChgDpt,tp.canClose,tp.canCreate,tp.canDelete, tp.canRead,tp.canModify, tp.canReopen,tp.canReply,tp.canSubscribe,tp.canResolve,tp.canRunReport from Topic t left outer join Topicspermissions  tp on tp.topicId=t and t in  ?1  and tp.assigne =?2  and tp.type=?3")
     Set<Topicspermissions> findTopicsPermissionJoinTopic(List<Topic> topicList, Integer assigne, String type);
 */
-    @Query("select tp.id,tp.assigne, t ,tp.admin,tp.canAssign,tp.canChgDpt,tp.canClose,tp.canCreate,tp.canDelete, tp.canRead,tp.canModify, tp.canReopen,tp.canReply,tp.canSubscribe,tp.canResolve,tp.canRunReport from   Topic  t   join Topicspermissions tp on tp.topicId=t and t in  ?1  and tp.assigne =?2  and tp.type=?3")
-    Set<Topicspermissions> findTopicsPermissionJoinTopic(List<Topic> topicList, Integer assigne, String type);
-
-
+    @Query("select tp from   Topicspermissions  tp where tp.topicId in ?1  and tp.assigne =?2  and tp.type=?3")
+    List<Topicspermissions> findTopicsPermissionByTPListAndAssigneAndType(List<Topic> topicList, Integer assigne, String type);
 }
