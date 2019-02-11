@@ -47,12 +47,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private String AD_URL;
 
 
-
     @Autowired
     public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         //authenticationManagerBuilder.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
-        authenticationManagerBuilder.authenticationProvider(databaseProvider);
-      //  authenticationManagerBuilder.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
+        authenticationManagerBuilder.authenticationProvider( databaseProvider );
+        //  authenticationManagerBuilder.authenticationProvider(activeDirectoryLdapAuthenticationProvider());
     }
 
     @Bean
@@ -60,18 +59,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("*");
+                registry.addMapping( "/**" ).allowedOrigins( "*" );
             }
         };
     }
 
     public AuthenticationProvider activeDirectoryLdapAuthenticationProvider() {
         ActiveDirectoryLdapAuthenticationProvider provider =
-                new ActiveDirectoryLdapAuthenticationProvider(AD_DOMAIN, AD_URL);
+                new ActiveDirectoryLdapAuthenticationProvider( AD_DOMAIN, AD_URL );
 
-        provider.setConvertSubErrorCodesToExceptions(false);
-        provider.setUseAuthenticationRequestCredentials(true);
-        provider.setUserDetailsContextMapper(ldapUserDetailsMapper);
+        provider.setConvertSubErrorCodesToExceptions( false );
+        provider.setUseAuthenticationRequestCredentials( true );
+        provider.setUserDetailsContextMapper( ldapUserDetailsMapper );
         return provider;
     }
 
@@ -91,15 +90,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .csrf().disable()
 
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .exceptionHandling().authenticationEntryPoint( unauthorizedHandler ).and()
 
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
 
                 .authorizeRequests().antMatchers( "/auth/**", "/metrics/**", "/v2/**", "/favicon.ico", "/swagger/**" ).permitAll().antMatchers( HttpMethod.OPTIONS, "/**" )
                 .permitAll().anyRequest().authenticated();
 
         // Custom JWT based security filter
-        httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore( authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class );
 
         // disable page caching
         httpSecurity.headers().cacheControl();
@@ -107,13 +106,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+        web.ignoring().antMatchers( HttpMethod.OPTIONS, "/**" );
     }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        source.registerCorsConfiguration( "/**", new CorsConfiguration().applyPermitDefaultValues() );
         return source;
     }
 

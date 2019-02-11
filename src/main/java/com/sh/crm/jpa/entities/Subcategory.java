@@ -34,7 +34,6 @@ public class Subcategory extends BasicModelWithIDInt {
     @Size(min = 1, max = 150)
     @Column(name = "EnglishLabel")
     private String englishLabel;
-
     @Column(name = "Enabled")
     private Boolean enabled;
     @JsonIgnore
@@ -129,7 +128,12 @@ public class Subcategory extends BasicModelWithIDInt {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Subcategory[ id=" + id + " ]";
+        return "Subcategory{" +
+                "arabicLabel='" + arabicLabel + '\'' +
+                ", englishLabel='" + englishLabel + '\'' +
+                ", enabled=" + enabled +
+                ", topicList=" + topicList +
+                ", mainCategory=" + mainCategory +
+                '}';
     }
-
 }
