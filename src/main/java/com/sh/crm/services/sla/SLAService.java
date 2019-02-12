@@ -10,7 +10,6 @@ import com.sh.crm.services.tickets.TicketServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -80,7 +79,7 @@ public class SLAService {
                             Topicsla topicsla = topicSlaRepo.findById( esclatedTicket.getTopicSLA() ).orElse( null );
 
                             TicketHistory history = new TicketHistory();
-                            history.setActionID( ticketactions.getActionID() );
+                            history.setActionID( new Ticketactions( ticketactions.getActionID() ) );
                             history.setTicketID( ticket.getId() );
                             history.setOldStatus( ticket.getCurrentStatus() );
                             if (ticketactions.getSetStatusTo() != null) {
@@ -141,7 +140,6 @@ public class SLAService {
 
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( logger, e, "error" );
-
             } finally {
                 lock.unlock();
                 logger.debug( "................SLA Service Unlock................" );
