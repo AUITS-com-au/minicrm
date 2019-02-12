@@ -139,6 +139,8 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
             if (orderby != null) {
                 cq.orderBy( orderby );
             }
+        } else {
+            cq.orderBy( getCriteriaBuilder().desc( root.get( Ticket_.creationDate ) ) );
         }
         TypedQuery<Ticket> query = em.createQuery( cq );
         query.setMaxResults( searchTicketsContainer.getSize() );

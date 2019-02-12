@@ -27,14 +27,14 @@ public class Ticketdata extends BasicModelWithID {
     private String notes;
     @Column(name = "Hidden")
     private Boolean hidden;
-    @Column(name = "OldStatus")
-    private Integer oldStatus;
-    @Column(name = "NewStatus")
-    private Integer newStatus;
-    @Column(name = "OldTopic")
-    private Integer oldTopic;
-    @Column(name = "NewTopic")
-    private Integer newTopic;
+    /*  @Column(name = "OldStatus")
+      private Integer oldStatus;
+      @Column(name = "NewStatus")
+      private Integer newStatus;
+      @Column(name = "OldTopic")
+      private Integer oldTopic;
+      @Column(name = "NewTopic")
+      private Integer newTopic;*/
     @Column(name = "NotificationID")
     private BigInteger notificationID;
     @Column(name = "Notify")
@@ -102,37 +102,9 @@ public class Ticketdata extends BasicModelWithID {
         this.hidden = hidden;
     }
 
-    public Integer getOldStatus() {
-        return oldStatus;
-    }
 
-    public void setOldStatus(Integer oldStatus) {
-        this.oldStatus = oldStatus;
-    }
 
-    public Integer getNewStatus() {
-        return newStatus;
-    }
 
-    public void setNewStatus(Integer newStatus) {
-        this.newStatus = newStatus;
-    }
-
-    public Integer getOldTopic() {
-        return oldTopic;
-    }
-
-    public void setOldTopic(Integer oldTopic) {
-        this.oldTopic = oldTopic;
-    }
-
-    public Integer getNewTopic() {
-        return newTopic;
-    }
-
-    public void setNewTopic(Integer newTopic) {
-        this.newTopic = newTopic;
-    }
 
     public BigInteger getNotificationID() {
         return notificationID;
@@ -194,10 +166,6 @@ public class Ticketdata extends BasicModelWithID {
                 ", ticketData='" + ticketData + '\'' +
                 ", notes='" + notes + '\'' +
                 ", hidden=" + hidden +
-                ", oldStatus=" + oldStatus +
-                ", newStatus=" + newStatus +
-                ", oldTopic=" + oldTopic +
-                ", newTopic=" + newTopic +
                 ", notificationID=" + notificationID +
                 ", notify=" + notify +
                 ", notfiyStatus=" + notfiyStatus +

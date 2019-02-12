@@ -82,6 +82,11 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 if (ticket.getSourceChannel() == null)
                     ticket.setSourceChannel( 1 );
                 ticket.setEscalationCalDate( java.util.Calendar.getInstance().getTime() );
+
+                if (ticket.getPriority() == null)
+                    ticket.setPriority( 1 );
+                if (ticket.getLanguage() == null)
+                    ticket.setLanguage( 1 );
                 if (log.isDebugEnabled())
                     log.debug( "persisting ticket  {} into database", ticket );
                 ticket = ticketsRepo.save( ticket );
@@ -93,7 +98,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     log.debug( "log ticket action after creation" );
                 TicketHistory history = new TicketHistory();
                 history.setTicketID( ticket.getId() );
-                history.setActionID( TicketAction.CREATE );
+                history.setActionID( new Ticketactions( TicketAction.CREATE ) );
                 if (ticketHolder.getExtDataList() != null && !ticketHolder.getExtDataList().isEmpty()) {
                     List<TicketExtData> updatedList = new ArrayList<>( ticketHolder.getExtDataList().size() );
                     for (TicketExtData data : ticketHolder.getExtDataList()) {
@@ -145,8 +150,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             //if open ticket for read only no need to make a lock
             TicketHistory history = new TicketHistory();
             history.setTicketID( ticket );
-            history.setActionID( actionID );
-
+            history.setActionID( new Ticketactions( actionID ) );
 
             List<Ticketlock> locks = ticketLocksRepo.getByTicketIDAndExpiresOnAfterAndExpiredIsFalse( ticketObject, Calendar.getInstance().getTime() );
             if (locks == null || locks.isEmpty()) {
@@ -179,7 +183,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     log.debug( "saving ticket lock action" );
                 // action id 10 means ticket locked for editing
 
-                history.setActionID( TicketAction.LOCK );
+                history.setActionID( new Ticketactions( TicketAction.LOCK ) );
                 ticketServices.logTicketHistory( history, principal );
                 Ticket ticket1 = getTicketFullInfo( lock.getTicketID() );
                 lock.setTicketID( ticket1 );
@@ -274,7 +278,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
         ticket.setAssignedTo( user );
         ticketsRepo.save( ticket );
         history.setNewAssigne( user );
-        history.setActionID( TicketAction.ASSIGN );
+        history.setActionID( new Ticketactions( TicketAction.ASSIGN ) );
         history.setTicketID( ticket.getId() );
         ticketServices.logTicketHistory( history, principal );
     }
@@ -311,12 +315,8 @@ public class TicketRestController extends BasicController<TicketHolder> {
             if (topicPermissionsService.isAllowedPermission( ticket.getTopic().getId(), principal.getName(), ticketactions )) {
                 Status newStatus = ticketactions.getSetStatusTo();
                 ticketdata.setTicketID( ticket );
-                ticketdata.setNewStatus( newStatus != null ? newStatus.getId() : null );
-                ticketdata.setOldStatus( ticket.getCurrentStatus() );
-                ticketdata.setOldTopic( ticket.getTopic().getId() );
-                if (newTopic != null) {
-                    ticketdata.setNewTopic( newTopic );
 
+                if (newTopic != null) {
                     ticket.setTopic( topicRepo.getOne( newTopic ) );
                 }
                 ticketdata.setActionID( ticketactions );
@@ -336,11 +336,11 @@ public class TicketRestController extends BasicController<TicketHolder> {
                     log.debug( "Storing Ticket Action {} for ticket {} ", actionID, ticket.getId() );
                 }
                 TicketHistory history = new TicketHistory();
-                history.setActionID( actionID );
+                history.setActionID( new Ticketactions( actionID ) );
                 history.setTicketID( ticket.getId() );
                 history.setDataID( ticketdata.getId() );
-                history.setOldTopic( currentTopic.getId() );
-                history.setNewTopic( ticket.getTopic().getId() );
+                history.setOldTopic( currentTopic );
+                history.setNewTopic( ticket.getTopic() );
                 history.setOldStatus( currentStatus );
                 history.setNewStatus( ticket.getCurrentStatus() );
                 history.setOldAssigne( ticket.getAssignedTo() );
@@ -398,7 +398,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
             TicketHistory history = new TicketHistory();
             history.setTicketID( ticket.getId() );
-            history.setActionID( TicketAction.MODIFYINFO );
+            history.setActionID( new Ticketactions( TicketAction.MODIFYINFO ) );
             ticketsRepo.save( originalTicket );
             ticketServices.logTicketHistory( history, principal );
             log.info( "Ticket {} has been modified by user {}", ticket.getId(), principal.getName() );
@@ -485,7 +485,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
 
             TicketHistory history = new TicketHistory();
             history.setTicketID( ticket.getId() );
-            history.setActionID( TicketAction.READ );
+            history.setActionID( new Ticketactions( TicketAction.READ ) );
             ticketServices.logTicketHistory( history, principal );
 
             ticket = getTicketFullInfo( ticket );

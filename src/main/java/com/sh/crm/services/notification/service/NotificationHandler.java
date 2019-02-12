@@ -25,8 +25,8 @@ public class NotificationHandler extends BasicService {
                 logger.debug( "handling ticket history action with ID {}", actionID );
             TicketHistory history = historyRepo.findById( actionID ).orElse( null );
             String assignedUser = null;
-            if (history != null && history.getActionID() != null) {
-                if (history.getActionID() == TicketAction.ESC) {
+            if (history != null && history.getActionID() != null && history.getActionID().getActionID() != null) {
+                if (history.getActionID().getActionID() == TicketAction.ESC) {
                     handleSLA( history );
                     return;
                 }
@@ -35,7 +35,7 @@ public class NotificationHandler extends BasicService {
                 Integer templateID = null;
 
                 int notificationStatus = 0;
-                switch (history.getActionID()) {
+                switch (history.getActionID().getActionID()) {
                     case TicketAction
                             .MODIFYINFO:
                     case TicketAction.ONPROGRESS:
@@ -131,7 +131,7 @@ public class NotificationHandler extends BasicService {
 
     private void createEmails(Collection<EmailPref> emailPrefSet, Integer templateID, Long ticketID, TicketHistory histroy, Escalationhistory escalationhistory, String operation) {
         Emailtemplates emailtemplates = null;
-        Integer actionID = (histroy == null) ? 0 : histroy.getActionID();
+        Integer actionID = (histroy == null) ? 0 : histroy.getActionID().getActionID();
         try {
             emailtemplates = formatTemplate( templateID, ticketID, escalationhistory == null ? null : escalationhistory.getTopicSLA(), null, operation );
         } catch (Exception e) {
@@ -144,7 +144,8 @@ public class NotificationHandler extends BasicService {
         List<Long> attachmentsList = null;
         if (histroy != null && histroy.getDataID() != null) {
             attachmentsList = ticketAttachmentsRepo.getAttachmentsByDataID( histroy.getDataID() );
-        } else if (ticketID != null && (histroy.getActionID() == TicketAction.CREATE || histroy.getActionID() == TicketAction.CHGDEPT || histroy.getActionID() == TicketAction.ASSIGN)) {
+        } else if (ticketID != null && (histroy.getActionID().getActionID() == TicketAction.CREATE || histroy.getActionID().getActionID() == TicketAction.CHGDEPT
+                || histroy.getActionID().getActionID() == TicketAction.ASSIGN)) {
             attachmentsList = ticketAttachmentsRepo.getAttachmentsIDByTicketID( ticketID );
         }
         if (attachmentsList != null && !attachmentsList.isEmpty()) {

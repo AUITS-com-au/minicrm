@@ -1,9 +1,6 @@
 package com.sh.crm.jpa.entities;
 
 
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,16 +26,19 @@ public class TicketHistory {
     @Size(max = 50)
     @Column(name = "CreatedBy")
     private String createdBy;
-    @Column(name = "ActionID")
-    private Integer actionID;
+    @JoinColumn(name = "ActionID", referencedColumnName = "actionID")
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Ticketactions actionID;
     @Column(name = "OldStatus")
     private Integer oldStatus;
     @Column(name = "NewStatus")
     private Integer newStatus;
-    @Column(name = "OldTopic")
-    private Integer oldTopic;
-    @Column(name = "NewTopic")
-    private Integer newTopic;
+    @JoinColumn(name = "OldTopic", referencedColumnName = "ID")
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Topic oldTopic;
+    @JoinColumn(name = "NewTopic", referencedColumnName = "ID")
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Topic newTopic;
     @Column(name = "OldAssigne")
     private String oldAssigne;
     @Column(name = "NewAssigne")
@@ -73,6 +73,30 @@ public class TicketHistory {
         this.ticketID = ticketID;
     }
 
+    public Ticketactions getActionID() {
+        return actionID;
+    }
+
+    public void setActionID(Ticketactions actionID) {
+        this.actionID = actionID;
+    }
+
+
+    public Topic getOldTopic() {
+        return oldTopic;
+    }
+
+    public void setOldTopic(Topic oldTopic) {
+        this.oldTopic = oldTopic;
+    }
+
+    public Topic getNewTopic() {
+        return newTopic;
+    }
+
+    public void setNewTopic(Topic newTopic) {
+        this.newTopic = newTopic;
+    }
 
     public String getCreatedBy() {
         return createdBy;
@@ -80,14 +104,6 @@ public class TicketHistory {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public Integer getActionID() {
-        return actionID;
-    }
-
-    public void setActionID(Integer actionID) {
-        this.actionID = actionID;
     }
 
     public Integer getOldStatus() {
@@ -104,22 +120,6 @@ public class TicketHistory {
 
     public void setNewStatus(Integer newStatus) {
         this.newStatus = newStatus;
-    }
-
-    public Integer getOldTopic() {
-        return oldTopic;
-    }
-
-    public void setOldTopic(Integer oldTopic) {
-        this.oldTopic = oldTopic;
-    }
-
-    public Integer getNewTopic() {
-        return newTopic;
-    }
-
-    public void setNewTopic(Integer newTopic) {
-        this.newTopic = newTopic;
     }
 
     public String getOldAssigne() {
