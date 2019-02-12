@@ -493,19 +493,26 @@ public class TicketRestController extends BasicController<TicketHolder> {
     }
 
     @PostMapping("attachments/data")
-    public ResponseEntity<?> getAttachments(@RequestBody List<Long> request) {
+    public List<Attachments> getAttachments(@RequestBody List<Long> request) {
         if (request != null && !request.isEmpty()) {
-            return ResponseEntity.ok( attachmentsRepo.findByIdIn( request ) );
+            List<Attachments> attachmentsList = attachmentsRepo.findByIdIn( request );
+            if (attachmentsList != null && attachmentsList.size() > 0)
+                return attachmentsList;
         }
-        return ResponseEntity.badRequest().build();
+        return null;
     }
 
     @PostMapping("attachments/info")
-    public ResponseEntity<?> getAttachmentsInfo(@RequestBody List<Long> request) {
+    public List<Attachments> getAttachmentsInfo(@RequestBody List<Long> request) {
         if (request != null && !request.isEmpty()) {
-            return ResponseEntity.ok( attachmentsRepo.findInfo( request ) );
+            List<Attachments> attachmentsList = attachmentsRepo.findInfo( request );
+            if (attachmentsList != null && attachmentsList.size() > 0) {
+                log.debug( "attachments {} ", attachmentsList );
+                return attachmentsList;
+            }
+
         }
-        return ResponseEntity.badRequest().build();
+        return null;
     }
 
     /**

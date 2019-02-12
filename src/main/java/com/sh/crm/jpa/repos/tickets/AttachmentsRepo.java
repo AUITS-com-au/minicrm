@@ -9,6 +9,10 @@ import java.util.List;
 public interface AttachmentsRepo extends JpaRepository<Attachments, Long> {
     List<Attachments> findByIdIn(List<Long> ids);
 
-    @Query("select at.id,at.createdBy,at.creationDate,at.fileType,at.fileName from Attachments at where at.id in ?1")
+    @Query(value = "SELECT  [ID]      ,[FileName]      ,[FileType]    " +
+            "  ,[Hash]      ,null  as [RAWContent]      ,[FilePath]    " +
+            "  ,[CreatedBy]      ,[CreationDate]      ,[ModifiedBy]    " +
+            "  ,[ModificationDate]    " +
+            "  ,[FileDesc]  FROM  [attachments] where id in ?1", nativeQuery = true)
     List<Attachments> findInfo(List<Long> ids);
 }
