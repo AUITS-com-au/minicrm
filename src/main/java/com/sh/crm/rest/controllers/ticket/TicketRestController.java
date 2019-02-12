@@ -289,7 +289,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
         Integer actionID = ticketHolder.getActionID();
         Ticketdata ticketdata = ticketHolder.getTicketdata();
         Integer newTopic = ticketHolder.getNewTopic();
-
         log.debug( "Trying to persist ticket action data" );
         Ticketactions ticketactions = ticketActionsRepo.findById( actionID ).orElse( null );
         Ticket ticket = null;
@@ -365,7 +364,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
             ticketactions = null;
         }
     }
-
 
     @PostMapping("modifyInfo")
     @Transactional
@@ -494,29 +492,56 @@ public class TicketRestController extends BasicController<TicketHolder> {
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
     }
 
+    @PostMapping("attachments/data")
+    public ResponseEntity<?> getAttachments(@RequestBody List<Long> request) {
+        if (request != null && !request.isEmpty()) {
+            return ResponseEntity.ok( attachmentsRepo.findByIdIn( request ) );
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("attachments/info")
+    public ResponseEntity<?> getAttachmentsInfo(@RequestBody List<Long> request) {
+        if (request != null && !request.isEmpty()) {
+            return ResponseEntity.ok( attachmentsRepo.findInfo( request ) );
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    /**
+     * @param ticket
+     * @return Ticket
+     */
     private Ticket getTicketFullInfo(Ticket ticket) {
         if (ticket != null) {
-
             List<TicketExtData> ticketExtDataList = ticketExtDataRepo.findByTicketID( ticket.getId() );
             if (ticketExtDataList != null)
                 ticket.setTicketExtData( ticketExtDataList );
 
             List<Ticketdata> ticketdataList = ticketDataRepo.findByTicketIDOrderByCreationDateDesc( ticket );
-            if (ticketdataList != null)
-                ticket.setTicketdataList( ticketdataList );
-
-
+            if (ticketdataList != null && !ticketdataList.isEmpty()) {
+                List<Ticketdata> newTicketData = new ArrayList<>();
+                for (Ticketdata tdata : ticketdataList) {
+                    tdata.setAttachmentsList( ticketAttachmentRepo.getAttachmentsByDataID( tdata.getId() ) );
+                    newTicketData.add( tdata );
+                }
+                ticket.setTicketdataList( newTicketData );
+            }
             List<Escalationhistory> escalationhistories = escalationHistoryRepo.findByTicketID( ticket );
             if (escalationhistories != null)
                 ticket.setEscalationhistoryList( escalationhistories );
-
 
             List<TicketHistory> ticketHistoryList = ticketHistoryRepo.findByTicketID( ticket.getId() );
             if (ticketHistoryList != null)
                 ticket.setTicketHistoryList( ticketHistoryList );
 
+            List<Long> attachmentsList = ticketAttachmentRepo.getAttachmentsIDByTicketID( ticket.getId() );
 
+            if (attachmentsList != null && attachmentsList.size() > 0) {
+                ticket.setAttachmentsList( attachmentsList );
+            }
         }
+
         return ticket;
     }
 
