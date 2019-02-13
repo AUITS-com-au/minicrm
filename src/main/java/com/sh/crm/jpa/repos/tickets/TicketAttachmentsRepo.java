@@ -14,6 +14,6 @@ public interface TicketAttachmentsRepo extends JpaRepository<TicketAttachments, 
     @Query("select distinct ta.attachmentID from TicketAttachments ta where ta.dataID=?1")
     List<Long> getAttachmentsByDataID(long dataID);
 
-    @Query("select distinct ta.attachmentID from TicketAttachments ta where ta.ticketID=?1")
+    @Query("select distinct ta.attachmentID from TicketAttachments ta where ta.ticketID=?1 and ta.dataID is null")
     List<Long> getAttachmentsIDByTicketID(long ticketID);
 }

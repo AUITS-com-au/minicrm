@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigInteger;
+import java.util.List;
 
 @Entity
 @Table(name = "ticketdata")
@@ -45,6 +46,9 @@ public class Ticketdata extends BasicModelWithID {
     @JoinColumn(name = "TicketID", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Ticket ticketID;
+    @Transient
+    private List<Long> attachmentsList;
+
 
     public Ticketdata() {
     }
@@ -103,9 +107,6 @@ public class Ticketdata extends BasicModelWithID {
     }
 
 
-
-
-
     public BigInteger getNotificationID() {
         return notificationID;
     }
@@ -136,6 +137,14 @@ public class Ticketdata extends BasicModelWithID {
 
     public void setTicketID(Ticket ticketID) {
         this.ticketID = ticketID;
+    }
+
+    public List<Long> getAttachmentsList() {
+        return attachmentsList;
+    }
+
+    public void setAttachmentsList(List<Long> attachmentsList) {
+        this.attachmentsList = attachmentsList;
     }
 
     @Override

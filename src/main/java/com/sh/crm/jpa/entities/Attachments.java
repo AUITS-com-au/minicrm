@@ -1,38 +1,34 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Arrays;
 
-/**
- * @author achah
- */
+
 @Entity
 @Table(name = "attachments")
 @XmlRootElement
 public class Attachments extends BasicModelWithID {
-
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 500)
+    @JsonProperty
     @Column(name = "FileName")
     private String fileName;
     @Size(max = 500)
     @Column(name = "FileType")
+    @JsonProperty
     private String fileType;
     @Size(max = 50)
     @Column(name = "Hash")
     private String hash;
     @Lob
-    @JsonIgnore
     @Column(name = "RAWContent")
     private byte[] rawContent;
     @Size(max = 500)
@@ -117,7 +113,6 @@ public class Attachments extends BasicModelWithID {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Attachments)) {
             return false;
         }
@@ -130,7 +125,18 @@ public class Attachments extends BasicModelWithID {
 
     @Override
     public String toString() {
-        return "com.sh.crm.jpa.entities.Attachments[ id=" + id + " ]";
+        return "Attachments{" +
+                "fileName='" + fileName + '\'' +
+                ", fileType='" + fileType + '\'' +
+                ", hash='" + hash + '\'' +
+                ", rawContent=" + Arrays.toString( rawContent ) +
+                ", filePath='" + filePath + '\'' +
+                ", fileDesc='" + fileDesc + '\'' +
+                ", id=" + id +
+                ", createdBy='" + createdBy + '\'' +
+                ", modificationDate=" + modificationDate +
+                ", modifiedBy='" + modifiedBy + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
     }
-
 }

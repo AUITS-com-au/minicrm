@@ -89,6 +89,8 @@ public class Ticket extends BasicModel {
 
     @Transient
     private List<TicketHistory> ticketHistoryList;
+    @Transient
+    private List<Long> attachmentsList;
 
     public Ticket() {
     }
@@ -326,6 +328,14 @@ public class Ticket extends BasicModel {
 
     public void setTicketHistoryList(List<TicketHistory> ticketHistoryList) {
         this.ticketHistoryList = ticketHistoryList;
+    }
+
+    public List<Long> getAttachmentsList() {
+        return attachmentsList;
+    }
+
+    public void setAttachmentsList(List<Long> attachmentsList) {
+        this.attachmentsList = attachmentsList;
     }
 
     @XmlTransient

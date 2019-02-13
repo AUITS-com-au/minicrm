@@ -27,17 +27,17 @@ public class TicketHistory {
     @Column(name = "CreatedBy")
     private String createdBy;
     @JoinColumn(name = "ActionID", referencedColumnName = "actionID")
-    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     private Ticketactions actionID;
     @Column(name = "OldStatus")
     private Integer oldStatus;
     @Column(name = "NewStatus")
     private Integer newStatus;
     @JoinColumn(name = "OldTopic", referencedColumnName = "ID")
-    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     private Topic oldTopic;
     @JoinColumn(name = "NewTopic", referencedColumnName = "ID")
-    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(optional = true, fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     private Topic newTopic;
     @Column(name = "OldAssigne")
     private String oldAssigne;
