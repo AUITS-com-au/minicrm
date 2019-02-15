@@ -70,7 +70,8 @@ public abstract class BasicGeneralController {
     protected AttachmentsRepo attachmentsRepo;
     @Autowired
     protected EscalationHistoryRepo escalationHistoryRepo;
-
+    @Autowired
+    protected GeneratedTopicsPermissionsRepo generatedTopicsPermissionsRepo;
     @Autowired
     protected TicketHistoryRepo ticketHistoryRepo;
     @Autowired

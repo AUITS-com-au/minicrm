@@ -515,6 +515,13 @@ public class TicketRestController extends BasicController<TicketHolder> {
         return null;
     }
 
+
+    @GetMapping("/authorizedActions/{topic}")
+    public Iterable<?> getTopicPermissions(@PathVariable("topic") Integer topicID, Principal principal) {
+        Set<GeneratedTopicPermissions> generatedTopicPermissiont = generatedTopicsPermissionsRepo.getByUserNameAndTopic_Id( principal.getName(), topicID );
+        return ticketActionsRepo.findDistinctByEnabledTrueAndActionIDIn( topicPermissionsService.getActionsFromTopicPermission( generatedTopicPermissiont ) );
+    }
+
     /**
      * @param ticket
      * @return Ticket
@@ -579,7 +586,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
         if (ticketlock == null)
             throw new GeneralException( Errors.INVALID_TICKET_LOCK );
 
-        if (ticketlock.getTicketID().getId() != ticketID) {
+        if (!ticketlock.getTicketID().getId().equals( ticketID )) {
             log.info( "ticket id cannot match with the lock ticket ID, target ticket id {} received ticket ID {}", ticketID, ticketlock.getTicketID().getId() );
             throw new GeneralException( Errors.INVALID_TICKET_LOCK );
         }
