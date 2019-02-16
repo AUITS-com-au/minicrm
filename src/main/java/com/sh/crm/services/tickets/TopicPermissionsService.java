@@ -104,6 +104,7 @@ public class TopicPermissionsService {
                 }
             }
         }
+        log.debug( "Generated SET of available actions is \n{}", set );
         return set;
     }
 
