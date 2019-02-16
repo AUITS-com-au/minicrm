@@ -117,8 +117,8 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
     private Order getOrderBy(Root root, SearchTicketsSorting sorting) {
         Order orderBy = null;
         if (sorting != null && sorting.getSortBy() != null && !sorting.getSortBy().isEmpty()) {
-            orderBy = sorting.getSortType() == 1 ? getCriteriaBuilder().asc( root.get( sorting.getSortBy() ) ) :
-                    getCriteriaBuilder().desc( root.get( sorting.getSortBy() ) );
+            orderBy = sorting.getSortType() == 1 ? getCriteriaBuilder().desc( root.get( sorting.getSortBy() ) ) :
+                    getCriteriaBuilder().asc( root.get( sorting.getSortBy() ) );
         }
         return orderBy;
     }
@@ -140,7 +140,7 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
                 cq.orderBy( orderby );
             }
         } else {
-            cq.orderBy( getCriteriaBuilder().desc( root.get( Ticket_.creationDate ) ) );
+            cq.orderBy( getCriteriaBuilder().desc( root.get( Ticket_.priority ) ) );
         }
         TypedQuery<Ticket> query = em.createQuery( cq );
         query.setMaxResults( searchTicketsContainer.getSize() );

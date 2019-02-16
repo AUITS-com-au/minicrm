@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TicketHistoryRepo extends JpaRepository<TicketHistory, Long> {
 
-    List<TicketHistory> findByTicketID(Long ticket);
+    List<TicketHistory> findByTicketIDOrderByCreationDateDesc(Long ticket);
 }

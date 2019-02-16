@@ -217,7 +217,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 case TicketAction.REOPEN:
                 case TicketAction.RESOLVED:
                     handleTicketData( ticketHolder, principal );
-                    return ResponseEntity.ok( ticketsRepo.findById( ticketHolder.getTicket().getId() ).orElse( null ) );
+                    return ResponseEntity.ok( getTicketFullInfo( ticketsRepo.findById( ticketHolder.getTicket().getId() ).orElse( null ) ) );
                 case TicketAction.ASSIGN:
                     Set<Ticket> response = assignTickets( ticketHolder, principal );
                     return ResponseEntity.ok( response );
@@ -403,7 +403,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             log.info( "Ticket {} has been modified by user {}", ticket.getId(), principal.getName() );
 
             ticket = null;
-            return ResponseEntity.ok( originalTicket );
+            return ResponseEntity.ok( getTicketFullInfo( originalTicket ) );
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
     }
@@ -566,11 +566,11 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 }
                 ticket.setTicketdataList( newTicketData );
             }
-            List<Escalationhistory> escalationhistories = escalationHistoryRepo.findByTicketID( ticket );
+            List<Escalationhistory> escalationhistories = escalationHistoryRepo.findByTicketIDOrderByEscDateTimeDesc( ticket );
             if (escalationhistories != null)
                 ticket.setEscalationhistoryList( escalationhistories );
 
-            List<TicketHistory> ticketHistoryList = ticketHistoryRepo.findByTicketID( ticket.getId() );
+            List<TicketHistory> ticketHistoryList = ticketHistoryRepo.findByTicketIDOrderByCreationDateDesc( ticket.getId() );
             if (ticketHistoryList != null)
                 ticket.setTicketHistoryList( ticketHistoryList );
 

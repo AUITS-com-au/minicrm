@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface EscalationHistoryRepo extends JpaRepository<Escalationhistory, Long> {
-    List<Escalationhistory> findByTicketID(Ticket ticket);
+    List<Escalationhistory> findByTicketIDOrderByEscDateTimeDesc(Ticket ticket);
 }
