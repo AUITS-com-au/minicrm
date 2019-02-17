@@ -48,6 +48,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     @Column(name = "EnglishLabel")
     private String englishLabel;
 
+    @Column(name = "AvailableActions")
+    private String availableActions;
 
     public Status() {
     }
@@ -116,6 +118,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 
     public void setEnglishLabel(String englishLabel) {
         this.englishLabel = englishLabel;
+    }
+
+    public String getAvailableActions() {
+        return availableActions;
+    }
+
+    public void setAvailableActions(String availableActions) {
+        this.availableActions = availableActions;
     }
 
     @Override

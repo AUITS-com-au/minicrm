@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "tickets", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -216,7 +217,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 case TicketAction.REOPEN:
                 case TicketAction.RESOLVED:
                     handleTicketData( ticketHolder, principal );
-                    return ResponseEntity.ok( ticketsRepo.findById( ticketHolder.getTicket().getId() ).orElse( null ) );
+                    return ResponseEntity.ok( getTicketFullInfo( ticketsRepo.findById( ticketHolder.getTicket().getId() ).orElse( null ) ) );
                 case TicketAction.ASSIGN:
                     Set<Ticket> response = assignTickets( ticketHolder, principal );
                     return ResponseEntity.ok( response );
@@ -402,7 +403,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
             log.info( "Ticket {} has been modified by user {}", ticket.getId(), principal.getName() );
 
             ticket = null;
-            return ResponseEntity.ok( originalTicket );
+            return ResponseEntity.ok( getTicketFullInfo( originalTicket ) );
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.UNAUTHORIZED ) );
     }
@@ -515,6 +516,37 @@ public class TicketRestController extends BasicController<TicketHolder> {
         return null;
     }
 
+
+    @GetMapping("/authorizedActions/{topic}")
+    public Iterable<?> getTopicPermissions(@PathVariable("topic") Integer topicID, Principal principal) {
+        Set<GeneratedTopicPermissions> generatedTopicPermissiont = generatedTopicsPermissionsRepo.getByUserNameAndTopic_Id( principal.getName(), topicID );
+        return ticketActionsRepo.findDistinctByEnabledTrueAndActionIDIn( topicPermissionsService.getActionsFromTopicPermission( generatedTopicPermissiont ) );
+    }
+
+    @GetMapping("/authorizedActions/ticket/{ticketID}")
+    public Iterable<?> getTicketPermissions(@PathVariable("ticketID") Long ticketID, Principal principal) {
+        Ticket ticket = ticketsRepo.findById( ticketID ).orElse( null );
+        if (ticket == null)
+            return null;
+        Iterable<Ticketactions> ticketactions = (Iterable<Ticketactions>) getTopicPermissions( ticket.getTopic().getId(), principal );
+        if (ticketactions != null) {
+            Status ticketStatus = ticketStatusRepo.findById( ticket.getCurrentStatus() ).orElse( null );
+            if (ticketStatus.getAvailableActions() != null && !ticketStatus.getAvailableActions().equalsIgnoreCase( "" )) {
+                Set<Ticketactions> filteredActions = new HashSet<>();
+                List<Integer> availableActions = Arrays.stream( ticketStatus.getAvailableActions().split( "\\s*,\\s*" ) ).
+                        map( value -> Integer.parseInt( value ) ).
+                        collect( Collectors.toList() );
+
+                ticketactions.forEach( ticketaction -> {
+                    if (availableActions.contains( ticketaction.getActionID() ))
+                        filteredActions.add( ticketaction );
+                } );
+                return filteredActions;
+            }
+        }
+        return null;
+    }
+
     /**
      * @param ticket
      * @return Ticket
@@ -534,11 +566,11 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 }
                 ticket.setTicketdataList( newTicketData );
             }
-            List<Escalationhistory> escalationhistories = escalationHistoryRepo.findByTicketID( ticket );
+            List<Escalationhistory> escalationhistories = escalationHistoryRepo.findByTicketIDOrderByEscDateTimeDesc( ticket );
             if (escalationhistories != null)
                 ticket.setEscalationhistoryList( escalationhistories );
 
-            List<TicketHistory> ticketHistoryList = ticketHistoryRepo.findByTicketID( ticket.getId() );
+            List<TicketHistory> ticketHistoryList = ticketHistoryRepo.findByTicketIDOrderByCreationDateDesc( ticket.getId() );
             if (ticketHistoryList != null)
                 ticket.setTicketHistoryList( ticketHistoryList );
 
@@ -579,7 +611,7 @@ public class TicketRestController extends BasicController<TicketHolder> {
         if (ticketlock == null)
             throw new GeneralException( Errors.INVALID_TICKET_LOCK );
 
-        if (ticketlock.getTicketID().getId() != ticketID) {
+        if (!ticketlock.getTicketID().getId().equals( ticketID )) {
             log.info( "ticket id cannot match with the lock ticket ID, target ticket id {} received ticket ID {}", ticketID, ticketlock.getTicketID().getId() );
             throw new GeneralException( Errors.INVALID_TICKET_LOCK );
         }

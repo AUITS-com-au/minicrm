@@ -2,6 +2,7 @@ package com.sh.crm.services.tickets;
 
 import com.sh.crm.general.utils.TicketOperation;
 import com.sh.crm.general.utils.Utils;
+import com.sh.crm.jpa.entities.GeneratedTopicPermissions;
 import com.sh.crm.jpa.entities.Ticketactions;
 import com.sh.crm.jpa.entities.Topic;
 import com.sh.crm.jpa.repos.tickets.GeneratedTopicsPermissionsRepo;
@@ -9,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class TopicPermissionsService {
@@ -64,6 +69,43 @@ public class TopicPermissionsService {
         if (returnValue == null || !returnValue)
             return false;
         return true;
+    }
+
+    public Set<Integer> getActionsFromTopicPermission(Collection<GeneratedTopicPermissions> generatedTopicPermissions) {
+        Set<Integer> set = new HashSet<>();
+        if (generatedTopicPermissions != null && generatedTopicPermissions.size() > 0) {
+            for (GeneratedTopicPermissions gp : generatedTopicPermissions) {
+                if (gp.getCanAssign() != null && gp.getCanAssign()) {
+                    set.add( 11 );
+                }
+                if (gp.getCanChgDpt() != null && gp.getCanChgDpt()) {
+                    set.add( 8 );
+                }
+                if (gp.getCanClose() != null && gp.getCanClose()) {
+                    set.add( 2 );
+                }
+                if (gp.getCanCreate() != null && gp.getCanCreate()) {
+                    set.add( 4 );
+                }
+                if (gp.getCanModify() != null && gp.getCanModify()) {
+                    set.add( 7 );
+                }
+                if (gp.getCanRead() != null && gp.getCanRead()) {
+                    set.add( 9 );
+                }
+                if (gp.getCanReopen() != null && gp.getCanReopen()) {
+                    set.add( 3 );
+                }
+                if (gp.getCanReply() != null && gp.getCanReply()) {
+                    set.add( 12 );
+                }
+                if (gp.getCanResolve() != null && gp.getCanResolve()) {
+                    set.add( 1 );
+                }
+            }
+        }
+        log.debug( "Generated SET of available actions is \n{}", set );
+        return set;
     }
 
     public Boolean isAllowedPermissionWrap(Topic topic, String username, String operation) {

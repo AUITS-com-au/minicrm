@@ -13,6 +13,8 @@ public interface GeneratedTopicsPermissionsRepo extends JpaRepository<GeneratedT
 
     Set<GeneratedTopicPermissions> getByUserName(String username);
 
+    Set<GeneratedTopicPermissions> getByUserNameAndTopic_Id(String username, Integer topic);
+
     @Query("select true from GeneratedTopicPermissions g where g.userName=?1 and g.topic=?2 and (g.canRead=true or g.admin=true)")
     Boolean canRead(String username, Topic topic);
 
