@@ -15,6 +15,9 @@ import com.sh.crm.rest.general.BasicController;
 import com.sh.crm.security.annotation.Administrator;
 import com.sh.crm.services.tickets.TopicPermissionsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -516,6 +519,21 @@ public class TicketRestController extends BasicController<TicketHolder> {
         return null;
     }
 
+    @GetMapping(
+            value = "attachments/download/{id}",
+            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+    )
+    public ResponseEntity<Resource> getFile(@PathVariable("id") Long id) throws IOException {
+        Attachments attachments = attachmentsRepo.findById( id ).orElse( null );
+        if (attachments != null) {
+            Resource resource = new ByteArrayResource( attachments.getRAWContent() );
+            return ResponseEntity.ok()
+                    .contentType( MediaType.parseMediaType( attachments.getFileType() ) )
+                    .header( HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachments.getFileName() + "\"" )
+                    .body( resource );
+        }
+        return ResponseEntity.badRequest().build();
+    }
 
     @GetMapping("/authorizedActions/{topic}")
     public Iterable<?> getTopicPermissions(@PathVariable("topic") Integer topicID, Principal principal) {
