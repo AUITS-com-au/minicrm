@@ -46,7 +46,7 @@ public class TopicRestController extends BasicController<Topic> {
                 topicRepo.save( topic );
                 if (log.isDebugEnabled())
                     log.debug( "Topic {} created successfully", topic );
-                return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+                return ResponseEntity.ok( topicRepo.findBySubCategory( topic.getSubCategory() ) );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
@@ -65,13 +65,39 @@ public class TopicRestController extends BasicController<Topic> {
                 topic = topicRepo.save( topic );
                 if (log.isDebugEnabled())
                     log.debug( "topic {} modified successfully", topic );
-                return ResponseEntity.ok( new ResponseCode( Errors.SUCCESSFUL ) );
+                return ResponseEntity.ok( topicRepo.findBySubCategory( topic.getSubCategory() ) );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
     }
+
+    @TicketsAdmin
+    @GetMapping("change/{topic}/{newStatus}")
+    public ResponseEntity<?> changeStatus(@PathVariable("topic") Integer topic,
+                                          @PathVariable("newStatus") Boolean newStatus) {
+        if (topic != null) {
+            if (log.isDebugEnabled())
+                log.debug( "Received request to change topic {} " +
+                        "status to {}", topic, newStatus );
+            try {
+                Topic topicOriginal = topicRepo.findById( topic ).orElse( null );
+                if (topicOriginal == null)
+                    throw new GeneralException( Errors.CANNOT_EDIT_OBJECT );
+
+
+                topicOriginal.setEnabled( newStatus );
+                topicRepo.save( topicOriginal );
+                return ResponseEntity.ok( topicRepo.findBySubCategory( topicOriginal.getSubCategory() ) );
+            } catch (Exception e) {
+                LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
+            }
+        }
+        return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
+
+    }
+
 
     @TicketsAdmin
     @PostMapping("/permissions/create")
@@ -187,6 +213,7 @@ public class TopicRestController extends BasicController<Topic> {
     public ResponseEntity<?> editTopicPermissions(@RequestBody List<Topicspermissions> topicspermissions) throws GeneralException {
         return createTopicPermissions( topicspermissions );
     }
+
 
     @TicketsAdmin
     @GetMapping("/permissions/{topic}")
