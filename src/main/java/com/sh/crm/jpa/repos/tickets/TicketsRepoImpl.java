@@ -12,7 +12,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -62,9 +61,13 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getCustomerAccounts() != null && !st.getCustomerAccounts().isEmpty()) {
             predicates.add( root.get( Ticket_.customerAccount ).in( st.getCustomerAccounts() ) );
         }
-        if (st.getStartDate() != null && st.getEndDate() != null && st.getStartDate() > 0 && st.getEndDate() > 0) {
-            predicates.add( getCriteriaBuilder().between( root.get( Ticket_.creationDate ), new Date( st.getStartDate() ), new Date( st.getEndDate() ) ) );
+        if (st.getStartDate() != null) {
+            predicates.add( getCriteriaBuilder().greaterThanOrEqualTo( root.get( Ticket_.creationDate ), st.getStartDate() ) );
         }
+        if (st.getEndDate() != null) {
+            predicates.add( getCriteriaBuilder().lessThanOrEqualTo( root.get( Ticket_.creationDate ), st.getEndDate() ) );
+        }
+
         if (st.getSolved() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.solved ),
                     st.getSolved() ) );
@@ -111,7 +114,36 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getNumberOfCrossedSLA() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.numberOfCrossedSLA ), st.getNumberOfCrossedSLA() ) );
         }
+
+        if (st.getCustomerContainer() != null) {
+            Join<Ticket, CustomerAccounts> joinCustomerAcc = root.join( Ticket_.customerAccount, JoinType.LEFT );
+            if (st.getCustomerContainer().getCustomerBasic() != null && !st.getCustomerContainer().getCustomerBasic().isEmpty()) {
+                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_CI_F ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerBasic() ) ) );
+            }
+            if (st.getCustomerContainer().getCustomerMobile() != null && !st.getCustomerContainer().getCustomerMobile().isEmpty()) {
+                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.MOBILE ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerMobile() ) ) );
+            }
+            if (st.getCustomerContainer().getCustomerName() != null && !st.getCustomerContainer().getCustomerName().isEmpty()) {
+                predicates.add( getCriteriaBuilder().or( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_NAME_AR ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerName() ) ), getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_NAME_EN ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerName() ) ) ) );
+            }
+            if (st.getCustomerContainer().getCustomerBranch() != null && !st.getCustomerContainer().getCustomerBranch().isEmpty()) {
+                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.BRANCH_NAME ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerBranch() ) ) );
+            }
+            if (st.getCustomerContainer().getCustomerSegment() != null && !st.getCustomerContainer().getCustomerSegment().isEmpty()) {
+                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.SEGMENT ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerSegment() ) ) );
+            }
+            if (st.getCustomerContainer().getNan() != null && !st.getCustomerContainer().getNan().isEmpty()) {
+                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.NIN ), getFormattedForSQLLike( st.getCustomerContainer().getNan() ) ) );
+            }
+            if (st.getCustomerContainer().getCustomerEmail() != null && !st.getCustomerContainer().getCustomerEmail().isEmpty()) {
+                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.EMAIL ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerEmail() ) ) );
+            }
+        }
         return predicates;
+    }
+
+    private String getFormattedForSQLLike(String str) {
+        return "%" + str + "%";
     }
 
     private Order getOrderBy(Root root, SearchTicketsSorting sorting) {
