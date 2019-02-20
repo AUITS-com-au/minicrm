@@ -39,7 +39,7 @@ public class SubcategoryRestController extends BasicController<Subcategory> {
                 subcategoryRepo.save( subcategory );
                 if (log.isDebugEnabled())
                     log.debug( "Sub-category {} created successfully", subcategory );
-                return ResponseEntity.ok( subcategoryRepo.findAll() );
+                return ResponseEntity.ok( subcategoryRepo.findByMainCategory( subcategory.getMainCategory() ) );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
@@ -60,7 +60,7 @@ public class SubcategoryRestController extends BasicController<Subcategory> {
                 subcategoryRepo.save( subcategory );
                 if (log.isDebugEnabled())
                     log.debug( "Sub-category {} modified successfully", subcategory );
-                return ResponseEntity.ok( subcategoryRepo.findAll() );
+                return ResponseEntity.ok( subcategoryRepo.findByMainCategory( subcategory.getMainCategory() ) );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }
@@ -100,7 +100,7 @@ public class SubcategoryRestController extends BasicController<Subcategory> {
                 Subcategory subcategory = optSub.get();
                 subcategory.setEnabled( newStatus );
                 subcategoryRepo.save( subcategory );
-                return ResponseEntity.ok( subcategoryRepo.findAll() );
+                return ResponseEntity.ok( subcategoryRepo.findByMainCategory( subcategory.getMainCategory() ) );
             } catch (Exception e) {
                 LoggingUtils.logStackTrace( log, e, LoggingUtils.ERROR );
             }

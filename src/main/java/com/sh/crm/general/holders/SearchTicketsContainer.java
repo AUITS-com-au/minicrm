@@ -1,6 +1,9 @@
 package com.sh.crm.general.holders;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 import java.util.List;
 
 public class SearchTicketsContainer {
@@ -10,8 +13,12 @@ public class SearchTicketsContainer {
     private boolean skipValidation;
     private Boolean runningReport;
     private List<String> createdBy;
-    private Long startDate;
-    private Long endDate;
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private Date startDate;
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private Date endDate;
     private List<Integer> topics;
     private List<Integer> originalTopics;
     private List<Integer> subCats;
@@ -34,6 +41,7 @@ public class SearchTicketsContainer {
     private Long totalCrossedTime;
     private SearchTicketsSorting sorting;
 
+    private SearchTicketsCustomerContainer customerContainer;
 
     public SearchTicketsContainer() {
 
@@ -87,20 +95,19 @@ public class SearchTicketsContainer {
         this.createdBy = createdBy;
     }
 
-
-    public Long getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Long startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public Long getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Long endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
@@ -193,7 +200,6 @@ public class SearchTicketsContainer {
     }
 
 
-
     public List<Integer> getLanguage() {
         return language;
     }
@@ -264,5 +270,13 @@ public class SearchTicketsContainer {
 
     public void setTotalCrossedTime(Long totalCrossedTime) {
         this.totalCrossedTime = totalCrossedTime;
+    }
+
+    public SearchTicketsCustomerContainer getCustomerContainer() {
+        return customerContainer;
+    }
+
+    public void setCustomerContainer(SearchTicketsCustomerContainer customerContainer) {
+        this.customerContainer = customerContainer;
     }
 }

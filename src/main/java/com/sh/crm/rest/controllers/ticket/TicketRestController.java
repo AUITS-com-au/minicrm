@@ -220,8 +220,12 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 case TicketAction.REOPEN:
                 case TicketAction.RESOLVED:
                     handleTicketData( ticketHolder, principal );
+                    if (ticketHolder.getLockID() != null)
+                        releaseLock( ticketHolder.getLockID() );
                     return ResponseEntity.ok( getTicketFullInfo( ticketsRepo.findById( ticketHolder.getTicket().getId() ).orElse( null ) ) );
                 case TicketAction.ASSIGN:
+                    if (ticketHolder.getLockID() != null)
+                        releaseLock( ticketHolder.getLockID() );
                     Set<Ticket> response = assignTickets( ticketHolder, principal );
                     return ResponseEntity.ok( response );
                 case TicketAction.MODIFYINFO:
@@ -535,13 +539,13 @@ public class TicketRestController extends BasicController<TicketHolder> {
         return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/authorizedActions/{topic}")
+    @GetMapping("authorizedActions/{topic}")
     public Iterable<?> getTopicPermissions(@PathVariable("topic") Integer topicID, Principal principal) {
         Set<GeneratedTopicPermissions> generatedTopicPermissiont = generatedTopicsPermissionsRepo.getByUserNameAndTopic_Id( principal.getName(), topicID );
         return ticketActionsRepo.findDistinctByEnabledTrueAndActionIDIn( topicPermissionsService.getActionsFromTopicPermission( generatedTopicPermissiont ) );
     }
 
-    @GetMapping("/authorizedActions/ticket/{ticketID}")
+    @GetMapping("authorizedActions/ticket/{ticketID}")
     public Iterable<?> getTicketPermissions(@PathVariable("ticketID") Long ticketID, Principal principal) {
         Ticket ticket = ticketsRepo.findById( ticketID ).orElse( null );
         if (ticket == null)
@@ -563,6 +567,19 @@ public class TicketRestController extends BasicController<TicketHolder> {
             }
         }
         return null;
+    }
+
+    @GetMapping("authorizedActions/validate/ticket/{ticketID}/{actionID}")
+    public Boolean validateTicketAction(@PathVariable("ticketID") Long ticketID, @PathVariable("actionID") Integer actionID, Principal principal) {
+        Iterable avaialable = getTicketPermissions( ticketID, principal );
+        if (avaialable != null) {
+            Set<Ticketactions> ticketactions = (Set<Ticketactions>) avaialable;
+            for (Ticketactions action : ticketactions) {
+                if (action.getActionID().equals( actionID ))
+                    return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -658,6 +675,10 @@ public class TicketRestController extends BasicController<TicketHolder> {
                 }
             }
         }
+    }
+
+    private void releaseLock(Long lockID) {
+        ticketLocksRepo.invalidateLock( lockID );
     }
 
     private Ticket updateTotalNumberOfSLA(Ticket ticket) {
