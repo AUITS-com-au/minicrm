@@ -1,6 +1,6 @@
 package com.sh.crm.general.holders;
 
-import com.sh.crm.general.utils.TicketStatus;
+import com.sh.crm.jpa.entities.SourceChannel;
 import com.sh.crm.jpa.entities.Status;
 import com.sh.crm.jpa.entities.Ticketactions;
 import com.sh.crm.jpa.entities.Tickettypes;
@@ -12,6 +12,7 @@ public class TicketExtras {
     private List<Status> ticketStatusList;
     private List<Tickettypes> tickettypesList;
     private List<TicketPriorityHolder> ticketPriorityList;
+    private List<SourceChannel> channelsList;
 
     public TicketExtras() {
 
@@ -43,6 +44,14 @@ public class TicketExtras {
 
     public List<TicketPriorityHolder> getTicketPriorityList() {
         return ticketPriorityList;
+    }
+
+    public List<SourceChannel> getChannelsList() {
+        return channelsList;
+    }
+
+    public void setChannelsList(List<SourceChannel> channelsList) {
+        this.channelsList = channelsList;
     }
 
     public void setTicketPriorityList(List<TicketPriorityHolder> ticketPriorityList) {

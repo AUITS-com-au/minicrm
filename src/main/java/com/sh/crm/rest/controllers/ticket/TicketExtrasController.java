@@ -25,6 +25,7 @@ public class TicketExtrasController extends BasicGeneralController {
         ticketExtras.setTicketPriorityList( priorities );
         ticketExtras.setTicketStatusList( ticketStatusRepo.findAll() );
         ticketExtras.setTickettypesList( ticketTypeRepo.findAll() );
+        ticketExtras.setChannelsList( sourceChannelRepo.findAll() );
         return ticketExtras;
     }
 
