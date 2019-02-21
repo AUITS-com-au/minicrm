@@ -76,6 +76,8 @@ public abstract class BasicGeneralController {
     protected TicketHistoryRepo ticketHistoryRepo;
     @Autowired
     protected GroupsRepo groupsRepo;
+    @Autowired
+    protected SourceChannelRepo sourceChannelRepo;
 
     protected Users getAuthorizedUser() {
         return usersRepos.findByUserID( SecurityUtils.getPrincipal() );
