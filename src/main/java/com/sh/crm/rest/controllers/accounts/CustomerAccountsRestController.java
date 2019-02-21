@@ -2,22 +2,21 @@ package com.sh.crm.rest.controllers.accounts;
 
 import com.sh.crm.general.Errors;
 import com.sh.crm.general.exceptions.GeneralException;
+import com.sh.crm.general.holders.SearchTicketsCustomerContainer;
 import com.sh.crm.general.utils.Utils;
 import com.sh.crm.jpa.entities.CustomerAccounts;
 import com.sh.crm.rest.general.BasicController;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collection;
 
 @RestController
 @RequestMapping(value = "accounts", produces = MediaType.APPLICATION_JSON_VALUE)
-@PreAuthorize("hasAnyAuthority('TICKET:USER','TICKET:ADMIN','Administrator')")
+
 public class CustomerAccountsRestController extends BasicController<CustomerAccounts> {
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -53,4 +52,11 @@ public class CustomerAccountsRestController extends BasicController<CustomerAcco
     public ResponseEntity<?> delete(CustomerAccounts object, Principal principal) throws GeneralException {
         return null;
     }
+
+    @PostMapping("search")
+    @PutMapping("search")
+    public Collection<CustomerAccounts> searchCustomer(@RequestBody SearchTicketsCustomerContainer container) {
+        return customerAccountsRepo.findDistinctByCustomerCIFOrCustomerNameARLikeOrCustomerNameEnLikeOrEmailOrNinLikeOrMobileLike( container.getCustomerBasic(), container.getCustomerName(), container.getCustomerName(), container.getCustomerEmail(), container.getNan(), container.getCustomerMobile() );
+    }
+
 }
