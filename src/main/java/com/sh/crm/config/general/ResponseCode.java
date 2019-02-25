@@ -7,9 +7,6 @@ public class ResponseCode {
     private String code;
     private String msg;
 
-
-
-
     public ResponseCode(String errorCode, String errorMsg) {
         super();
         this.code = errorCode;
