@@ -2,6 +2,9 @@ package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -30,7 +33,6 @@ public class Maincategory extends BasicModelWithIDInt {
     @Column(name = "Enabled")
     private Boolean enabled;
     @Column(name = "Configuration")
-    @JsonIgnore
     private String configuration;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "mainCategory", fetch = FetchType.LAZY)
@@ -76,10 +78,24 @@ public class Maincategory extends BasicModelWithIDInt {
         this.englishLabel = englishLabel;
     }
 
+    @JsonProperty("configuration")
+    public JsonNode getConfigurationNode() {
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode object = mapper.readTree( configuration );
+            return object;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public String getConfiguration() {
         return configuration;
     }
 
+    @JsonProperty("configuration")
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
     }
