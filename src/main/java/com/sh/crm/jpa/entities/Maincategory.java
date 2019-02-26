@@ -29,6 +29,9 @@ public class Maincategory extends BasicModelWithIDInt {
     private String englishLabel;
     @Column(name = "Enabled")
     private Boolean enabled;
+    @Column(name = "Configuration")
+    @JsonIgnore
+    private String configuration;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "mainCategory", fetch = FetchType.LAZY)
     private List<Maincatholidays> maincatholidaysList;
@@ -38,6 +41,7 @@ public class Maincategory extends BasicModelWithIDInt {
 
     public Maincategory() {
     }
+
     public Maincategory(Integer id) {
         this.id = id;
     }
@@ -72,6 +76,13 @@ public class Maincategory extends BasicModelWithIDInt {
         this.englishLabel = englishLabel;
     }
 
+    public String getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
+    }
 
     public Boolean getEnabled() {
         return enabled;

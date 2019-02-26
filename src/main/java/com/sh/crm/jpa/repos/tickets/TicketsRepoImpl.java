@@ -67,7 +67,6 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
         if (st.getEndDate() != null) {
             predicates.add( getCriteriaBuilder().lessThanOrEqualTo( root.get( Ticket_.creationDate ), st.getEndDate() ) );
         }
-
         if (st.getSolved() != null) {
             predicates.add( getCriteriaBuilder().equal( root.get( Ticket_.solved ),
                     st.getSolved() ) );

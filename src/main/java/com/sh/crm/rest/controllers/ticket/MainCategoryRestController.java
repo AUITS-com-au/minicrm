@@ -1,5 +1,7 @@
 package com.sh.crm.rest.controllers.ticket;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sh.crm.config.general.ResponseCode;
 import com.sh.crm.general.Errors;
 import com.sh.crm.general.exceptions.GeneralException;
@@ -11,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -61,6 +64,7 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
                 original.setEnabled( maincategory.getEnabled() );
                 original.setArabicLabel( maincategory.getArabicLabel() );
                 original.setEnglishLabel( maincategory.getEnglishLabel() );
+                original.setConfiguration( maincategory.getConfiguration() );
                 mainCategoryRepo.save( original );
                 if (log.isDebugEnabled())
                     log.debug( "Main category {} modified successfully", original );
@@ -94,6 +98,20 @@ public class MainCategoryRestController extends BasicController<Maincategory> {
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
 
+    }
+
+    @GetMapping("config/{mainCat}")
+    ResponseEntity<?> getConfiguration(@PathVariable("mainCat") Integer mainCat) throws IOException, GeneralException {
+        Maincategory maincategory =
+                mainCategoryRepo.findById( mainCat ).orElse( null );
+        if (maincategory == null)
+            throw new GeneralException( Errors.CANNOT_EDIT_OBJECT );
+        if (maincategory.getConfiguration() == null || maincategory.getConfiguration().equalsIgnoreCase( "" ))
+            return null;
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode object = mapper.readTree( maincategory.getConfiguration() );
+
+        return ResponseEntity.ok( object );
     }
 
 

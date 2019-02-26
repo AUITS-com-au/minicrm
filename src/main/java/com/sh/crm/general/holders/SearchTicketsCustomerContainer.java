@@ -68,4 +68,17 @@ public class SearchTicketsCustomerContainer {
     public void setCustomerEmail(String customerEmail) {
         this.customerEmail = customerEmail;
     }
+
+    @Override
+    public String toString() {
+        return "SearchTicketsCustomerContainer{" +
+                "customerBasic='" + customerBasic + '\'' +
+                ", customerMobile='" + customerMobile + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", customerSegment='" + customerSegment + '\'' +
+                ", customerBranch='" + customerBranch + '\'' +
+                ", customerEmail='" + customerEmail + '\'' +
+                ", nan='" + nan + '\'' +
+                '}';
+    }
 }

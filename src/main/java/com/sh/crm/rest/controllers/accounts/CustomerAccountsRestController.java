@@ -56,6 +56,7 @@ public class CustomerAccountsRestController extends BasicController<CustomerAcco
     @PostMapping("search")
     @PutMapping("search")
     public Collection<CustomerAccounts> searchCustomer(@RequestBody SearchTicketsCustomerContainer container) {
+        log.debug( "searching for customer with criteria {}", container );
         return customerAccountsRepo.findDistinctByCustomerCIFOrCustomerNameARLikeOrCustomerNameEnLikeOrEmailOrNinLikeOrMobileLike( container.getCustomerBasic(), container.getCustomerName(), container.getCustomerName(), container.getCustomerEmail(), container.getNan(), container.getCustomerMobile() );
     }
 
