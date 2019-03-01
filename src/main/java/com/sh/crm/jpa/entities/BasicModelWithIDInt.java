@@ -19,4 +19,5 @@ public abstract class BasicModelWithIDInt extends BasicModel{
     public void setId(Integer id) {
         this.id = id;
     }
+
 }

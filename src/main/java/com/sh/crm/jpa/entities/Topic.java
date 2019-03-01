@@ -3,6 +3,9 @@ package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -118,6 +121,31 @@ public class Topic extends BasicModelWithIDInt {
 
     public void setPrincipals(String principals) {
         this.principals = principals;
+    }
+
+    @JsonProperty("configuration")
+    public JsonNode getConfigurationNode() {
+        if (configuration != null && !configuration.equalsIgnoreCase( "" ))
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode object = mapper.readTree( getConfiguration() );
+                return object;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        return null;
+    }
+
+    @JsonProperty("configuration")
+    public void setConfigurationNode(JsonNode node) {
+        if (node != null)
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String object = mapper.writeValueAsString( node );
+                setConfiguration( object );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
     @XmlTransient

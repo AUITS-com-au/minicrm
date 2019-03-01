@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SlaUsersRepo extends JpaRepository<Slausers, Long> {
     List<Slausers> findByTopicSLAAndEnabledIsTrue(Integer topicSLA);
+
+    void deleteAllByTopicSLA(Integer topicSla);
 }

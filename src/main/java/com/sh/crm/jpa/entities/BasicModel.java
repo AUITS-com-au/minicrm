@@ -1,6 +1,9 @@
 package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -29,6 +32,7 @@ public abstract class BasicModel {
     @Column(name = "CreationDate")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = dtfPattern)
     protected Date creationDate;
+
 
     public String getCreatedBy() {
         return createdBy;
@@ -61,4 +65,6 @@ public abstract class BasicModel {
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
+
+
 }

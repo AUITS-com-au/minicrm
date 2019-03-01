@@ -78,24 +78,37 @@ public class Maincategory extends BasicModelWithIDInt {
         this.englishLabel = englishLabel;
     }
 
+
     @JsonProperty("configuration")
     public JsonNode getConfigurationNode() {
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode object = mapper.readTree( configuration );
-            return object;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (configuration != null && !configuration.equalsIgnoreCase( "" ))
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode object = mapper.readTree( configuration );
+                return object;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         return null;
     }
 
-    public String getConfiguration() {
-        return configuration;
+    @JsonProperty("configuration")
+    public void setConfigurationNode(JsonNode node) {
+        if (node != null)
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String object = mapper.writeValueAsString( node );
+                setConfiguration( object );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
-    @JsonProperty("configuration")
+
+    public String getConfiguration() {
+        return this.configuration;
+    }
+
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
     }
