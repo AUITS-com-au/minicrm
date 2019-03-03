@@ -5,12 +5,13 @@
  */
 package com.sh.crm.jpa.entities;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author achah
@@ -18,7 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = "slausers")
 @XmlRootElement
-public class Slausers  extends BasicModelWithID{
+public class Slausers extends BasicModelWithID {
 
 
     @Size(max = 50)
@@ -29,9 +30,8 @@ public class Slausers  extends BasicModelWithID{
     @Column(name = "Topicsla")
     private int topicSLA;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "Enabled")
-    private Boolean enabled;
+    private Boolean enabled = true;
     @Size(max = 2147483647)
     @Column(name = "Emails")
     private String emails;
@@ -110,7 +110,7 @@ public class Slausers  extends BasicModelWithID{
             return false;
         }
         Slausers other = (Slausers) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
