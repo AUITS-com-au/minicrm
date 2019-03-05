@@ -30,7 +30,7 @@ public interface UsersRepos extends JpaRepository<Users, Integer> {
 
     Users findByUserIDAndPassword(String username, String password);
 
-    @Query("select u  from Users  u where u.email is not null and u.enabled=true ")
+    @Query("select u  from Users  u where u.email is not null and u.enabled=true and u.userID in ?1 ")
     List<Users> getUsersByUserName(Collection<String> userIDs);
 
     Users findByUserIDAndEnabledAndLDAPUser(String username, boolean enabled, boolean LDAPUser);
