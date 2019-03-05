@@ -7,6 +7,7 @@ import com.sh.crm.general.holders.TopicSlaHolder;
 import com.sh.crm.jpa.entities.Slausers;
 import com.sh.crm.jpa.entities.Topic;
 import com.sh.crm.jpa.entities.Topicsla;
+import com.sh.crm.jpa.entities.Users;
 import com.sh.crm.jpa.repos.tickets.SlaRepo;
 import com.sh.crm.jpa.repos.tickets.SlaUsersRepo;
 import com.sh.crm.rest.general.BasicController;
@@ -64,7 +65,21 @@ public class TopicSlaController extends BasicController<TopicSlaHolder> {
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
     }
 
+
     @Override
+    public ResponseEntity<?> delete(TopicSlaHolder object, Principal principal) throws GeneralException {
+        return null;
+    }
+
+    @PostMapping("delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
+        Topicsla topicsla = topicSlaRepo.findById( id ).orElse( null );
+        Topic topic = topicsla.getTopicID();
+        topicSlaRepo.deleteById( id );
+        return ResponseEntity.ok( topicSlaRepo.findDistinctByTopicIDOrderBySlaLevelAsc( topic ) );
+    }
+
+   /* @Override
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<?> delete(@RequestBody TopicSlaHolder topicSlaHolder, Principal principal) throws GeneralException {
         if (topicSlaHolder.getTopicsla() != null && topicSlaHolder.getTopicsla().getId() != null) {
@@ -73,7 +88,7 @@ public class TopicSlaController extends BasicController<TopicSlaHolder> {
             return ResponseEntity.ok( topicSlaRepo.findDistinctByTopicIDOrderBySlaLevelAsc( topic ) );
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
-    }
+    }*/
 
     @Transactional(rollbackFor = Exception.class)
     public void createSlaUsers(Integer topicSla, List<String> usersList) {
@@ -89,7 +104,15 @@ public class TopicSlaController extends BasicController<TopicSlaHolder> {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @GetMapping("users/{topicSla}")
+    List<Users> getSlaUsers(@PathVariable("topicSla") Integer topicSLA) {
+        List<String> slaUsers = slaUsersRepo.getSlaUsersId( topicSLA );
+        if (slaUsers != null && !slaUsers.isEmpty()) {
+            return usersRepos.getUsersByUserName( slaUsers );
+        }
+        return null;
+    }
+
     public void deleteSlaUsers(Integer topicSla) {
         slaUsersRepo.deleteAllByTopicSLA( topicSla );
     }
