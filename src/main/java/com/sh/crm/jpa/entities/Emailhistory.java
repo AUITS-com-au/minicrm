@@ -59,8 +59,11 @@ public class Emailhistory {
     @Column(name = "DeleteStatus")
     private Short deleteStatus;
     @JoinColumn(name = "EmailMessage", referencedColumnName = "Id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Emailmessage emailMessage;
+
+    @Column(name = "Tries")
+    private Integer tries;
 
     public Emailhistory() {
     }
@@ -188,6 +191,14 @@ public class Emailhistory {
         this.emailMessage = emailMessage;
     }
 
+    public Integer getTries() {
+        return tries;
+    }
+
+    public void setTries(Integer tries) {
+        this.tries = tries;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -202,7 +213,7 @@ public class Emailhistory {
             return false;
         }
         Emailhistory other = (Emailhistory) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

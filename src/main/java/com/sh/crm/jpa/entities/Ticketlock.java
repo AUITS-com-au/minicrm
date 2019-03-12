@@ -5,8 +5,7 @@
  */
 package com.sh.crm.jpa.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.data.annotation.CreatedDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -21,6 +20,7 @@ import java.util.Date;
 @Table(name = "ticketlock")
 @XmlRootElement
 public class Ticketlock {
+    static final String dtfPattern = "yyyy-MM-dd hh:mm:ss a";
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +33,7 @@ public class Ticketlock {
     private String userID;
 
     @Column(name = "DateTime")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = dtfPattern)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateTime;
     @Basic(optional = false)
