@@ -30,6 +30,7 @@ public class TopicRestController extends BasicController<Topic> {
     private TopicRepo topicRepo;
     @Autowired
     private TopicsPermissionsRepo topicsPermissionsRepo;
+
     @Override
     @TicketsAdmin
     @Transactional(rollbackFor = Exception.class)
@@ -50,6 +51,7 @@ public class TopicRestController extends BasicController<Topic> {
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_CREATE_OBJECT ) );
     }
+
     @Override
     @TicketsAdmin
     @Transactional(rollbackFor = Exception.class)
@@ -68,6 +70,7 @@ public class TopicRestController extends BasicController<Topic> {
         }
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
     }
+
     @TicketsAdmin
     @GetMapping("change/{topic}/{newStatus}")
     public ResponseEntity<?> changeStatus(@PathVariable("topic") Integer topic,
@@ -92,6 +95,7 @@ public class TopicRestController extends BasicController<Topic> {
         return ResponseEntity.badRequest().body( new ResponseCode( Errors.CANNOT_EDIT_OBJECT ) );
 
     }
+
     @TicketsAdmin
     @PostMapping("/permissions/create")
     @Transactional(rollbackFor = Exception.class)
@@ -142,6 +146,7 @@ public class TopicRestController extends BasicController<Topic> {
         }
         throw new GeneralException( Errors.CANNOT_CREATE_OBJECT );
     }
+
     @TicketsAdmin
     @PostMapping("/permissions/delete")
     @Transactional(rollbackFor = Exception.class)
@@ -180,6 +185,7 @@ public class TopicRestController extends BasicController<Topic> {
         }
         throw new GeneralException( Errors.CANNOT_CREATE_OBJECT );
     }
+
     private boolean validateTopicPerm(Topicspermissions tp) {
         if (tp != null) {
             return (tp.getCanAssign() ||
@@ -198,26 +204,31 @@ public class TopicRestController extends BasicController<Topic> {
         }
         return false;
     }
+
     @TicketsAdmin
     @PostMapping("/permissions/edit")
     public ResponseEntity<?> editTopicPermissions(@RequestBody List<Topicspermissions> topicspermissions) throws GeneralException {
         return createTopicPermissions( topicspermissions );
     }
+
     @TicketsAdmin
     @GetMapping("/permissions/{topic}")
     public Iterable<Topicspermissions> getTopicPermissions(@PathVariable("topic") Integer topicID) {
         return fillInfo( topicsPermissionsRepo.findByTopicId_Id( topicID ) );
     }
+
     @TicketsAdmin
     @GetMapping("/permissions/subCat/{subCat}")
     public Iterable<Topicspermissions> getSubCatPermissions(@PathVariable("subCat") Integer subCat) {
         return fillInfo( topicsPermissionsRepo.findByTopicId_SubCategory_Id( subCat ) );
     }
+
     @TicketsAdmin
     @GetMapping("/permissions/mainCat/{mainCat}")
     public Iterable<Topicspermissions> getMainCatPermissions(@PathVariable("mainCat") Integer mainCat) {
         return fillInfo( topicsPermissionsRepo.findByTopicId_SubCategory_MainCategory_Id( mainCat ) );
     }
+
     @TicketsAdmin
     @GetMapping("/permissions/users/{userId}")
     public Iterable<Topicspermissions> getUserTopicPermissions(@PathVariable("userId") Integer userID) {

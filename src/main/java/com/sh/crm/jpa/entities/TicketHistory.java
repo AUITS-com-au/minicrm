@@ -18,11 +18,12 @@ public class TicketHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     protected Long id;
+    @Column(name = "CreationDate")
+    protected Date creationDate;
     @Basic(optional = false)
     @NotNull
     @Column(name = "TicketID")
     private long ticketID;
-
     @Size(max = 50)
     @Column(name = "CreatedBy")
     private String createdBy;
@@ -43,9 +44,6 @@ public class TicketHistory {
     private String oldAssigne;
     @Column(name = "NewAssigne")
     private String newAssigne;
-    @Column(name = "CreationDate")
-    protected Date creationDate;
-
     @Column(name = "DataID")
     private Long dataID;
 

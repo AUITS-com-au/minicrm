@@ -83,7 +83,7 @@ public class Globalconfiguration {
             return false;
         }
         Globalconfiguration other = (Globalconfiguration) object;
-        if ((this.property == null && other.property != null) || (this.property != null && !this.property.equals(other.property))) {
+        if ((this.property == null && other.property != null) || (this.property != null && !this.property.equals( other.property ))) {
             return false;
         }
         return true;

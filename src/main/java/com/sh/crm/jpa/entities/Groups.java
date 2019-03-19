@@ -80,7 +80,7 @@ public class Groups extends BasicModelWithIDInt {
             return false;
         }
         Groups other = (Groups) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

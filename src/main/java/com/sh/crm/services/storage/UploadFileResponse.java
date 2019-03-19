@@ -2,8 +2,6 @@ package com.sh.crm.services.storage;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.Arrays;
-
 public class UploadFileResponse {
     private String fileName;
     private String fileType;

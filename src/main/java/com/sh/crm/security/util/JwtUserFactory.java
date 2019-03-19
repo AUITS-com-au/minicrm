@@ -7,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class JwtUserFactory {
@@ -16,12 +15,12 @@ public final class JwtUserFactory {
     }
 
     public static JwtUser create(Users user, List<Permissions> authList) {
-        return new JwtUser(user.getId(), user.getUserID(), user.getFirstName(), user.getLastName(), user.getEmail(),
-                user.getPassword(), mapToGrantedAuthorities(authList), user.getEnabled());
+        return new JwtUser( user.getId(), user.getUserID(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                user.getPassword(), mapToGrantedAuthorities( authList ), user.getEnabled() );
     }
 
     private static List<GrantedAuthority> mapToGrantedAuthorities(List<Permissions> authorities) {
-        return authorities.stream().map(authority -> new SimpleGrantedAuthority(authority.getPermission()))
-                .collect(Collectors.toList());
+        return authorities.stream().map( authority -> new SimpleGrantedAuthority( authority.getPermission() ) )
+                .collect( Collectors.toList() );
     }
 }

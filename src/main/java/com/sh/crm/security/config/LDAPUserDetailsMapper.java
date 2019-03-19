@@ -17,14 +17,14 @@ import java.util.Collection;
 
 @Component
 public class LDAPUserDetailsMapper extends LdapUserDetailsMapper {
-    private final Logger log = LoggerFactory.getLogger(LDAPUserDetailsMapper.class);
+    private final Logger log = LoggerFactory.getLogger( LDAPUserDetailsMapper.class );
     @Autowired
     private JwtUserDetailsServiceImpl userDetailsService;
 
     public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities) {
-        log.debug("Loading LDAP user details for user: " + username);
+        log.debug( "Loading LDAP user details for user: " + username );
 
-        return userDetailsService.loadUserByUsername(username);
+        return userDetailsService.loadUserByUsername( username );
 
     }
 

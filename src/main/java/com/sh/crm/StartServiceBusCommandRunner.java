@@ -1,6 +1,5 @@
 package com.sh.crm;
 
-import com.sh.crm.jpa.entities.Ticket;
 import com.sh.crm.jpa.repos.notifications.EmailTemplatesRepo;
 import com.sh.crm.jpa.repos.tickets.TicketsRepo;
 import com.sh.crm.services.notification.Config;

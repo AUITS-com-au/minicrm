@@ -6,8 +6,6 @@ import com.sh.crm.jpa.entities.Users;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,6 +27,7 @@ public class GroupHolder {
     public GroupHolder() {
 
     }
+
     public String getName() {
         return name;
     }

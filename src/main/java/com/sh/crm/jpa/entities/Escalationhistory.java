@@ -1,11 +1,9 @@
-
 package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
@@ -37,7 +35,6 @@ public class Escalationhistory {
     public Escalationhistory(Long id) {
         this.id = id;
     }
-
 
 
     public Long getId() {

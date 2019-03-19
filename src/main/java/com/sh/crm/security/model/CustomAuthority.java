@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 public class CustomAuthority implements GrantedAuthority {
     String authority;
+
     public CustomAuthority() {
 
     }

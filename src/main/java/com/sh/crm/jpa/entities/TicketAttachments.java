@@ -1,9 +1,6 @@
 package com.sh.crm.jpa.entities;
 
-import java.io.Serializable;
-import java.math.BigInteger;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity

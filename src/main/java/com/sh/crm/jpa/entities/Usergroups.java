@@ -25,18 +25,18 @@ public class Usergroups {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     protected Integer id;
-    @ManyToOne
-    @JoinColumn(name = "groupID")
-    private Groups groupID;
-    @ManyToOne
-    @JoinColumn(name = "userID")
-    private Users userID;
     @Column(name = "CreatedBy")
     @CreatedBy
     protected String createdBy;
     @CreatedDate
     @Column(name = "CreationDate")
     protected Date creationDate;
+    @ManyToOne
+    @JoinColumn(name = "groupID")
+    private Groups groupID;
+    @ManyToOne
+    @JoinColumn(name = "userID")
+    private Users userID;
 
     public Usergroups() {
     }
@@ -99,7 +99,7 @@ public class Usergroups {
             return false;
         }
         Usergroups other = (Usergroups) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;

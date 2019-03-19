@@ -22,7 +22,7 @@ import java.util.Set;
 @Service
 public class JwtUserDetailsServiceImpl implements UserDetailsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtUserDetailsServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger( JwtUserDetailsServiceImpl.class );
     @Autowired
     private UsersRepos userRepository;
     @Autowired
@@ -31,23 +31,23 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = userRepository.findByUserID(username);
+        Users user = userRepository.findByUserID( username );
         if (user == null) {
             if (logger.isErrorEnabled())
-                logger.info("User: " + username + " not found");
-            throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
+                logger.info( "User: " + username + " not found" );
+            throw new UsernameNotFoundException( String.format( "No user found with username '%s'.", username ) );
         } else {
             if (logger.isDebugEnabled())
-                logger.debug("User :" + username + " found, loading information");
+                logger.debug( "User :" + username + " found, loading information" );
             return JwtUserFactory.create( user, getUserAuthorities( user.getUserID() ) );
         }
     }
 
     public List<Permissions> getUserAuthorities(String id) {
 
-        List<Permissions> userAuthorities = permissionsRepo.usersPermission(id);
+        List<Permissions> userAuthorities = permissionsRepo.usersPermission( id );
         if (logger.isDebugEnabled())
-            logger.debug("User Authorities loaded: " + userAuthorities);
+            logger.debug( "User Authorities loaded: " + userAuthorities );
 
         return userAuthorities;
     }
@@ -58,7 +58,7 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
         Set<CustomAuthority> activeAuth = new HashSet<>();
         if (allAuth != null) {
             for (Permissions auth : allAuth) {
-                activeAuth.add(new CustomAuthority(auth.getPermission()));
+                activeAuth.add( new CustomAuthority( auth.getPermission() ) );
             }
         }
 
