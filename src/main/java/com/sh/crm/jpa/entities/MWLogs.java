@@ -21,9 +21,7 @@ public class MWLogs implements Serializable {
     @Column(name = "DateTime")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateTime;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
+    @Size(max = 10)
     @Column(name = "CustomerNumber")
     private String customerNumber;
     @Basic(optional = false)

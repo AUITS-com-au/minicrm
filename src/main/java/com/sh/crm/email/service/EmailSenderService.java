@@ -36,7 +36,7 @@ public class EmailSenderService {
     private String sendingTime;
 
 
-    @Scheduled(fixedRate = emailPeriod)
+   // @Scheduled(fixedRate = emailPeriod)
     void emailSchedule() throws Exception {
 
         if (calendarRepo.findByIsHolidayFalseAndIsWeekdayTrueAndDate( Date.from( LocalDate.now().atStartOfDay( ZoneId.systemDefault() ).toInstant() ) ) == null) {

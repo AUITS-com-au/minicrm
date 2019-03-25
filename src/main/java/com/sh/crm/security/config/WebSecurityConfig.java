@@ -94,7 +94,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and()
 
-                .authorizeRequests().antMatchers( "/auth/**", "/metrics/**", "/v2/**", "/favicon.ico", "/swagger/**" ).permitAll().antMatchers( HttpMethod.OPTIONS, "/**" )
+                .authorizeRequests().antMatchers( "/auth/**", "/metrics/**", "/v2/**", "/favicon.ico", "/swagger/**","/ws/users/**" ).permitAll().antMatchers( HttpMethod.OPTIONS, "/**" )
                 .permitAll().anyRequest().authenticated();
 
         // Custom JWT based security filter
