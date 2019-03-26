@@ -26,19 +26,21 @@ public class UserWebServicesImpl {
             break;}
             case 2:{
                 WSResponseHolder<GetCustomerNoFromIdResponse> holder = getCustomerNoFromId(inputValue,lang);
-                if(holder != null && !holder.getValue().getCustomerList().getCustomerName().isEmpty()) {
+                if(holder != null && holder.getValue().getCustomerList() != null && !holder.getValue().getCustomerList().getCustomerName().isEmpty()) {
                     customerBasic = holder.getValue().getCustomerList().getCustomerName().get(0).getCustomerNo();
                 }
                 break;
             }
             case 3:{
                 WSResponseHolder<GetCustomerNoFromMobileResponse> holder = getCustomerNoFromMobile(inputValue,lang);
-                if(holder != null && !holder.getValue().getCustomerList().getCustomerName().isEmpty()) {
+                if(holder != null && holder.getValue().getCustomerList() != null && !holder.getValue().getCustomerList().getCustomerName().isEmpty()) {
                     customerBasic = holder.getValue().getCustomerList().getCustomerName().get(0).getCustomerNo();
                 }
                 break;
             }
         }
+
+
 
         GetCustomerProfileRequest request = new GetCustomerProfileRequest();
         WSResponseHolder<GetCustomerProfileResponse> wsResponseHolder;
@@ -48,10 +50,14 @@ public class UserWebServicesImpl {
         Holder<GetCustomerProfileResponse> customerProfileResponseHolder = new Holder<>();
         Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
         try {
+            if(customerBasic.equals("")){
+                throw new Exception("Customer Not Found");
+            }
             usersServicesProxy.getProxyService().getCustomerProfile( request, requestHeader, customerProfileResponseHolder, responseHeaderHolder );
             int status = usersServicesProxy.handleResponse( responseHeaderHolder );
 
             if (status == 0) {
+                customerProfileResponseHolder.value.getCaa().setCustomerNo(customerBasic);
                 wsResponseHolder = new WSResponseHolder<>( status, customerProfileResponseHolder.value );
             } else {
                 wsResponseHolder = new WSResponseHolder<>( status, null );
