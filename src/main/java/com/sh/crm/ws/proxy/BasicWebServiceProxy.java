@@ -51,4 +51,17 @@ public abstract class BasicWebServiceProxy<T> {
         return -1;
     }
 
+
+    public WSResponseHolder<?> handleResponseBody(Holder<ResponseHeader> responseHeaderHolder, Holder<?> responseHolder) {
+        WSResponseHolder wsResponseHolder = null;
+        int status = handleResponse(responseHeaderHolder);
+        if (status == 0) {
+            wsResponseHolder = new WSResponseHolder<>(status, responseHolder.value);
+        } else {
+            wsResponseHolder = new WSResponseHolder<>(status, null);
+            wsResponseHolder.setResponseHeader(responseHeaderHolder.value);
+        }
+        return wsResponseHolder;
+    }
+
 }
