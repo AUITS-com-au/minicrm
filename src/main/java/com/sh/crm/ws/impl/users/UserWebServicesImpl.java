@@ -58,14 +58,13 @@ public class UserWebServicesImpl extends WebServiceGeneral {
         Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
         try {
             usersServicesProxy.getProxyService().getCustomerProfile(request, requestHeader, customerProfileResponseHolder, responseHeaderHolder);
+            customerProfileResponseHolder.value.getCaa().setCustomerNo(customerBasic);
             wsResponseHolder = usersServicesProxy.handleResponseBody(responseHeaderHolder, customerProfileResponseHolder);
         } catch (Exception e) {
             e.printStackTrace();
             wsResponseHolder = generateFailureResponse();
         }
-
         return wsResponseHolder;
-
     }
 
     public WSResponseHolder getCustomerIncomeSource(String customerBasic, String lang) {
