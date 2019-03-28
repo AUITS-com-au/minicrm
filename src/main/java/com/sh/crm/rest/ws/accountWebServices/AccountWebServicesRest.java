@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -43,6 +42,5 @@ public class AccountWebServicesRest extends GeneralWSRest {
             return handleResponse(wsResponseHolder, true);
         } else
             return handleResponse(wsResponseHolder);
-
     }
 }

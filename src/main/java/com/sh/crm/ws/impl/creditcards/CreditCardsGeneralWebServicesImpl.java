@@ -41,6 +41,4 @@ public class CreditCardsGeneralWebServicesImpl extends WebServiceGeneral {
 
         return wsResponseHolder;
     }
-
-
 }
