@@ -66,7 +66,7 @@ public class AccountWebServicesImpl extends WebServiceGeneral {
             fromCal.setTimeInMillis(fromDate);
             toCal.setTimeInMillis(toDate);
             request.setFromDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(fromCal));
-             request.setAmountFrom(BigDecimal.ONE);
+            request.setAmountFrom(BigDecimal.ONE);
             request.setToDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(toCal));
             accountServicesProxy.getProxyService().getAccountTransactionList(request, requestHeader, responseHolder, responseHeaderHolder);
             wsResponseHolder = accountServicesProxy.handleResponseBody(responseHeaderHolder, responseHolder);
