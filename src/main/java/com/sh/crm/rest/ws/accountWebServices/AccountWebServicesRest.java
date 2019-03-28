@@ -2,6 +2,8 @@ package com.sh.crm.rest.ws.accountWebServices;
 
 
 import com.sh.crm.general.holders.ws.AccountTransactionsRequest;
+import com.sh.crm.general.holders.ws.enums.MWServiceName;
+import com.sh.crm.jpa.entities.ServiceAuditLog;
 import com.sh.crm.rest.ws.GeneralWSRest;
 import com.sh.crm.ws.impl.account.AccountWebServicesImpl;
 import com.sh.crm.ws.proxy.WSResponseHolder;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -26,21 +30,24 @@ public class AccountWebServicesRest extends GeneralWSRest {
     ResponseEntity<?> getCustomerAccounts(@PathVariable("customerBasic") String customerBasic,
                                           @PathVariable("lang") String lang,
                                           @PathVariable("idnumber") String idnumber,
-                                          @PathVariable("segment") String segment) {
-        WSResponseHolder<GetAccountsListResponse> wsResponseHolder = accountWebServices.getAccountList(customerBasic, idnumber, lang);
-
-        if (maskedSegments != null && maskedSegments.contains(segment)) {
-            return handleResponse(wsResponseHolder, true);
+                                          @PathVariable("segment") String segment,
+                                          HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getServiceAuditLog( httpServletRequest, MWServiceName.ACCOUNT_LIST, customerBasic );
+        serviceAuditLog = auditLogRepo.save( serviceAuditLog );
+        WSResponseHolder<GetAccountsListResponse> wsResponseHolder = accountWebServices.getAccountList( customerBasic, idnumber, lang );
+        updateSuccessAuditLog( serviceAuditLog );
+        if (maskedSegments != null && maskedSegments.contains( segment )) {
+            return handleResponse( wsResponseHolder, true );
         } else
-            return handleResponse(wsResponseHolder);
+            return handleResponse( wsResponseHolder );
     }
 
     @PostMapping("accountTransactions")
     ResponseEntity<?> getAccountTransactions(@RequestBody AccountTransactionsRequest request) {
-        WSResponseHolder wsResponseHolder = accountWebServices.getAccountTransaction(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo(), request.getFromDate(), request.getToDate());
-        if (maskedSegments != null && maskedSegments.contains(request.getSegment())) {
-            return handleResponse(wsResponseHolder, true);
+        WSResponseHolder wsResponseHolder = accountWebServices.getAccountTransaction( request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo(), request.getFromDate(), request.getToDate() );
+        if (maskedSegments != null && maskedSegments.contains( request.getSegment() )) {
+            return handleResponse( wsResponseHolder, true );
         } else
-            return handleResponse(wsResponseHolder);
+            return handleResponse( wsResponseHolder );
     }
 }
