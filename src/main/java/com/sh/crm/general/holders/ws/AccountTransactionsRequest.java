@@ -10,9 +10,27 @@ public class AccountTransactionsRequest {
     private String idnumber;
     private long fromDate;
     private long toDate;
+    private int statementType;
+    private String email;
 
     public AccountTransactionsRequest() {
 
+    }
+
+    public int getStatementType() {
+        return statementType;
+    }
+
+    public void setStatementType(int statementType) {
+        this.statementType = statementType;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public AccountNo getAccountNo() {

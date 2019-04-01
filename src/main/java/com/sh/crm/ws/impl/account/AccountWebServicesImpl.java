@@ -3,10 +3,7 @@ package com.sh.crm.ws.impl.account;
 import com.sh.crm.ws.impl.WebServiceGeneral;
 import com.sh.crm.ws.proxy.WSResponseHolder;
 import com.sh.crm.ws.proxy.account.AccountServicesProxy;
-import com.sh.ws.accountService.GetAccountTransactionListRequest;
-import com.sh.ws.accountService.GetAccountTransactionListResponse;
-import com.sh.ws.accountService.GetAccountsListRequest;
-import com.sh.ws.accountService.GetAccountsListResponse;
+import com.sh.ws.accountService.*;
 import com.sh.ws.request.RequestHeader;
 import com.sh.ws.response.ResponseHeader;
 import com.sh.ws.userServices.retailservices.baj.com.Account;
@@ -78,4 +75,93 @@ public class AccountWebServicesImpl extends WebServiceGeneral {
         return wsResponseHolder;
     }
 
+    public WSResponseHolder sendAccountStatement(String customerBasic, String idnumber, String lang, AccountNo account, int sendType, long fromDate, long
+            toDate, String email) {
+        WSResponseHolder<?> wsResponseHolder = null;
+        SendAccountStatementRequest request = new SendAccountStatementRequest();
+        RequestHeader requestHeader = accountServicesProxy.getRequestHeader(customerBasic, idnumber, lang);
+        request.setCustomerNo(customerBasic);
+        request.setAccountNo(account);
+        if (sendType == 1) {
+            //email
+            request.setEmail(email);
+            request.setSendEmail(true);
+        } else {
+            request.setSendMail(true);
+        }
+
+        Holder<SendAccountStatementResponse> responseHolder = new Holder<>();
+        Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
+        try {
+            final GregorianCalendar fromCal = new GregorianCalendar();
+            final GregorianCalendar toCal = new GregorianCalendar();
+            fromCal.setTimeInMillis(fromDate);
+            toCal.setTimeInMillis(toDate);
+            request.setFromDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(fromCal));
+            request.setToDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(toCal));
+            accountServicesProxy.getProxyService().sendAccountStatement(request, requestHeader, responseHolder, responseHeaderHolder);
+            wsResponseHolder = accountServicesProxy.handleResponseBody(responseHeaderHolder, responseHolder);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            wsResponseHolder = generateFailureResponse();
+        }
+        return wsResponseHolder;
+    }
+
+    public WSResponseHolder sendAccountIBANSMS(String customerBasic, String idnumber, String lang, AccountNo account) {
+        WSResponseHolder<?> wsResponseHolder = null;
+        SendIBANSMSRequest request = new SendIBANSMSRequest();
+        RequestHeader requestHeader = accountServicesProxy.getRequestHeader(customerBasic, idnumber, lang);
+        request.setCustomerNo(customerBasic);
+        request.setAccountNo(account);
+        Holder<SendIBANSMSResponse> responseHolder = new Holder<>();
+        Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
+        try {
+            accountServicesProxy.getProxyService().sendIBANSMS(request, requestHeader, responseHolder, responseHeaderHolder);
+            wsResponseHolder = accountServicesProxy.handleResponseBody(responseHeaderHolder, responseHolder);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            wsResponseHolder = generateFailureResponse();
+        }
+        return wsResponseHolder;
+    }
+
+    public WSResponseHolder chequeBookStatus(String customerBasic, String idnumber, String lang, AccountNo account) {
+        WSResponseHolder<?> wsResponseHolder = null;
+        GetChequeBookStatusRequest request = new GetChequeBookStatusRequest();
+        RequestHeader requestHeader = accountServicesProxy.getRequestHeader(customerBasic, idnumber, lang);
+        request.setAccountNo(account);
+        Holder<GetChequeBookStatusResponse> responseHolder = new Holder<>();
+        Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
+        try {
+            accountServicesProxy.getProxyService().getChequeBookStatus(request, requestHeader, responseHolder, responseHeaderHolder);
+            wsResponseHolder = accountServicesProxy.handleResponseBody(responseHeaderHolder, responseHolder);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            wsResponseHolder = generateFailureResponse();
+        }
+        return wsResponseHolder;
+    }
+
+    public WSResponseHolder chequeBookRequest(String customerBasic, String idnumber, String lang, AccountNo account) {
+        WSResponseHolder<?> wsResponseHolder = null;
+        ChequeBookRequestRequest request = new ChequeBookRequestRequest();
+        RequestHeader requestHeader = accountServicesProxy.getRequestHeader(customerBasic, idnumber, lang);
+        request.setAccountNumber(account);
+        request.setBranchCode(account.getBranch());
+        Holder<ChequeBookRequestResponse> responseHolder = new Holder<>();
+        Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
+        try {
+            accountServicesProxy.getProxyService().chequeBookRequest(request, requestHeader, responseHolder, responseHeaderHolder);
+            wsResponseHolder = accountServicesProxy.handleResponseBody(responseHeaderHolder, responseHolder);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            wsResponseHolder = generateFailureResponse();
+        }
+        return wsResponseHolder;
+    }
 }

@@ -32,22 +32,46 @@ public class AccountWebServicesRest extends GeneralWSRest {
                                           @PathVariable("idnumber") String idnumber,
                                           @PathVariable("segment") String segment,
                                           HttpServletRequest httpServletRequest) {
-        ServiceAuditLog serviceAuditLog = getServiceAuditLog( httpServletRequest, MWServiceName.ACCOUNT_LIST, customerBasic );
-        serviceAuditLog = auditLogRepo.save( serviceAuditLog );
-        WSResponseHolder<GetAccountsListResponse> wsResponseHolder = accountWebServices.getAccountList( customerBasic, idnumber, lang );
-        updateSuccessAuditLog( serviceAuditLog );
-        if (maskedSegments != null && maskedSegments.contains( segment )) {
-            return handleResponse( wsResponseHolder, true );
+        ServiceAuditLog serviceAuditLog = getServiceAuditLog(httpServletRequest, MWServiceName.ACCOUNT_LIST, customerBasic);
+        serviceAuditLog = auditLogRepo.save(serviceAuditLog);
+        WSResponseHolder<GetAccountsListResponse> wsResponseHolder = accountWebServices.getAccountList(customerBasic, idnumber, lang);
+        updateSuccessAuditLog(serviceAuditLog);
+        if (maskedSegments != null && maskedSegments.contains(segment)) {
+            return handleResponse(wsResponseHolder, true);
         } else
-            return handleResponse( wsResponseHolder );
+            return handleResponse(wsResponseHolder);
     }
 
     @PostMapping("accountTransactions")
     ResponseEntity<?> getAccountTransactions(@RequestBody AccountTransactionsRequest request) {
-        WSResponseHolder wsResponseHolder = accountWebServices.getAccountTransaction( request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo(), request.getFromDate(), request.getToDate() );
-        if (maskedSegments != null && maskedSegments.contains( request.getSegment() )) {
-            return handleResponse( wsResponseHolder, true );
+        WSResponseHolder wsResponseHolder = accountWebServices.getAccountTransaction(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo(), request.getFromDate(), request.getToDate());
+        if (maskedSegments != null && maskedSegments.contains(request.getSegment())) {
+            return handleResponse(wsResponseHolder, true);
         } else
-            return handleResponse( wsResponseHolder );
+            return handleResponse(wsResponseHolder);
+    }
+
+    @PostMapping("sendAccountStatement")
+    ResponseEntity<?> sendAccountStmt(@RequestBody AccountTransactionsRequest request) {
+        WSResponseHolder wsResponseHolder = accountWebServices.sendAccountStatement(request.getCustomerBasic(), request.getIdnumber(),
+                request.getLang(), request.getAccountNo(), request.getStatementType(), request.getFromDate(),
+                request.getToDate(), request.getEmail());
+        return handleResponse(wsResponseHolder);
+    }
+
+    @PostMapping("sendIBANSMS")
+    ResponseEntity<?> sendIBANSMS(@RequestBody AccountTransactionsRequest request) {
+        WSResponseHolder wsResponseHolder = accountWebServices.sendAccountIBANSMS(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo());
+        return handleResponse(wsResponseHolder);
+    }
+    @PostMapping("chequeBookStatus")
+    ResponseEntity<?> chequeBookStatus(@RequestBody AccountTransactionsRequest request) {
+        WSResponseHolder wsResponseHolder = accountWebServices.chequeBookStatus(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo());
+        return handleResponse(wsResponseHolder);
+    }
+    @PostMapping("chequeBookRequest")
+    ResponseEntity<?> chequeBookRequest(@RequestBody AccountTransactionsRequest request) {
+        WSResponseHolder wsResponseHolder = accountWebServices.chequeBookRequest(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo());
+        return handleResponse(wsResponseHolder);
     }
 }
