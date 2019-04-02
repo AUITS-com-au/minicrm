@@ -6,7 +6,10 @@ import com.sh.ws.response.ResponseState;
 import com.sh.ws.userServices.retailservices.baj.com.PagingInfo;
 import com.sh.ws.userServices.retailservices.baj.com.SortOrder;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigInteger;
+import java.util.GregorianCalendar;
 
 public abstract class WebServiceGeneral {
 
@@ -27,5 +30,16 @@ public abstract class WebServiceGeneral {
         pagingInfo.setOrderBy("");
         pagingInfo.setTotalRecords(BigInteger.valueOf(1000));
         return pagingInfo;
+    }
+
+    public XMLGregorianCalendar getXmlGregorianCalendar(long value) {
+        try {
+            final GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(value);
+            return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -58,13 +58,11 @@ public class AccountWebServicesImpl extends WebServiceGeneral {
         Holder<GetAccountTransactionListResponse> responseHolder = new Holder<>();
         Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
         try {
-            final GregorianCalendar fromCal = new GregorianCalendar();
-            final GregorianCalendar toCal = new GregorianCalendar();
-            fromCal.setTimeInMillis(fromDate);
-            toCal.setTimeInMillis(toDate);
-            request.setFromDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(fromCal));
+
+            request.setFromDate(getXmlGregorianCalendar(fromDate));
+            request.setToDate(getXmlGregorianCalendar(toDate));
             request.setAmountFrom(BigDecimal.ONE);
-            request.setToDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(toCal));
+
             accountServicesProxy.getProxyService().getAccountTransactionList(request, requestHeader, responseHolder, responseHeaderHolder);
             wsResponseHolder = accountServicesProxy.handleResponseBody(responseHeaderHolder, responseHolder);
 
@@ -93,12 +91,8 @@ public class AccountWebServicesImpl extends WebServiceGeneral {
         Holder<SendAccountStatementResponse> responseHolder = new Holder<>();
         Holder<ResponseHeader> responseHeaderHolder = new Holder<>();
         try {
-            final GregorianCalendar fromCal = new GregorianCalendar();
-            final GregorianCalendar toCal = new GregorianCalendar();
-            fromCal.setTimeInMillis(fromDate);
-            toCal.setTimeInMillis(toDate);
-            request.setFromDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(fromCal));
-            request.setToDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(toCal));
+            request.setFromDate(getXmlGregorianCalendar(fromDate));
+            request.setToDate(getXmlGregorianCalendar(toDate));
             accountServicesProxy.getProxyService().sendAccountStatement(request, requestHeader, responseHolder, responseHeaderHolder);
             wsResponseHolder = accountServicesProxy.handleResponseBody(responseHeaderHolder, responseHolder);
 
