@@ -103,8 +103,6 @@ public class UserWebServicesImpl extends WebServiceGeneral {
         }
         return wsResponseHolder;
     }
-
-
     public WSResponseHolder getCustomerNoFromMobile(String mobileNo, String lang) {
         WSResponseHolder<?> wsResponseHolder = null;
         GetCustomerNoFromMobileRequest request = new GetCustomerNoFromMobileRequest();
@@ -122,12 +120,9 @@ public class UserWebServicesImpl extends WebServiceGeneral {
         }
         return wsResponseHolder;
     }
-
-
     public WSResponseHolder getCustomerPersona(String customerBasic, String lang) {
         WSResponseHolder<?> wsResponseHolder = null;
         GetCustomerPersonaRequest request = new GetCustomerPersonaRequest();
-
         request.setCustomerNo(customerBasic);
         RequestHeader requestHeader = usersServicesProxy.getRequestHeader(customerBasic, null, lang);
         Holder<GetCustomerPersonaResponse> customerPersonaResponseHolder = new Holder<>();

@@ -27,10 +27,10 @@ public class UserWebServicesRest extends GeneralWSRest {
                                                 @PathVariable("inputType") int inputType,
                                                 @PathVariable("lang") String lang,
                                                 HttpServletRequest httpServletRequest) {
-        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, inputValue );
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, inputValue, MWServiceName.GET_CUSTOMERNO_BY_INPUT );
+        serviceAuditLog.setExtField1( String.valueOf( inputType ) );
         WSResponseHolder<GetCustomerProfileResponse> wsResponseHolder = userWebServices.getCustomerProfileByInput( inputValue, inputType, lang );
         updateSuccessAuditLog( serviceAuditLog );
-
         return handleResponse( wsResponseHolder );
     }
 
@@ -40,7 +40,7 @@ public class UserWebServicesRest extends GeneralWSRest {
             @PathVariable("customerBasic") String customerBasic,
             @PathVariable("lang") String lang,
             HttpServletRequest httpServletRequest) {
-        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, customerBasic );
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, customerBasic, MWServiceName.CUSTOMER_PROFILE );
         WSResponseHolder<GetCustomerProfileResponse> wsResponseHolder = userWebServices.getCustomerProfile( customerBasic, lang );
         updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
@@ -48,54 +48,82 @@ public class UserWebServicesRest extends GeneralWSRest {
 
 
     @GetMapping("customerIncome/{customerBasic}/{lang}")
-    ResponseEntity<?> getCustomerIncome(@PathVariable("customerBasic") String customerBasic, @PathVariable("lang") String lang) {
+    ResponseEntity<?> getCustomerIncome(@PathVariable("customerBasic") String customerBasic,
+                                        @PathVariable("lang") String lang,
+                                        HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, customerBasic, MWServiceName.GET_CUSTOMER_INCOME );
         WSResponseHolder<GetCustomerIncomeSourceResponse> wsResponseHolder = userWebServices.getCustomerIncomeSource( customerBasic, lang );
+        updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
     }
 
 
     @GetMapping("customerNoFromID/{nationalID}/{lang}")
-    ResponseEntity<?> getCustomerNoFromId(@PathVariable("nationalID") String nationalID, @PathVariable("lang") String lang) {
+    ResponseEntity<?> getCustomerNoFromId(@PathVariable("nationalID") String nationalID,
+                                          @PathVariable("lang") String lang,
+                                          HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, nationalID, MWServiceName.GET_CUSTOMER_BY_ID );
         WSResponseHolder<GetCustomerNoFromIdResponse> wsResponseHolder = userWebServices.getCustomerNoFromId( nationalID, lang );
+        updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
     }
 
     @GetMapping("customerNoFromMobile/{mobileNo}/{lang}")
-    ResponseEntity<?> getCustomerNoFromMobile(@PathVariable("mobileNo") String mobileNo, @PathVariable("lang") String lang) {
+    ResponseEntity<?> getCustomerNoFromMobile(@PathVariable("mobileNo") String mobileNo,
+                                              @PathVariable("lang") String lang,
+                                              HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, mobileNo, MWServiceName.GET_CUSTOMER_BY_MOBILE );
         WSResponseHolder<GetCustomerNoFromMobileResponse> wsResponseHolder = userWebServices.getCustomerNoFromMobile( mobileNo, lang );
+        updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
     }
 
 
     @GetMapping("customerPersona/{customerBasic}/{lang}")
-    ResponseEntity<?> getCustomerPersona(@PathVariable("customerBasic") String customerBasic, @PathVariable("lang") String lang) {
+    ResponseEntity<?> getCustomerPersona(@PathVariable("customerBasic") String customerBasic,
+                                         @PathVariable("lang") String lang,
+                                         HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, customerBasic, MWServiceName.GET_CUSTOMER_PERSONA );
         WSResponseHolder<GetCustomerPersonaResponse> wsResponseHolder = userWebServices.getCustomerPersona( customerBasic, lang );
+        updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
     }
 
 
     @GetMapping("customerRM/{customerBasic}/{lang}")
-    ResponseEntity<?> getCustomerRM(@PathVariable("customerBasic") String customerBasic, @PathVariable("lang") String lang) {
+    ResponseEntity<?> getCustomerRM(@PathVariable("customerBasic") String customerBasic,
+                                    @PathVariable("lang") String lang,
+                                    HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, customerBasic, MWServiceName.GET_CUSTOMER_RM );
         WSResponseHolder<GetCustomerRMResponse> wsResponseHolder = userWebServices.getCustomerRM( customerBasic, lang );
+        updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
     }
 
 
     @GetMapping("employeeDetails/{userID}/{lang}")
-    ResponseEntity<?> getEmployeeDetail(@PathVariable("userID") String userID, @PathVariable("lang") String lang) {
+    ResponseEntity<?> getEmployeeDetail(@PathVariable("userID") String userID,
+                                        @PathVariable("lang") String lang,
+                                        HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, userID, MWServiceName.GET_CUSTOMER_EMPLOYER_DETAILS );
         WSResponseHolder<GetEmployeeDetailResponse> wsResponseHolder = userWebServices.getEmployeeDetail( userID, lang );
+        updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
     }
 
     @GetMapping("spouseDetails/{customerBasic}/{lang}")
-    ResponseEntity<?> getSpouseDetails(@PathVariable("customerBasic") String customerBasic, @PathVariable("lang") String lang) {
+    ResponseEntity<?> getSpouseDetails(@PathVariable("customerBasic") String customerBasic,
+                                       @PathVariable("lang") String lang,
+                                       HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, customerBasic, MWServiceName.GET_CUSTOMER_SPOUSE );
         WSResponseHolder<GetSpouseDetailsResponse> wsResponseHolder = userWebServices.getSpouseDetails( customerBasic, lang );
+        updateSuccessAuditLog( serviceAuditLog );
         return handleResponse( wsResponseHolder );
     }
 
-    private ServiceAuditLog getAudits(HttpServletRequest httpServletRequest, String customerBasic) {
+   /* private ServiceAuditLog getAudits(HttpServletRequest httpServletRequest, String customerBasic) {
         ServiceAuditLog serviceAuditLog = getServiceAuditLog( httpServletRequest, MWServiceName.CUSTOMER_PROFILE, customerBasic );
         serviceAuditLog = auditLogRepo.save( serviceAuditLog );
         return serviceAuditLog;
-    }
+    }*/
 }

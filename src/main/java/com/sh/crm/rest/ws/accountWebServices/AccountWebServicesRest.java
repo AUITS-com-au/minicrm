@@ -32,46 +32,72 @@ public class AccountWebServicesRest extends GeneralWSRest {
                                           @PathVariable("idnumber") String idnumber,
                                           @PathVariable("segment") String segment,
                                           HttpServletRequest httpServletRequest) {
-        ServiceAuditLog serviceAuditLog = getServiceAuditLog(httpServletRequest, MWServiceName.ACCOUNT_LIST, customerBasic);
-        serviceAuditLog = auditLogRepo.save(serviceAuditLog);
-        WSResponseHolder<GetAccountsListResponse> wsResponseHolder = accountWebServices.getAccountList(customerBasic, idnumber, lang);
-        updateSuccessAuditLog(serviceAuditLog);
-        if (maskedSegments != null && maskedSegments.contains(segment)) {
-            return handleResponse(wsResponseHolder, true);
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, customerBasic, MWServiceName.ACCOUNTS_LIST );
+        WSResponseHolder<GetAccountsListResponse> wsResponseHolder = accountWebServices.getAccountList( customerBasic, idnumber, lang );
+        updateSuccessAuditLog( serviceAuditLog );
+        if (maskedSegments != null && maskedSegments.contains( segment )) {
+            return handleResponse( wsResponseHolder, true );
         } else
-            return handleResponse(wsResponseHolder);
+            return handleResponse( wsResponseHolder );
     }
 
     @PostMapping("accountTransactions")
-    ResponseEntity<?> getAccountTransactions(@RequestBody AccountTransactionsRequest request) {
-        WSResponseHolder wsResponseHolder = accountWebServices.getAccountTransaction(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo(), request.getFromDate(), request.getToDate());
-        if (maskedSegments != null && maskedSegments.contains(request.getSegment())) {
-            return handleResponse(wsResponseHolder, true);
+    ResponseEntity<?> getAccountTransactions(@RequestBody AccountTransactionsRequest request,
+                                             HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, request.getCustomerBasic(), MWServiceName.ACCOUNTS_LIST );
+        serviceAuditLog.setAccountNo( request.getAccountNo().toString() );
+        WSResponseHolder wsResponseHolder = accountWebServices.getAccountTransaction( request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo(), request.getFromDate(), request.getToDate() );
+        updateSuccessAuditLog( serviceAuditLog );
+        if (maskedSegments != null && maskedSegments.contains( request.getSegment() )) {
+            return handleResponse( wsResponseHolder, true );
         } else
-            return handleResponse(wsResponseHolder);
+            return handleResponse( wsResponseHolder );
     }
 
     @PostMapping("sendAccountStatement")
-    ResponseEntity<?> sendAccountStmt(@RequestBody AccountTransactionsRequest request) {
-        WSResponseHolder wsResponseHolder = accountWebServices.sendAccountStatement(request.getCustomerBasic(), request.getIdnumber(),
+    ResponseEntity<?> sendAccountStmt(@RequestBody AccountTransactionsRequest request,
+                                      HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, request.getCustomerBasic(), MWServiceName.ACCOUNT_STMT );
+        serviceAuditLog.setAccountNo( request.getAccountNo().toString() );
+
+        serviceAuditLog.setExtField1( String.valueOf( request.getStatementType() ) );
+        serviceAuditLog.setExtField2( request.getEmail() );
+        serviceAuditLog.setExtField3( getFormattedDateFromLong( request.getFromDate() ) );
+        serviceAuditLog.setExtField4( getFormattedDateFromLong( request.getToDate() ) );
+        WSResponseHolder wsResponseHolder = accountWebServices.sendAccountStatement( request.getCustomerBasic(), request.getIdnumber(),
                 request.getLang(), request.getAccountNo(), request.getStatementType(), request.getFromDate(),
-                request.getToDate(), request.getEmail());
-        return handleResponse(wsResponseHolder);
+                request.getToDate(), request.getEmail() );
+        updateSuccessAuditLog( serviceAuditLog );
+        return handleResponse( wsResponseHolder );
     }
 
     @PostMapping("sendIBANSMS")
-    ResponseEntity<?> sendIBANSMS(@RequestBody AccountTransactionsRequest request) {
-        WSResponseHolder wsResponseHolder = accountWebServices.sendAccountIBANSMS(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo());
-        return handleResponse(wsResponseHolder);
+    ResponseEntity<?> sendIBANSMS(@RequestBody AccountTransactionsRequest request,
+                                  HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, request.getCustomerBasic(), MWServiceName.ACCOUNT_IBAN_SMS );
+        serviceAuditLog.setAccountNo( request.getAccountNo().toString() );
+        WSResponseHolder wsResponseHolder = accountWebServices.sendAccountIBANSMS( request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo() );
+        updateSuccessAuditLog( serviceAuditLog );
+        return handleResponse( wsResponseHolder );
     }
+
     @PostMapping("chequeBookStatus")
-    ResponseEntity<?> chequeBookStatus(@RequestBody AccountTransactionsRequest request) {
-        WSResponseHolder wsResponseHolder = accountWebServices.chequeBookStatus(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo());
-        return handleResponse(wsResponseHolder);
+    ResponseEntity<?> chequeBookStatus(@RequestBody AccountTransactionsRequest request,
+                                       HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest, request.getCustomerBasic(), MWServiceName.ACCOUNT_CHEQUE_BOOK_STATUS );
+        serviceAuditLog.setAccountNo( request.getAccountNo().toString() );
+        WSResponseHolder wsResponseHolder = accountWebServices.chequeBookStatus( request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo() );
+        updateSuccessAuditLog( serviceAuditLog );
+        return handleResponse( wsResponseHolder );
     }
+
     @PostMapping("chequeBookRequest")
-    ResponseEntity<?> chequeBookRequest(@RequestBody AccountTransactionsRequest request) {
-        WSResponseHolder wsResponseHolder = accountWebServices.chequeBookRequest(request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo());
-        return handleResponse(wsResponseHolder);
+    ResponseEntity<?> chequeBookRequest(@RequestBody AccountTransactionsRequest request, HttpServletRequest httpServletRequest) {
+        ServiceAuditLog serviceAuditLog = getAudits( httpServletRequest,
+                request.getCustomerBasic(), MWServiceName.ACCOUNT_CHEQUE_BOOK_REQUEST );
+        serviceAuditLog.setAccountNo( request.getAccountNo().toString() );
+        WSResponseHolder wsResponseHolder = accountWebServices.chequeBookRequest( request.getCustomerBasic(), request.getIdnumber(), request.getLang(), request.getAccountNo() );
+        updateSuccessAuditLog( serviceAuditLog );
+        return handleResponse( wsResponseHolder );
     }
 }

@@ -17,10 +17,14 @@ import org.springframework.scheduling.annotation.Async;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public abstract class GeneralWSRest {
     @Autowired
     protected ServiceAuditLogRepo auditLogRepo;
+    private static DateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd hh:MM:ss a" );
 
     @Async
     public void updateAuditLog(ServiceAuditLog auditLog) {
@@ -98,11 +102,23 @@ public abstract class GeneralWSRest {
         return xfHeader.split( "," )[0];
     }
 
-    public ServiceAuditLog getServiceAuditLog(HttpServletRequest httpRequest, MWServiceName serviceName, String customerNo) {
+    private ServiceAuditLog getServiceAuditLog(HttpServletRequest httpRequest, MWServiceName serviceName, String customerNo) {
         ServiceAuditLog serviceAuditLog = new ServiceAuditLog();
         serviceAuditLog.setIPAddress( getClientIP( httpRequest ) );
         serviceAuditLog.setServiceName( serviceName.toString() );
         serviceAuditLog.setCustomerID( customerNo );
         return serviceAuditLog;
+    }
+
+    protected ServiceAuditLog getAudits(HttpServletRequest httpServletRequest, String customerBasic, MWServiceName serviceName) {
+        ServiceAuditLog serviceAuditLog = getServiceAuditLog( httpServletRequest, serviceName, customerBasic );
+        serviceAuditLog = auditLogRepo.save( serviceAuditLog );
+        return serviceAuditLog;
+    }
+
+    protected String getFormattedDateFromLong(long dateLong) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis( dateLong );
+        return dateFormat.format( calendar.getTime() );
     }
 }
