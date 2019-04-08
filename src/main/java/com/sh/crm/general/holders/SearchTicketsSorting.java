@@ -25,4 +25,12 @@ public class SearchTicketsSorting {
     public void setSortType(int sortType) {
         this.sortType = sortType;
     }
+
+    @Override
+    public String toString() {
+        return "SearchTicketsSorting{" +
+                "sortBy='" + sortBy + '\'' +
+                ", sortType=" + sortType +
+                '}';
+    }
 }
