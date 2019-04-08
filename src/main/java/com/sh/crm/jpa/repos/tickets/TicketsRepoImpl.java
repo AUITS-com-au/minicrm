@@ -116,26 +116,31 @@ public class TicketsRepoImpl implements TicketsRepoCustom {
 
         if (st.getCustomerContainer() != null) {
             Join<Ticket, CustomerAccounts> joinCustomerAcc = root.join( Ticket_.customerAccount, JoinType.LEFT );
+            List<Predicate> customerPredicates = new ArrayList<>();
+
             if (st.getCustomerContainer().getCustomerBasic() != null && !st.getCustomerContainer().getCustomerBasic().isEmpty()) {
-                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_CI_F ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerBasic() ) ) );
+                customerPredicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_CI_F ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerBasic() ) ) );
             }
             if (st.getCustomerContainer().getCustomerMobile() != null && !st.getCustomerContainer().getCustomerMobile().isEmpty()) {
-                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.MOBILE ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerMobile() ) ) );
+                customerPredicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.MOBILE ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerMobile() ) ) );
             }
             if (st.getCustomerContainer().getCustomerName() != null && !st.getCustomerContainer().getCustomerName().isEmpty()) {
-                predicates.add( getCriteriaBuilder().or( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_NAME_AR ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerName() ) ), getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_NAME_EN ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerName() ) ) ) );
+                customerPredicates.add( getCriteriaBuilder().or( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_NAME_AR ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerName() ) ), getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.CUSTOMER_NAME_EN ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerName() ) ) ) );
             }
             if (st.getCustomerContainer().getCustomerBranch() != null && !st.getCustomerContainer().getCustomerBranch().isEmpty()) {
-                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.BRANCH_NAME ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerBranch() ) ) );
+                customerPredicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.BRANCH_NAME ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerBranch() ) ) );
             }
             if (st.getCustomerContainer().getCustomerSegment() != null && !st.getCustomerContainer().getCustomerSegment().isEmpty()) {
-                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.SEGMENT ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerSegment() ) ) );
+                customerPredicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.SEGMENT ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerSegment() ) ) );
             }
             if (st.getCustomerContainer().getNan() != null && !st.getCustomerContainer().getNan().isEmpty()) {
-                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.NIN ), getFormattedForSQLLike( st.getCustomerContainer().getNan() ) ) );
+                customerPredicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.NIN ), getFormattedForSQLLike( st.getCustomerContainer().getNan() ) ) );
             }
             if (st.getCustomerContainer().getCustomerEmail() != null && !st.getCustomerContainer().getCustomerEmail().isEmpty()) {
-                predicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.EMAIL ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerEmail() ) ) );
+                customerPredicates.add( getCriteriaBuilder().like( joinCustomerAcc.get( CustomerAccounts_.EMAIL ), getFormattedForSQLLike( st.getCustomerContainer().getCustomerEmail() ) ) );
+            }
+            if (customerPredicates != null && customerPredicates.size() > 0) {
+                predicates.add( getCriteriaBuilder().or( customerPredicates.toArray( new Predicate[]{} ) ) );
             }
         }
         return predicates;
