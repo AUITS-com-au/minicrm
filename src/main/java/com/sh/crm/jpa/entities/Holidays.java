@@ -92,6 +92,7 @@ public class Holidays extends BasicModel {
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
+
     @XmlTransient
     public List<Maincatholidays> getMaincatholidaysList() {
         return maincatholidaysList;
@@ -115,7 +116,7 @@ public class Holidays extends BasicModel {
             return false;
         }
         Holidays other = (Holidays) object;
-        if ((this.holidayID == null && other.holidayID != null) || (this.holidayID != null && !this.holidayID.equals(other.holidayID))) {
+        if ((this.holidayID == null && other.holidayID != null) || (this.holidayID != null && !this.holidayID.equals( other.holidayID ))) {
             return false;
         }
         return true;

@@ -5,29 +5,21 @@
  */
 package com.sh.crm.jpa.entities;
 
-import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
  * @author achah
  */
 @Entity
 @Table(name = "status")
 @XmlRootElement
- public class Status extends BasicModelWithIDInt {
+public class Status extends BasicModelWithIDInt {
 
     @Column(name = "ListOrder")
     private Integer listOrder;
@@ -142,7 +134,7 @@ import javax.xml.bind.annotation.XmlRootElement;
             return false;
         }
         Status other = (Status) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
@@ -152,5 +144,5 @@ import javax.xml.bind.annotation.XmlRootElement;
     public String toString() {
         return "com.sh.crm.jpa.entities.Status[ id=" + id + " ]";
     }
-    
+
 }

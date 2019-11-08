@@ -4,7 +4,6 @@ import com.sh.crm.jpa.entities.CustomerAccounts;
 import com.sh.crm.jpa.entities.Ticket;
 import com.sh.crm.jpa.entities.TicketExtData;
 import com.sh.crm.jpa.entities.Ticketdata;
-import com.sh.crm.services.storage.UploadFileResponse;
 
 import java.util.List;
 

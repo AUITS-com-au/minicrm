@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.StoredProcedureQuery;
-import javax.persistence.Tuple;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

@@ -13,6 +13,7 @@ public interface UsersRepos extends JpaRepository<Users, Integer> {
     Users findByUserID(String username);
 
     Users findByUserIDAndEnabledIsTrue(String username);
+
     @Override
     @Query("select u from Users u order by u.creationDate desc")
     List<Users> findAll();
@@ -34,8 +35,6 @@ public interface UsersRepos extends JpaRepository<Users, Integer> {
     List<Users> getUsersByUserName(Collection<String> userIDs);
 
     Users findByUserIDAndEnabledAndLDAPUser(String username, boolean enabled, boolean LDAPUser);
-
-
 
 
 }

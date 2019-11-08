@@ -46,15 +46,15 @@ public class TicketExtras {
         return ticketPriorityList;
     }
 
+    public void setTicketPriorityList(List<TicketPriorityHolder> ticketPriorityList) {
+        this.ticketPriorityList = ticketPriorityList;
+    }
+
     public List<SourceChannel> getChannelsList() {
         return channelsList;
     }
 
     public void setChannelsList(List<SourceChannel> channelsList) {
         this.channelsList = channelsList;
-    }
-
-    public void setTicketPriorityList(List<TicketPriorityHolder> ticketPriorityList) {
-        this.ticketPriorityList = ticketPriorityList;
     }
 }

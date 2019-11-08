@@ -10,9 +10,10 @@ public class RoleHolder {
     private Roles role;
     private List<Permissions> permissions;
 
-    public RoleHolder(){
+    public RoleHolder() {
 
     }
+
     public Roles getRole() {
         return role;
     }

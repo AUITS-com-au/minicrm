@@ -5,27 +5,20 @@
  */
 package com.sh.crm.jpa.entities;
 
-import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
- *
  * @author achah
  */
 @Entity
 @Table(name = "countrycode")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Countrycode.findAll", query = "SELECT c FROM Countrycode c")})
+        @NamedQuery(name = "Countrycode.findAll", query = "SELECT c FROM Countrycode c")})
 public class Countrycode implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -306,7 +299,7 @@ public class Countrycode implements Serializable {
             return false;
         }
         Countrycode other = (Countrycode) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
@@ -316,5 +309,5 @@ public class Countrycode implements Serializable {
     public String toString() {
         return "com.sh.crm.jpa.entities.Countrycode[ id=" + id + " ]";
     }
-    
+
 }

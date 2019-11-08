@@ -11,10 +11,10 @@ public class QuickPasswordGenerator {
 
     public static void main(String[] args) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        System.out.print("Please enter the password:");
-        Scanner scanner = new Scanner(System.in);
+        System.out.print( "Please enter the password:" );
+        Scanner scanner = new Scanner( System.in );
         while (scanner.hasNextLine()) {
-            System.out.println(String.format("%s", passwordEncoder.encode(scanner.nextLine())));
+            System.out.println( String.format( "%s", passwordEncoder.encode( scanner.nextLine() ) ) );
         }
     }
 

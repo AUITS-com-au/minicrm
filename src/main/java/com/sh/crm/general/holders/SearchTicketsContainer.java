@@ -279,4 +279,39 @@ public class SearchTicketsContainer {
     public void setCustomerContainer(SearchTicketsCustomerContainer customerContainer) {
         this.customerContainer = customerContainer;
     }
+
+    @Override
+    public String toString() {
+        return "SearchTicketsContainer{" +
+                "size=" + size +
+                ", page=" + page +
+                ", searchUser='" + searchUser + '\'' +
+                ", skipValidation=" + skipValidation +
+                ", runningReport=" + runningReport +
+                ", createdBy=" + createdBy +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", topics=" + topics +
+                ", originalTopics=" + originalTopics +
+                ", subCats=" + subCats +
+                ", mainCats=" + mainCats +
+                ", originalSubCats=" + originalSubCats +
+                ", originalMainCats=" + originalMainCats +
+                ", sourceChannels=" + sourceChannels +
+                ", types=" + types +
+                ", status=" + status +
+                ", customerAccounts=" + customerAccounts +
+                ", assignedTo=" + assignedTo +
+                ", language=" + language +
+                ", priority=" + priority +
+                ", deleted=" + deleted +
+                ", solved=" + solved +
+                ", closed=" + closed +
+                ", numberOfCrossedSLA=" + numberOfCrossedSLA +
+                ", crossedAllSLA=" + crossedAllSLA +
+                ", totalCrossedTime=" + totalCrossedTime +
+                ", sorting=" + sorting +
+                ", customerContainer=" + customerContainer +
+                '}';
+    }
 }

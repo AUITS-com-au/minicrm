@@ -1,19 +1,8 @@
-
 package com.sh.crm.jpa.entities;
 
-import java.io.Serializable;
-
-import java.util.Date;
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -137,7 +126,7 @@ public class Subscriptions extends BasicModelWithID {
             return false;
         }
         Subscriptions other = (Subscriptions) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals( other.id ))) {
             return false;
         }
         return true;
@@ -147,5 +136,5 @@ public class Subscriptions extends BasicModelWithID {
     public String toString() {
         return "com.sh.crm.jpa.entities.Subscriptions[ id=" + id + " ]";
     }
-    
+
 }

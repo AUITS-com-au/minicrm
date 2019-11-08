@@ -450,8 +450,6 @@ public class TicketRestController extends BasicController<TicketHolder> {
         }
         ticketsRepo.save( ticket );
     }
-
-
     @PostMapping("list")
     SearchTicketsResult getTickets(@RequestBody SearchTicketsContainer searchTicketsContainer, Principal principal) {
         if (log.isDebugEnabled())

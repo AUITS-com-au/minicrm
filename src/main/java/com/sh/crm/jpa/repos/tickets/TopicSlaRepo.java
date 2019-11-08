@@ -1,6 +1,5 @@
 package com.sh.crm.jpa.repos.tickets;
 
-import com.sh.crm.jpa.entities.Subcategory;
 import com.sh.crm.jpa.entities.Topic;
 import com.sh.crm.jpa.entities.Topicsla;
 import org.springframework.data.jpa.repository.JpaRepository;

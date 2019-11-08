@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
-    private final static Logger log = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
+    private final static Logger log = LoggerFactory.getLogger( CustomAuthenticationProvider.class );
     @Autowired
     private UserServices userServices;
     @Autowired
@@ -23,18 +23,18 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication auth)
             throws AuthenticationException {
-        log.info("Authenticating user:" + auth.getName(), " check Database first");
+        log.info( "Authenticating user:" + auth.getName(), " check Database first" );
 
         String username = auth.getName();
         String password = auth.getCredentials().toString();
 
-        userServices.validateCredentials(username, password);
+        userServices.validateCredentials( username, password );
 
-        return new UsernamePasswordAuthenticationToken(username, password, userDetailsService.getUserGrantedAuth(username));
+        return new UsernamePasswordAuthenticationToken( username, password, userDetailsService.getUserGrantedAuth( username ) );
     }
 
     @Override
     public boolean supports(Class<?> auth) {
-        return auth.equals(UsernamePasswordAuthenticationToken.class);
+        return auth.equals( UsernamePasswordAuthenticationToken.class );
     }
 }

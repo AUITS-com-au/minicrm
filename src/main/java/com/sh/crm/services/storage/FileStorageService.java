@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-@Service
+//@Service
 public class FileStorageService {
     private static final Logger log = LoggerFactory.getLogger( FileStorageService.class );
     private Path fileStorageLocation;

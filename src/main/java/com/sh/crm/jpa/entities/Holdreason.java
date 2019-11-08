@@ -74,7 +74,7 @@ public class Holdreason extends BasicModel {
         this.englishLabel = englishLabel;
     }
 
-    
+
     public Integer getHoldTime() {
         return holdTime;
     }
@@ -105,7 +105,7 @@ public class Holdreason extends BasicModel {
             return false;
         }
         Holdreason other = (Holdreason) object;
-        if ((this.reasonID == null && other.reasonID != null) || (this.reasonID != null && !this.reasonID.equals(other.reasonID))) {
+        if ((this.reasonID == null && other.reasonID != null) || (this.reasonID != null && !this.reasonID.equals( other.reasonID ))) {
             return false;
         }
         return true;

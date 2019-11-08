@@ -5,6 +5,7 @@ import com.sh.crm.jpa.entities.Usergroups;
 import com.sh.crm.jpa.entities.Users;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+
 import java.util.List;
 
 public interface UserGroupsRepo extends CrudRepository<Usergroups, Long> {
@@ -12,8 +13,11 @@ public interface UserGroupsRepo extends CrudRepository<Usergroups, Long> {
 
     @Query(value = "select ug.groupID from Usergroups ug where ug.userID.id=?1")
     List<Groups> findGroupsOfUser(int userID);
+
     @Query("select g.userID from Usergroups g where g.groupID.id=?1")
     List<Users> getGroupUsers(Integer groups);
+
     void deleteByUserID(Users userID);
+
     void deleteByGroupID(Groups groups);
 }

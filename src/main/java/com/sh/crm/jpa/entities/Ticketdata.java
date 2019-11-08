@@ -1,4 +1,3 @@
-
 package com.sh.crm.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
